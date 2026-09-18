@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { OurRatesClient } from '@/components/rates/OurRatesClient';
 import { Sparkles } from 'lucide-react';
+import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
 export const revalidate = 60;
 
@@ -11,6 +12,8 @@ export const metadata = {
 };
 
 export default async function OurRatesPage() {
+  await ensureLocationsSeeded();
+
   const locations = await db.location.findMany({
     orderBy: { name: 'asc' },
   });

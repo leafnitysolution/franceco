@@ -1,9 +1,12 @@
 import { db } from '@/lib/db';
 import { HomePageClient } from '@/components/home/HomePageClient';
+import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
+  await ensureLocationsSeeded();
+
   const locations = await db.location.findMany({
     orderBy: { name: 'asc' },
   });

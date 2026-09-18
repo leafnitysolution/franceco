@@ -7,6 +7,7 @@ import { CustomerReviews } from '@/components/UI/CustomerReviews';
 import { FaqAccordion } from '@/components/UI/FaqAccordion';
 import { ShieldCheck, Clock, MapPin, CheckCircle2, Sparkles, HelpCircle, AlertCircle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
 export const revalidate = 60;
 
@@ -32,21 +33,19 @@ export async function generateMetadata({ params }: RoutePageProps): Promise<Meta
   const title = route?.metaTitle || `${formatSlugToTitle(slug)} | FastForward Shuttle`;
   const description =
     route?.metaDescription ||
-    `Book direct private transfers for ${formatSlugToTitle(
+    `Book door-to-door private transfers for ${formatSlugToTitle(
       slug
-    )}. Fixed prices, free child seats, and pay-on-arrival driver.`;
+    )}. Fixed pricing, free child seats, flight tracking, and pay on arrival.`;
 
   return {
     title,
     description,
-    alternates: {
-      canonical: `https://fastforwardshuttle.com/transfers/${slug}`,
-    },
   };
 }
 
-export default async function DynamicRoutePage({ params }: RoutePageProps) {
+export default async function RoutePage({ params }: RoutePageProps) {
   const { slug } = await params;
+  await ensureLocationsSeeded();
 
   let route = await db.route.findUnique({
     where: { slug },
