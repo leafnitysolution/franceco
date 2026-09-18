@@ -3,73 +3,82 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding database for FastForward Shuttle...');
+  console.log('Seeding database for FastForward Shuttle (safe upsert mode — bookings preserved)...');
 
-  await prisma.review.deleteMany();
-  await prisma.booking.deleteMany();
-  await prisma.route.deleteMany();
-  await prisma.location.deleteMany();
-
-  // 1. Create Hub Locations
-  const cdg = await prisma.location.create({
-    data: {
+  // 1. Upsert Hub Locations (preserves existing locations and custom attributes)
+  const cdg = await prisma.location.upsert({
+    where: { shortCode: 'CDG' },
+    update: {},
+    create: {
       name: 'Paris Charles de Gaulle Airport (CDG)',
       shortCode: 'CDG',
       category: 'AIRPORT',
     },
   });
 
-  const ory = await prisma.location.create({
-    data: {
+  const ory = await prisma.location.upsert({
+    where: { shortCode: 'ORY' },
+    update: {},
+    create: {
       name: 'Paris Orly Airport (ORY)',
       shortCode: 'ORY',
       category: 'AIRPORT',
     },
   });
 
-  const bva = await prisma.location.create({
-    data: {
+  const bva = await prisma.location.upsert({
+    where: { shortCode: 'BVA' },
+    update: {},
+    create: {
       name: 'Paris Beauvais Tillé Airport (BVA)',
       shortCode: 'BVA',
       category: 'AIRPORT',
     },
   });
 
-  const dlp = await prisma.location.create({
-    data: {
+  const dlp = await prisma.location.upsert({
+    where: { shortCode: 'DLP' },
+    update: {},
+    create: {
       name: 'Disneyland Paris Hotels & Parks',
       shortCode: 'DLP',
       category: 'AMUSEMENT_PARK',
     },
   });
 
-  const par = await prisma.location.create({
-    data: {
+  const par = await prisma.location.upsert({
+    where: { shortCode: 'PAR' },
+    update: {},
+    create: {
       name: 'Paris City Center (All Arrondissements)',
       shortCode: 'PAR',
       category: 'CITY_CENTER',
     },
   });
 
-  const gdn = await prisma.location.create({
-    data: {
+  const gdn = await prisma.location.upsert({
+    where: { shortCode: 'GDN' },
+    update: {},
+    create: {
       name: 'Gare du Nord & Paris Train Stations',
       shortCode: 'GDN',
       category: 'TRAIN_STATION',
     },
   });
 
-  const vers = await prisma.location.create({
-    data: {
+  const vers = await prisma.location.upsert({
+    where: { shortCode: 'VERS' },
+    update: {},
+    create: {
       name: 'Château de Versailles & Hotels',
       shortCode: 'VERS',
       category: 'PALACE',
     },
   });
 
-  console.log('Locations seeded.');
+  console.log('Locations upserted.');
 
-  // 2. Create Core Routes (15 All-inclusive Routes)
+  // 2. Create Core Routes (15 All-inclusive Routes) if they don't exist
   const routesData = [
     // --- AIRPORT TO DISNEYLAND ---
     {
@@ -353,49 +362,54 @@ async function main() {
   ];
 
   for (const r of routesData) {
-    await prisma.route.create({
-      data: r,
+    await prisma.route.upsert({
+      where: { slug: r.slug },
+      update: {}, // Keep existing admin updates intact
+      create: r,
     });
   }
 
-  console.log('15 Core Routes seeded.');
+  console.log('15 Core Routes upserted.');
 
-  // 3. Create Sample Reviews
-  await prisma.review.createMany({
-    data: [
-      {
-        authorName: 'Sarah & Family',
-        location: 'London, UK',
-        routeText: 'CDG Airport → Disneyland Paris',
-        rating: 5,
-        comment: 'Outstanding service! Our chauffeur met us directly inside CDG Terminal 2F holding a sign with my name. He helped with all 4 of our heavy suitcases and had baby & booster seats already installed in the clean Mercedes van. Fantastic start to our Disney holiday!',
-      },
-      {
-        authorName: 'Michael R.',
-        location: 'New York, USA',
-        routeText: 'Orly Airport → Paris City Center',
-        rating: 5,
-        comment: 'Punctual, luxurious vehicle, and polite English-speaking driver. The fare was 100% fixed at 60€ with no meters or hidden fees. Paid the driver upon arrival at our hotel. Highly recommended!',
-      },
-      {
-        authorName: 'Elena & David',
-        location: 'Madrid, Spain',
-        routeText: 'Beauvais Airport → Disneyland Paris',
-        rating: 5,
-        comment: 'Beauvais Airport is quite far from Disney, but our driver made the trip smooth and comfortable. Free booster seats for our kids, smooth driving, and great recommendations for Paris sightseeing.',
-      },
-      {
-        authorName: 'Jean-Pierre M.',
-        location: 'Montreal, Canada',
-        routeText: 'Paris City → Château de Versailles',
-        rating: 5,
-        comment: 'Booked a private chauffeur for our family trip to Versailles Palace. The driver arrived 10 minutes early at our Paris hotel lobby and was waiting right on time for our return pickup. 10/10 service!',
-      },
-    ],
-  });
+  // 3. Create Sample Reviews only if review table is empty
+  const reviewCount = await prisma.review.count();
+  if (reviewCount === 0) {
+    await prisma.review.createMany({
+      data: [
+        {
+          authorName: 'Sarah & Family',
+          location: 'London, UK',
+          routeText: 'CDG Airport → Disneyland Paris',
+          rating: 5,
+          comment: 'Outstanding service! Our chauffeur met us directly inside CDG Terminal 2F holding a sign with my name. He helped with all 4 of our heavy suitcases and had baby & booster seats already installed in the clean Mercedes van. Fantastic start to our Disney holiday!',
+        },
+        {
+          authorName: 'Michael R.',
+          location: 'New York, USA',
+          routeText: 'Orly Airport → Paris City Center',
+          rating: 5,
+          comment: 'Punctual, luxurious vehicle, and polite English-speaking driver. The fare was 100% fixed at 60€ with no meters or hidden fees. Paid the driver upon arrival at our hotel. Highly recommended!',
+        },
+        {
+          authorName: 'Elena & David',
+          location: 'Madrid, Spain',
+          routeText: 'Beauvais Airport → Disneyland Paris',
+          rating: 5,
+          comment: 'Beauvais Airport is quite far from Disney, but our driver made the trip smooth and comfortable. Free booster seats for our kids, smooth driving, and great recommendations for Paris sightseeing.',
+        },
+        {
+          authorName: 'Jean-Pierre M.',
+          location: 'Montreal, Canada',
+          routeText: 'Paris City → Château de Versailles',
+          rating: 5,
+          comment: 'Booked a private chauffeur for our family trip to Versailles Palace. The driver arrived 10 minutes early at our Paris hotel lobby and was waiting right on time for our return pickup. 10/10 service!',
+        },
+      ],
+    });
+    console.log('Sample reviews seeded.');
+  }
 
-  console.log('Reviews seeded.');
-  console.log('Seeding completed successfully!');
+  console.log('Seeding completed successfully! Bookings are preserved.');
 }
 
 main()
