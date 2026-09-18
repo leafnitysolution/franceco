@@ -1,0 +1,98 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  name      String
+  shortCode String   @unique
+  category  String   // AIRPORT, AMUSEMENT_PARK, CITY_CENTER, TRAIN_STATION, PALACE
+
+  originRoutes      Route[]   @relation("OriginLocation")
+  destinationRoutes Route[]   @relation("DestinationLocation")
+  originBookings    Booking[] @relation("BookingOrigin")
+  destinationBookings Booking[] @relation("BookingDestination")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Route {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  isActive            Boolean  @default(true)
+  isFeatured          Boolean  @default(false)
+  
+  originId            String
+  origin              Location @relation("OriginLocation", fields: [originId], references: [id])
+  
+  destinationId       String
+  destination         Location @relation("DestinationLocation", fields: [destinationId], references: [id])
+  
+  distanceKm          Float
+  estDurationMinutes  Int
+  sedanPriceEur       Float
+  economyVanPriceEur  Float
+  businessVanPriceEur Float
+  minibusPriceEur     Float    @default(180)
+  
+  h1Heading           String
+  metaTitle           String
+  metaDescription     String
+  overviewText        String
+  faqs                String   @default("[]")
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Booking {
+  id                  String   @id @default(cuid())
+  bookingRef          String   @unique
+  status              String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+
+  originId            String?
+  origin              Location? @relation("BookingOrigin", fields: [originId], references: [id])
+  
+  destinationId       String?
+  destination         Location? @relation("BookingDestination", fields: [destinationId], references: [id])
+
+  pickupAddress       String
+  dropoffAddress      String
+  pickupDateTime      DateTime
+  flightOrTrainNumber String?
+  returnDateTime      DateTime?
+  returnFlightNumber  String?
+
+  vehicleTier         String   // SEDAN, ECONOMY_VAN, BUSINESS_VAN, MINIBUS
+  passengers          Int      @default(1)
+  luggageCount        Int      @default(1)
+  babySeats           Int      @default(0)
+  boosterSeats        Int      @default(0)
+
+  totalFareEur        Float
+  customerName        String
+  customerEmail       String
+  customerPhone       String
+  notes               String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  authorName   String
+  location     String   @default("Paris, France")
+  routeText    String   @default("Paris Airport Transfer")
+  rating       Int      @default(5)
+  comment      String
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
