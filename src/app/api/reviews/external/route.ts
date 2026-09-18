@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
 export async function GET() {
   const tripAdvisorApiKey = process.env.TRIPADVISOR_API_KEY;
@@ -27,6 +28,8 @@ export async function GET() {
       console.warn('TripAdvisor API fetch error, falling back to local DB:', error);
     }
   }
+
+  await ensureLocationsSeeded();
 
   // 2. Fallback to database reviews
   const dbReviews = await db.review.findMany({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { sendBookingConfirmationEmails } from '@/lib/email';
+import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
 export async function POST(req: NextRequest) {
   // 1. Authenticate Partner API Key
@@ -50,6 +51,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Auto-seed if database has 0 locations
+    await ensureLocationsSeeded();
 
     // 3. Resolve Origin & Destination Locations
     const originLoc = await db.location.findFirst({
