@@ -55,24 +55,53 @@ export async function POST(req: NextRequest) {
     // Auto-seed if database has 0 locations
     await ensureLocationsSeeded();
 
+    const cleanOriginCode = originCode.trim().toUpperCase();
+    const cleanDestCode = destinationCode.trim().toUpperCase();
+
     // 3. Resolve Origin & Destination Locations
-    const originLoc = await db.location.findFirst({
+    let originLoc = await db.location.findFirst({
       where: {
-        OR: [{ shortCode: originCode.toUpperCase() }, { id: originCode }, { name: { contains: originCode } }],
+        OR: [
+          { shortCode: cleanOriginCode },
+          { id: originCode },
+        ],
       },
     });
 
-    const destLoc = await db.location.findFirst({
+    if (!originLoc) {
+      const allLocs = await db.location.findMany();
+      originLoc = allLocs.find(
+        (l) =>
+          l.shortCode.toUpperCase() === cleanOriginCode ||
+          l.id === originCode ||
+          l.name.toLowerCase().includes(originCode.toLowerCase())
+      ) || null;
+    }
+
+    let destLoc = await db.location.findFirst({
       where: {
-        OR: [{ shortCode: destinationCode.toUpperCase() }, { id: destinationCode }, { name: { contains: destinationCode } }],
+        OR: [
+          { shortCode: cleanDestCode },
+          { id: destinationCode },
+        ],
       },
     });
+
+    if (!destLoc) {
+      const allLocs = await db.location.findMany();
+      destLoc = allLocs.find(
+        (l) =>
+          l.shortCode.toUpperCase() === cleanDestCode ||
+          l.id === destinationCode ||
+          l.name.toLowerCase().includes(destinationCode.toLowerCase())
+      ) || null;
+    }
 
     if (!originLoc || !destLoc) {
       return NextResponse.json(
         {
           success: false,
-          error: `Invalid route location codes. Origin '${originCode}' or Destination '${destinationCode}' not found.`,
+          error: `Invalid route location codes. Origin '${originCode}' or Destination '${destinationCode}' not found. Available codes: CDG, ORY, BVA, DLP, PAR, GDN, VERS.`,
         },
         { status: 400 }
       );
