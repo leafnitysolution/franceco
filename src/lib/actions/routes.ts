@@ -170,16 +170,98 @@ export async function createLocationAction(name: string, shortCode: string, type
 
     const location = await db.location.create({
       data: {
-        name,
+        name: name.trim(),
         shortCode: shortCode.toUpperCase().trim(),
         category: type || 'CUSTOM',
       },
     });
 
+    revalidatePath('/');
     revalidatePath('/ffs-portal-sec-99x/routes');
+    revalidatePath('/ffs-portal-sec-99x/locations');
     return { success: true, location };
   } catch (error: any) {
     console.error('Error creating location:', error);
     return { success: false, error: 'Failed to create new location.' };
   }
 }
+
+export async function updateLocationAction(id: string, name: string, shortCode: string, category?: string) {
+  try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return { success: false, error: 'Unauthorized: Admin authentication required.' };
+    }
+
+    if (!id || !name || !shortCode) {
+      return { success: false, error: 'Location ID, name, and short code are required.' };
+    }
+
+    const updated = await db.location.update({
+      where: { id },
+      data: {
+        name: name.trim(),
+        shortCode: shortCode.toUpperCase().trim(),
+        category: category || 'CUSTOM',
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/ffs-portal-sec-99x/routes');
+    revalidatePath('/ffs-portal-sec-99x/locations');
+    return { success: true, location: updated };
+  } catch (error: any) {
+    console.error('Error updating location:', error);
+    return { success: false, error: 'Failed to update location hub.' };
+  }
+}
+
+export async function deleteLocationAction(id: string) {
+  try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return { success: false, error: 'Unauthorized: Admin authentication required.' };
+    }
+
+    const location = await db.location.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            originRoutes: true,
+            destinationRoutes: true,
+            originBookings: true,
+            destinationBookings: true,
+          },
+        },
+      },
+    });
+
+    if (!location) {
+      return { success: false, error: 'Location not found.' };
+    }
+
+    const routeCount = (location._count.originRoutes || 0) + (location._count.destinationRoutes || 0);
+    const bookingCount = (location._count.originBookings || 0) + (location._count.destinationBookings || 0);
+
+    if (routeCount > 0 || bookingCount > 0) {
+      return {
+        success: false,
+        error: `Cannot delete '${location.name}' because it is currently linked to ${routeCount} route(s) and ${bookingCount} booking(s). Please remove or reassign those first.`,
+      };
+    }
+
+    await db.location.delete({
+      where: { id },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/ffs-portal-sec-99x/routes');
+    revalidatePath('/ffs-portal-sec-99x/locations');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error deleting location:', error);
+    return { success: false, error: 'Failed to delete location hub.' };
+  }
+}
+
