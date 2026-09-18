@@ -230,8 +230,8 @@ export function LocationManager({ locations }: LocationManagerProps) {
                 required
                 placeholder="e.g. AST"
                 value={shortCode}
-                onChange={(e) => setShortCode(e.target.value.toUpperCase())}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500 uppercase"
+                onChange={(e) => setShortCode(e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500"
               />
             </div>
           </div>
@@ -302,8 +302,8 @@ export function LocationManager({ locations }: LocationManagerProps) {
                     <input
                       type="text"
                       value={editShortCode}
-                      onChange={(e) => setEditShortCode(e.target.value.toUpperCase())}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500 uppercase"
+                      onChange={(e) => setEditShortCode(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500"
                     />
                   </div>
                 </div>
@@ -334,7 +334,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
             <div key={loc.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-gold-400 transition-all space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                  <span className="text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
                     {loc.shortCode}
                   </span>
                   <h4 className="text-sm font-extrabold text-slate-900 mt-2">{loc.name}</h4>

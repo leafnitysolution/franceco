@@ -171,7 +171,7 @@ export async function createLocationAction(name: string, shortCode: string, type
     const location = await db.location.create({
       data: {
         name: name.trim(),
-        shortCode: shortCode.toUpperCase().trim(),
+        shortCode: shortCode.trim(),
         category: type || 'CUSTOM',
       },
     });
@@ -201,7 +201,7 @@ export async function updateLocationAction(id: string, name: string, shortCode: 
       where: { id },
       data: {
         name: name.trim(),
-        shortCode: shortCode.toUpperCase().trim(),
+        shortCode: shortCode.trim(),
         category: category || 'CUSTOM',
       },
     });

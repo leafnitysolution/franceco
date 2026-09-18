@@ -272,8 +272,8 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
                       type="text"
                       placeholder="e.g. AST"
                       value={newHubCode}
-                      onChange={(e) => setNewHubCode(e.target.value.toUpperCase())}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500 uppercase"
+                      onChange={(e) => setNewHubCode(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500"
                     />
                   </div>
                 </div>
