@@ -5,6 +5,7 @@ import { createBookingAction } from '@/lib/actions/bookings';
 import { useBookingStore, ServiceMode } from '@/lib/store';
 import { LocationItem } from '@/types';
 import { VehicleCard } from './VehicleCard';
+import { LocationPickerModal } from './LocationPickerModal';
 import { useLanguage } from '@/lib/LanguageContext';
 import { CountryCodePhoneInput } from '@/components/UI/CountryCodePhoneInput';
 import {
@@ -30,6 +31,7 @@ import {
   Plus,
   Minus,
   Search,
+  ChevronDown,
 } from 'lucide-react';
 
 interface BookingWidgetProps {
@@ -59,6 +61,7 @@ export function BookingWidget({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [activePickerModal, setActivePickerModal] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
 
   useEffect(() => {
     if (locations && locations.length > 0) {
@@ -283,26 +286,27 @@ export function BookingWidget({
               {store.serviceMode === 'TRANSFER' && (
                 <>
                   {/* FROM FIELD */}
-                  <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5 transition-all focus-within:ring-2 focus-within:ring-slate-400">
-                    <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider">
+                  <div
+                    onClick={() => setActivePickerModal('ORIGIN')}
+                    className="bg-slate-100/90 hover:bg-slate-200/60 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5 transition-all cursor-pointer group"
+                  >
+                    <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
                       From
                     </label>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      <select
-                        value={store.origin?.id || ''}
-                        onChange={(e) => {
-                          const loc = locations.find((l) => l.id === e.target.value);
-                          store.setOrigin(loc || null);
-                        }}
-                        className="w-full bg-transparent text-xs sm:text-sm font-black text-slate-900 focus:outline-none cursor-pointer"
-                      >
-                        {locations.map((loc) => (
-                          <option key={loc.id} value={loc.id}>
-                            {loc.name} ({loc.shortCode})
-                          </option>
-                        ))}
-                      </select>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {store.origin?.category === 'AIRPORT' ? (
+                          <Plane className="w-4 h-4 text-slate-700 shrink-0" />
+                        ) : store.origin?.category === 'AMUSEMENT_PARK' ? (
+                          <Sparkles className="w-4 h-4 text-gold-600 shrink-0" />
+                        ) : (
+                          <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
+                        )}
+                        <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
+                          {store.origin ? store.origin.name : 'Select Pickup Location...'}
+                        </span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
                     </div>
                   </div>
 
@@ -319,28 +323,49 @@ export function BookingWidget({
                   </div>
 
                   {/* TO FIELD */}
-                  <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5 transition-all focus-within:ring-2 focus-within:ring-slate-400">
-                    <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider">
+                  <div
+                    onClick={() => setActivePickerModal('DESTINATION')}
+                    className="bg-slate-100/90 hover:bg-slate-200/60 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5 transition-all cursor-pointer group"
+                  >
+                    <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
                       To
                     </label>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      <select
-                        value={store.destination?.id || ''}
-                        onChange={(e) => {
-                          const loc = locations.find((l) => l.id === e.target.value);
-                          store.setDestination(loc || null);
-                        }}
-                        className="w-full bg-transparent text-xs sm:text-sm font-black text-slate-900 focus:outline-none cursor-pointer"
-                      >
-                        {locations.map((loc) => (
-                          <option key={loc.id} value={loc.id}>
-                            {loc.name} ({loc.shortCode})
-                          </option>
-                        ))}
-                      </select>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {store.destination?.category === 'AIRPORT' ? (
+                          <Plane className="w-4 h-4 text-slate-700 shrink-0" />
+                        ) : store.destination?.category === 'AMUSEMENT_PARK' ? (
+                          <Sparkles className="w-4 h-4 text-gold-600 shrink-0" />
+                        ) : (
+                          <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
+                        )}
+                        <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
+                          {store.destination ? store.destination.name : 'Select Drop-off Location...'}
+                        </span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
                     </div>
                   </div>
+
+                  {/* LOCATION PICKER MODAL (ORIGIN) */}
+                  <LocationPickerModal
+                    isOpen={activePickerModal === 'ORIGIN'}
+                    onClose={() => setActivePickerModal(null)}
+                    title="Select Pickup Location..."
+                    locations={locations}
+                    selectedLocationId={store.origin?.id}
+                    onSelectLocation={(loc) => store.setOrigin(loc)}
+                  />
+
+                  {/* LOCATION PICKER MODAL (DESTINATION) */}
+                  <LocationPickerModal
+                    isOpen={activePickerModal === 'DESTINATION'}
+                    onClose={() => setActivePickerModal(null)}
+                    title="Select Drop-off Location..."
+                    locations={locations}
+                    selectedLocationId={store.destination?.id}
+                    onSelectLocation={(loc) => store.setDestination(loc)}
+                  />
                 </>
               )}
 
