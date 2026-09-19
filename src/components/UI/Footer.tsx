@@ -19,23 +19,24 @@ export function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12 border-b border-[#1E2D42] items-start">
           {/* Brand Info & Contact Quick Actions (Col 8) */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <Link
                 href="/"
-                className="inline-block bg-white rounded-2xl px-4 py-2.5 shadow-md border border-white/20 hover:scale-[1.02] transition-transform self-start"
+                className="inline-block bg-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-white/40 hover:scale-[1.02] transition-all self-start"
               >
-                <div className="relative h-14 w-52 sm:w-60">
+                <div className="relative h-20 sm:h-24 w-72 sm:w-[380px]">
                   <Image
                     src="/images/logo.png"
                     alt="FranceGo - VIP Transfers & Tours"
                     fill
-                    className="object-contain object-center scale-105"
+                    priority
+                    className="object-contain object-left scale-110"
                   />
                 </div>
               </Link>
 
               {/* Quick Badge */}
-              <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/30 px-3.5 py-1.5 rounded-full text-gold-400 text-xs font-bold self-start">
+              <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/40 px-4 py-2 rounded-full text-gold-400 text-xs font-black tracking-wider self-start sm:self-center shadow-md">
                 <ShieldCheck className="w-4 h-4 text-gold-400" />
                 <span>OFFICIAL PARIS CHAUFFEUR SERVICE</span>
               </div>
