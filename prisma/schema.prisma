@@ -106,3 +106,16 @@ model LocationCategory {
   updatedAt DateTime @updatedAt
 }
 
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String   @default("General Transfer Inquiry")
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+

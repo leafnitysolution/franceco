@@ -18,6 +18,7 @@ export default async function AdminDashboardPage() {
   const totalBookingsCount = await db.booking.count();
   const pendingBookingsCount = await db.booking.count({ where: { status: 'PENDING' } });
   const totalRoutesCount = await db.route.count();
+  const unreadMessagesCount = await db.contactSubmission.count({ where: { isRead: false } });
 
   const recentBookings = await db.booking.findMany({
     take: 5,
@@ -46,7 +47,7 @@ export default async function AdminDashboardPage() {
             Admin Overview & Analytics
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Real-time reservation metrics, chauffeur dispatching, and route pricing control.
+            Real-time reservation metrics, customer messages, chauffeur dispatching, and route pricing control.
           </p>
         </div>
 
@@ -62,7 +63,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Analytics KPI Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
           <div className="flex justify-between items-center text-slate-500 text-xs font-bold">
             <span>Total Reservations</span>
@@ -87,6 +88,23 @@ export default async function AdminDashboardPage() {
           <div className="text-3xl font-black text-amber-600">{pendingBookingsCount}</div>
           <div className="text-[11px] text-amber-700 font-bold">Awaiting chauffeur assignment</div>
         </div>
+
+        <Link
+          href="/ffs-portal-sec-99x/messages"
+          className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2 hover:border-gold-500 transition-colors block group"
+        >
+          <div className="flex justify-between items-center text-slate-500 text-xs font-bold">
+            <span>Contact Inquiries</span>
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 group-hover:scale-105 transition-transform">
+              <Clock className="w-4 h-4 text-gold-600" />
+            </div>
+          </div>
+          <div className="text-3xl font-black text-navy-900">{unreadMessagesCount} <span className="text-xs font-bold text-amber-600">Unread</span></div>
+          <div className="text-[11px] text-gold-700 font-bold flex items-center gap-1">
+            <span>View contact messages</span>
+            <ArrowRight className="w-3 h-3" />
+          </div>
+        </Link>
 
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-2">
           <div className="flex justify-between items-center text-slate-500 text-xs font-bold">

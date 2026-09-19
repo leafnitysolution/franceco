@@ -15,15 +15,31 @@ export default function ContactUsPage() {
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage('');
 
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubmitted(true);
+      } else {
+        setErrorMessage(data.error || 'Failed to submit inquiry. Please try again.');
+      }
+    } catch (err: any) {
+      setErrorMessage('Network error while sending message. Please try again.');
+    } finally {
       setLoading(false);
-      setSubmitted(true);
-    }, 600);
+    }
   };
 
   return (
@@ -148,6 +164,11 @@ export default function ContactUsPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {errorMessage && (
+                  <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold animate-in fade-in">
+                    {errorMessage}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-slate-700">Full Name *</label>
