@@ -28,16 +28,16 @@ export default function AdminLoginPage() {
 
         {/* Lock Icon Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center mx-auto text-brand-600 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-[#0B192C] border border-[#1E2D42] flex items-center justify-center mx-auto text-gold-400 shadow-sm">
             <Lock className="w-7 h-7" />
           </div>
 
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-            Admin Management Login
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight font-serif">
+            Back-Office Portal Login
           </h1>
 
           <p className="text-xs text-slate-500 font-medium">
-            Secure Chauffeur Dispatch & Route Back-Office
+            Authorized Personnel Only
           </p>
         </div>
 
@@ -53,24 +53,24 @@ export default function AdminLoginPage() {
           {/* Email / Username Field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-brand-500" />
-              <span>Admin Email / ID</span>
+              <Mail className="w-3.5 h-3.5 text-gold-600" />
+              <span>Email / Username</span>
             </label>
             <input
-              type="email"
+              type="text"
               name="email"
               required
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="admin@fastforwardshuttle.com"
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-medium focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 placeholder-slate-400"
+              placeholder="Enter email or admin username"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-medium focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 placeholder-slate-400"
             />
           </div>
 
           {/* Password Field */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Key className="w-3.5 h-3.5 text-brand-500" />
+              <Key className="w-3.5 h-3.5 text-gold-600" />
               <span>Password</span>
             </label>
             <div className="relative">
@@ -80,8 +80,8 @@ export default function AdminLoginPage() {
                 required
                 value={passInput}
                 onChange={(e) => setPassInput(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-medium focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 pr-10 placeholder-slate-400"
+                placeholder="Enter password"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 font-medium focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 pr-10 placeholder-slate-400"
               />
               <button
                 type="button"
@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white font-black text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-500 via-gold-600 to-amber-600 hover:brightness-105 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
           >
             {isPending ? (
               <>
