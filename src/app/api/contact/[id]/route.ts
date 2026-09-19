@@ -3,10 +3,10 @@ import { db } from '@/lib/db';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     if (!id) {
       return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
     }
@@ -30,10 +30,10 @@ export async function DELETE(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { isRead } = body;
 
