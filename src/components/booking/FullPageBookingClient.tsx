@@ -509,6 +509,18 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                       Book today, lock the price. You can cancel for free up to 24 hours before the transfer time.
                     </p>
                   </div>
+
+                  {/* Inline Continue Button */}
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleNextToStep2}
+                      className="w-full sm:w-auto px-8 py-3.5 bg-black hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                    >
+                      <span>Continue</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -617,6 +629,26 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                       className="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:outline-none focus:border-slate-900"
                     />
                   </div>
+
+                  {/* Inline Action Buttons for Step 2 */}
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextToStep3}
+                      className="px-8 py-3.5 bg-black hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+                    >
+                      <span>Continue to Passenger Details</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -718,6 +750,35 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                         By confirming this booking you agree to our <strong className="text-slate-900">Terms and Conditions</strong>, <strong className="text-slate-900">Privacy Policy</strong>, and <strong className="text-slate-900">Cancellation Policy</strong>. Pay driver on arrival.
                       </span>
                     </label>
+                  </div>
+
+                  {/* Inline Action Buttons for Step 3 */}
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(2)}
+                      className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-8 py-3.5 bg-black hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Confirm and Book</span>
+                          <Check className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </form>
@@ -954,7 +1015,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
               <span>{errorMsg}</span>
             </div>
           )}
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 py-3.5 px-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 py-3.5 px-4 pr-20 md:pr-24">
             <div className="flex items-center gap-3">
               {step > 1 && (
                 <button
