@@ -2,64 +2,82 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, Mail, MapPin, ShieldCheck, Clock, Award, Star, ExternalLink, ArrowRight, MessageSquare } from 'lucide-react';
+import { Phone, Mail, MapPin, ShieldCheck, Clock, Award, Star, ExternalLink, ArrowRight, MessageSquare, Send } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
 export function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-[#0B192C] text-slate-300 pt-16 pb-8 border-t border-[#1E2D42]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <footer className="bg-[#0B192C] text-slate-300 pt-16 pb-8 border-t border-[#1E2D42] relative overflow-hidden">
+      {/* Ambient background glow accents */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-gold-600/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/2 -right-40 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
         {/* TOP BRAND & TRUST SECTION */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12 border-b border-[#1E2D42] items-start">
           {/* Brand Info & Contact Quick Actions (Col 8) */}
           <div className="lg:col-span-8 space-y-6">
-            <Link
-              href="/"
-              className="inline-block bg-white rounded-2xl px-4 py-2.5 shadow-md border border-white/20 hover:scale-[1.02] transition-transform"
-            >
-              <div className="relative h-14 w-52 sm:w-60">
-                <Image
-                  src="/images/logo.png"
-                  alt="FranceGo - VIP Transfers & Tours"
-                  fill
-                  className="object-contain object-center scale-105"
-                />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <Link
+                href="/"
+                className="inline-block bg-white rounded-2xl px-4 py-2.5 shadow-md border border-white/20 hover:scale-[1.02] transition-transform self-start"
+              >
+                <div className="relative h-14 w-52 sm:w-60">
+                  <Image
+                    src="/images/logo.png"
+                    alt="FranceGo - VIP Transfers & Tours"
+                    fill
+                    className="object-contain object-center scale-105"
+                  />
+                </div>
+              </Link>
+
+              {/* Quick Badge */}
+              <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/30 px-3.5 py-1.5 rounded-full text-gold-400 text-xs font-bold self-start">
+                <ShieldCheck className="w-4 h-4 text-gold-400" />
+                <span>OFFICIAL PARIS CHAUFFEUR SERVICE</span>
               </div>
-            </Link>
+            </div>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl font-medium">
               Premium private transfers and curated day trips across Paris, its airports, and the most loved destinations in France. Booked in advance, executed with concierge-level care 24/7.
             </p>
 
-            {/* Quick Contact Details */}
+            {/* Quick Contact Details Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2">
-              <div className="flex items-start gap-2.5">
-                <Phone className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
+                  <Phone className="w-4 h-4 text-gold-400" />
+                </div>
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">24/7 Support</div>
-                  <a href="tel:+33189400000" className="font-bold text-white hover:text-gold-400 transition-colors">
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">24/7 Hotline</div>
+                  <a href="tel:+33189400000" className="font-extrabold text-white hover:text-gold-400 transition-colors">
                     +33 1 89 40 00 00
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5">
-                <Mail className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4 text-gold-400" />
+                </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Email Dispatch</div>
-                  <a href="mailto:contact@francego.com" className="font-bold text-white hover:text-gold-400 transition-colors">
+                  <a href="mailto:contact@francego.com" className="font-extrabold text-white hover:text-gold-400 transition-colors">
                     contact@francego.com
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
+                  <MapPin className="w-4 h-4 text-gold-400" />
+                </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Head Office & Hubs</div>
-                  <span className="font-bold text-slate-200">Paris CDG, Orly & Disneyland Paris</span>
+                  <span className="font-bold text-slate-200">Paris CDG, Orly & DLP</span>
                 </div>
               </div>
             </div>
@@ -68,28 +86,34 @@ export function Footer() {
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 href="/book"
-                className="px-6 py-3 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 via-gold-600 to-amber-600 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-gold-950/40 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
               >
                 <span>Plan a Transfer</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/contact-us"
-                className="px-6 py-3 rounded-xl bg-[#132338] hover:bg-[#1A2E47] border border-[#243752] text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2"
+                className="px-6 py-3.5 rounded-2xl bg-[#132338] hover:bg-gold-600 border border-gold-500/40 text-gold-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md hover:shadow-gold-900/20 transform hover:-translate-y-0.5"
               >
-                <MessageSquare className="w-4 h-4 text-gold-400" />
-                <span>Talk to Operations</span>
+                <MessageSquare className="w-4 h-4 text-gold-400 group-hover:text-white" />
+                <span>Talk to Us</span>
               </Link>
             </div>
           </div>
 
           {/* Awards & Trust Card (Col 4) */}
-          <div className="lg:col-span-4 bg-[#0F1E36] border border-[#1E2D42] rounded-3xl p-6 space-y-4 shadow-xl">
-            <div className="text-[10px] uppercase font-black text-gold-400 tracking-wider">
-              AWARDS & TRUST
+          <div className="lg:col-span-4 bg-[#0F1E36] border border-[#1E2D42] rounded-3xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] uppercase font-black text-gold-400 tracking-wider">
+                AWARDS & TRUST
+              </div>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                VERIFIED
+              </span>
             </div>
+
             <div className="bg-[#0B192C] border border-emerald-500/30 p-4 rounded-2xl flex items-start gap-3">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 shadow-xs">
                 <Award className="w-6 h-6 text-emerald-400" />
               </div>
               <div className="space-y-1">
@@ -99,15 +123,18 @@ export function Footer() {
                 <div className="text-sm font-serif font-black text-white">
                   Travellers&apos; Choice Award
                 </div>
-                <p className="text-[11px] text-slate-400 leading-snug">
+                <p className="text-[11px] text-slate-400 leading-snug font-medium">
                   Awarded for consistent 5-star private chauffeur reviews in Paris.
                 </p>
               </div>
             </div>
 
-            <div className="pt-1 flex items-center gap-2 text-xs font-bold text-slate-300">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span>4.9 / 5.0 Rating based on 1,400+ Passenger Reviews</span>
+            <div className="pt-2 border-t border-[#1E2D42] flex items-center justify-between text-xs font-bold text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <span>4.9 / 5.0 Rating</span>
+              </div>
+              <span className="text-[11px] text-slate-400 font-medium">1,400+ Reviews</span>
             </div>
           </div>
         </div>
@@ -116,7 +143,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Column 1: Transfers */}
           <div className="space-y-3">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2">
+            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               TRANSFERS
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
@@ -160,7 +187,7 @@ export function Footer() {
 
           {/* Column 2: Tours & Day Trips */}
           <div className="space-y-3">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2">
+            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               TOURS & DAY TRIPS
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
@@ -199,7 +226,7 @@ export function Footer() {
 
           {/* Column 3: Company */}
           <div className="space-y-3">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2">
+            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               COMPANY
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
@@ -220,7 +247,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/contact-us" className="hover:text-gold-400 transition-colors">
-                  Contact Operations
+                  Contact Us
                 </Link>
               </li>
             </ul>
@@ -228,7 +255,7 @@ export function Footer() {
 
           {/* Column 4: Help & Policies */}
           <div className="space-y-3">
-            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2">
+            <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               HELP & POLICIES
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
