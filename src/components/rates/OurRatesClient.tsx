@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
-import { ArrowRight, ArrowRightLeft, Car, Users, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowRightLeft, Car, Users, Sparkles, CheckCircle2, ShieldCheck, Clock, Award } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -12,9 +13,10 @@ interface OurRatesClientProps {
 }
 
 export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps) {
+  const router = useRouter();
   const [selectedFromId, setSelectedFromId] = useState<string>('');
   const [selectedToId, setSelectedToId] = useState<string>('');
-  const { openModal, setOrigin, setDestination } = useBookingStore();
+  const { setOrigin, setDestination } = useBookingStore();
   const { t } = useLanguage();
 
   // Smart Filter: exact match first, or partial match if no exact match
@@ -184,50 +186,78 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
 
               {/* Action Button */}
               <button
+                type="button"
                 onClick={() => {
-                  setOrigin(route.originId);
-                  setDestination(route.destinationId);
-                  openModal();
+                  if (route.origin) setOrigin(route.origin);
+                  if (route.destination) setDestination(route.destination);
+                  router.push('/book');
                 }}
-                className="w-full py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <span>Reserve Transfer Now</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-gold-400" />
               </button>
             </div>
           );
         })}
       </div>
 
-      {/* No Exact Route Notice shifted BELOW the cards grid */}
-      {isFiltered && exactRoutes.length === 0 && (
-        <div className="bg-[#F7F2E7] border border-[#E5D7BC] rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto text-center space-y-4 shadow-sm mt-8">
-          <div className="w-12 h-12 bg-white rounded-full border border-[#E5D7BC] flex items-center justify-center mx-auto text-gold-600">
-            <Car className="w-6 h-6" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="font-serif text-lg font-bold text-navy-900">
-              No Pre-Set Fixed Route for this exact pair
-            </h3>
-            <p className="text-xs text-slate-600 font-medium max-w-md mx-auto">
-              We provide private chauffeur transfers between ANY locations in France! You can book by distance (€2.0/km) or by hour (€65/h) using our instant booking engine.
+      {/* Transparent Rate Guarantee Banner */}
+      <div className="bg-white border border-[#E5D7BC] rounded-3xl p-8 shadow-sm space-y-6">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <span className="text-[10px] font-black uppercase text-gold-700 tracking-wider bg-[#F7F2E7] px-3.5 py-1 rounded-full border border-[#E5D7BC]">
+            OUR FIXED RATE PROMISE
+          </span>
+          <h2 className="font-serif text-2xl font-bold text-navy-900">
+            What is Included in Your Guaranteed Fare?
+          </h2>
+          <p className="text-xs text-slate-600 font-medium">
+            No surprises, no taximeters, and zero upfront deposits. Everything is included in your booking.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-2">
+          <div className="bg-[#FBF9F5] p-4 rounded-2xl border border-[#E5D7BC]/70 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-xs text-navy-900">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>100% Fixed Rates</span>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+              Highway tolls, airport parking fees, and VAT taxes are fully included. Prices never change due to traffic delays.
             </p>
           </div>
-          <button
-            onClick={() => {
-              const fromLoc = locations.find((l) => l.id === selectedFromId);
-              const toLoc = locations.find((l) => l.id === selectedToId);
-              if (fromLoc) setOrigin(fromLoc);
-              if (toLoc) setDestination(toLoc);
-              openModal();
-            }}
-            className="px-6 py-3 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all inline-flex items-center gap-2"
-          >
-            <span>Book Custom Distance Transfer</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+
+          <div className="bg-[#FBF9F5] p-4 rounded-2xl border border-[#E5D7BC]/70 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-xs text-navy-900">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Free Child Seats</span>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+              Infant, baby, and booster seats provided 100% free of charge upon request for your family&apos;s safety.
+            </p>
+          </div>
+
+          <div className="bg-[#FBF9F5] p-4 rounded-2xl border border-[#E5D7BC]/70 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-xs text-navy-900">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>60 Min Free Wait Time</span>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+              Live flight radar monitoring for CDG, Orly & Beauvais. Up to 60 minutes free wait time after flight landing.
+            </p>
+          </div>
+
+          <div className="bg-[#FBF9F5] p-4 rounded-2xl border border-[#E5D7BC]/70 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-xs text-navy-900">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Pay on Arrival</span>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+              Zero upfront deposit required. Pay your private driver upon arrival at your hotel via cash or card.
+            </p>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
