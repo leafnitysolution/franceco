@@ -5,7 +5,7 @@ import { createBookingAction } from '@/lib/actions/bookings';
 import { useBookingStore, ServiceMode } from '@/lib/store';
 import { LocationItem } from '@/types';
 import { VehicleCard } from './VehicleCard';
-import { LocationPickerModal } from './LocationPickerModal';
+import { LocationDropdown } from './LocationDropdown';
 import { useLanguage } from '@/lib/LanguageContext';
 import { CountryCodePhoneInput } from '@/components/UI/CountryCodePhoneInput';
 import {
@@ -61,7 +61,7 @@ export function BookingWidget({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [activePickerModal, setActivePickerModal] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
 
   useEffect(() => {
     if (locations && locations.length > 0) {
@@ -286,28 +286,44 @@ export function BookingWidget({
               {store.serviceMode === 'TRANSFER' && (
                 <>
                   {/* FROM FIELD */}
-                  <div
-                    onClick={() => setActivePickerModal('ORIGIN')}
-                    className="bg-slate-100/90 hover:bg-slate-200/60 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5 transition-all cursor-pointer group"
-                  >
-                    <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
-                      From
-                    </label>
-                    <div className="flex items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {store.origin?.category === 'AIRPORT' ? (
-                          <Plane className="w-4 h-4 text-slate-700 shrink-0" />
-                        ) : store.origin?.category === 'AMUSEMENT_PARK' ? (
-                          <Sparkles className="w-4 h-4 text-gold-600 shrink-0" />
-                        ) : (
-                          <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
-                        )}
-                        <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
-                          {store.origin ? store.origin.name : 'Select Pickup Location...'}
-                        </span>
+                  <div className="relative">
+                    <div
+                      onClick={() => setActiveDropdown(activeDropdown === 'ORIGIN' ? null : 'ORIGIN')}
+                      className={`bg-slate-100/90 hover:bg-slate-200/60 rounded-xl p-2.5 border space-y-0.5 transition-all cursor-pointer group ${
+                        activeDropdown === 'ORIGIN' ? 'ring-2 ring-slate-900 border-slate-900' : 'border-slate-200/80'
+                      }`}
+                    >
+                      <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
+                        From
+                      </label>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {store.origin?.category === 'AIRPORT' ? (
+                            <Plane className="w-4 h-4 text-sky-600 shrink-0" />
+                          ) : store.origin?.category === 'AMUSEMENT_PARK' ? (
+                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                          ) : (
+                            <MapPin className="w-4 h-4 text-indigo-600 shrink-0" />
+                          )}
+                          <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
+                            {store.origin ? store.origin.name : 'Select Pickup Location...'}
+                          </span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-200 shrink-0 ${
+                          activeDropdown === 'ORIGIN' ? 'rotate-180 text-slate-900' : ''
+                        }`} />
                       </div>
-                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
                     </div>
+
+                    {/* LOCATION INLINE DROPDOWN (ORIGIN) */}
+                    <LocationDropdown
+                      isOpen={activeDropdown === 'ORIGIN'}
+                      onClose={() => setActiveDropdown(null)}
+                      placeholder="Search pickup location or airport..."
+                      locations={locations}
+                      selectedLocationId={store.origin?.id}
+                      onSelectLocation={(loc) => store.setOrigin(loc)}
+                    />
                   </div>
 
                   {/* SWAP BUTTON (Centered between From & To) */}
@@ -323,49 +339,45 @@ export function BookingWidget({
                   </div>
 
                   {/* TO FIELD */}
-                  <div
-                    onClick={() => setActivePickerModal('DESTINATION')}
-                    className="bg-slate-100/90 hover:bg-slate-200/60 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5 transition-all cursor-pointer group"
-                  >
-                    <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
-                      To
-                    </label>
-                    <div className="flex items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {store.destination?.category === 'AIRPORT' ? (
-                          <Plane className="w-4 h-4 text-slate-700 shrink-0" />
-                        ) : store.destination?.category === 'AMUSEMENT_PARK' ? (
-                          <Sparkles className="w-4 h-4 text-gold-600 shrink-0" />
-                        ) : (
-                          <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
-                        )}
-                        <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
-                          {store.destination ? store.destination.name : 'Select Drop-off Location...'}
-                        </span>
+                  <div className="relative">
+                    <div
+                      onClick={() => setActiveDropdown(activeDropdown === 'DESTINATION' ? null : 'DESTINATION')}
+                      className={`bg-slate-100/90 hover:bg-slate-200/60 rounded-xl p-2.5 border space-y-0.5 transition-all cursor-pointer group ${
+                        activeDropdown === 'DESTINATION' ? 'ring-2 ring-slate-900 border-slate-900' : 'border-slate-200/80'
+                      }`}
+                    >
+                      <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
+                        To
+                      </label>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {store.destination?.category === 'AIRPORT' ? (
+                            <Plane className="w-4 h-4 text-sky-600 shrink-0" />
+                          ) : store.destination?.category === 'AMUSEMENT_PARK' ? (
+                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                          ) : (
+                            <MapPin className="w-4 h-4 text-indigo-600 shrink-0" />
+                          )}
+                          <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
+                            {store.destination ? store.destination.name : 'Select Drop-off Location...'}
+                          </span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-200 shrink-0 ${
+                          activeDropdown === 'DESTINATION' ? 'rotate-180 text-slate-900' : ''
+                        }`} />
                       </div>
-                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
                     </div>
+
+                    {/* LOCATION INLINE DROPDOWN (DESTINATION) */}
+                    <LocationDropdown
+                      isOpen={activeDropdown === 'DESTINATION'}
+                      onClose={() => setActiveDropdown(null)}
+                      placeholder="Search drop-off location or airport..."
+                      locations={locations}
+                      selectedLocationId={store.destination?.id}
+                      onSelectLocation={(loc) => store.setDestination(loc)}
+                    />
                   </div>
-
-                  {/* LOCATION PICKER MODAL (ORIGIN) */}
-                  <LocationPickerModal
-                    isOpen={activePickerModal === 'ORIGIN'}
-                    onClose={() => setActivePickerModal(null)}
-                    title="Select Pickup Location..."
-                    locations={locations}
-                    selectedLocationId={store.origin?.id}
-                    onSelectLocation={(loc) => store.setOrigin(loc)}
-                  />
-
-                  {/* LOCATION PICKER MODAL (DESTINATION) */}
-                  <LocationPickerModal
-                    isOpen={activePickerModal === 'DESTINATION'}
-                    onClose={() => setActivePickerModal(null)}
-                    title="Select Drop-off Location..."
-                    locations={locations}
-                    selectedLocationId={store.destination?.id}
-                    onSelectLocation={(loc) => store.setDestination(loc)}
-                  />
                 </>
               )}
 
