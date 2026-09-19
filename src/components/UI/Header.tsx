@@ -38,7 +38,7 @@ export function Header() {
         <div className="flex items-center justify-between h-20 gap-4">
           {/* Header Logo - FRANCE GO */}
           <Link href="/" className="flex items-center gap-3 group shrink-0 py-1">
-            <div className="relative h-14 sm:h-16 w-56 sm:w-72 hover:scale-[1.02] transition-transform duration-200">
+            <div className="relative h-16 sm:h-20 w-56 sm:w-72 hover:scale-[1.02] transition-transform duration-200">
               <Image
                 src="/images/logo.png"
                 alt="FRANCE GO - VIP Transfers & Tours"
