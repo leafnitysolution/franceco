@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { ShieldCheck, Award, Car, Users, Clock, CheckCircle2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'About Us | FastForward Shuttle',
+  title: 'About Us | FranceGo',
   description:
     'Premier private chauffeur & airport transfer operator in Paris & Disneyland Paris. Delivering reliable door-to-door comfort for families and business travelers.',
 };
@@ -15,7 +15,7 @@ export default function AboutUsPage() {
         <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
           <Image
             src="/images/meet_greet_driver.jpg"
-            alt="About FastForward Shuttle Paris"
+            alt="About FranceGo Paris"
             fill
             priority
             className="object-cover object-center"
@@ -28,7 +28,7 @@ export default function AboutUsPage() {
             OUR STORY & MISSION
           </span>
           <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
-            About FastForward Shuttle
+            About FranceGo
           </h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium max-w-xl mx-auto">
             Delivering safe, comfortable, fixed-price private chauffeur transfers across Paris, Disneyland Paris, and greater France.
@@ -41,11 +41,11 @@ export default function AboutUsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-              Paris's Most Reliable Family & Airport Transfer Partner
+              Paris&apos;s Most Reliable Family & Airport Transfer Partner
             </h2>
 
             <p className="text-sm text-slate-700 leading-relaxed font-medium">
-              FastForward Shuttle was founded with a singular purpose: to remove the stress and anxiety from airport arrivals and family travel across Paris. Navigating crowded public train stations with heavy suitcases or small children after a long international flight is exhausting.
+              FranceGo was founded with a singular purpose: to remove the stress and anxiety from airport arrivals and family travel across Paris. Navigating crowded public train stations with heavy suitcases or small children after a long international flight is exhausting.
             </p>
 
             <p className="text-sm text-slate-700 leading-relaxed font-medium">

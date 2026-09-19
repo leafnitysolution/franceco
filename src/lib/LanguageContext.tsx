@@ -110,7 +110,7 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     // Fleet & Services
     fleetTitle: 'Our Premium Chauffeur Fleet',
     fleetSubtitle: 'Clean, modern, fully licensed luxury sedans and spacious passenger vans.',
-    servicesTitle: 'Why Choose FastForward Shuttle',
+    servicesTitle: 'Why Choose FranceGo',
     servicesSubtitle: 'Premium door-to-door transfer services tailored for families and international travelers.',
 
     // Reviews Section

@@ -25,7 +25,7 @@ interface EmailPayload {
 }
 
 export async function sendBookingConfirmationEmails(data: EmailPayload) {
-  const adminEmail = process.env.ADMIN_DISPATCH_EMAIL || 'admin@fastforwardshuttle.com';
+  const adminEmail = process.env.ADMIN_DISPATCH_EMAIL || 'admin@francego.com';
 
   const vehicleName =
     data.vehicleTier === 'SEDAN'
@@ -46,11 +46,11 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
       <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; }
-        .header { background: linear-gradient(135deg, #ea580c, #f37826); padding: 24px; text-align: center; color: #ffffff; }
-        .header h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+        .header { background: linear-gradient(135deg, #0B192C, #1E2D42); padding: 24px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; color: #D4AF37; font-family: Georgia, serif; }
         .content { padding: 24px; font-size: 14px; line-height: 1.6; }
-        .ref-box { background: #fff7ed; border: 2px dashed #f37826; border-radius: 12px; padding: 16px; text-align: center; margin: 16px 0; }
-        .ref-code { font-size: 26px; font-weight: 900; color: #ea580c; letter-spacing: 2px; }
+        .ref-box { background: #fbf9f5; border: 2px dashed #C5A059; border-radius: 12px; padding: 16px; text-align: center; margin: 16px 0; }
+        .ref-code { font-size: 26px; font-weight: 900; color: #0B192C; letter-spacing: 2px; }
         .details-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
         .details-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
         .label { font-weight: bold; color: #475569; width: 40%; }
@@ -61,12 +61,12 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>FASTFORWARD SHUTTLE</h1>
-          <p style="margin: 4px 0 0; font-size: 13px;">Private Airport & Disneyland Paris Transfers</p>
+          <h1>FRANCEGO</h1>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #e2e8f0;">Private Airport & Disneyland Paris Transfers</p>
         </div>
         <div class="content">
           <p>Dear <strong>${data.customerName}</strong>,</p>
-          <p>Thank you for choosing FastForward Shuttle! Your private transfer reservation has been confirmed and registered with our dispatch team.</p>
+          <p>Thank you for choosing FranceGo! Your private transfer reservation has been confirmed and registered with our dispatch team.</p>
 
           <div class="ref-box">
             <div style="font-size: 12px; font-weight: bold; color: #64748b;">YOUR BOOKING REFERENCE:</div>
@@ -74,7 +74,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
             <div style="font-size: 12px; color: #16a34a; font-weight: bold; margin-top: 4px;">Status: CONFIRMED • Pay Driver on Arrival</div>
           </div>
 
-          <h3 style="color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 4px;">Trip Specifications</h3>
+          <h3 style="color: #0f172a; border-bottom: 2px solid #C5A059; padding-bottom: 4px;">Trip Specifications</h3>
           <table class="details-table">
             <tr><td class="label">Route:</td><td class="value">${data.originName} → ${data.destinationName}</td></tr>
             <tr><td class="label">Pickup Location:</td><td class="value">${data.pickupAddress}</td></tr>
@@ -85,7 +85,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
             <tr><td class="label">Passengers & Bags:</td><td class="value">${data.passengers} Passengers, ${data.luggageCount} Luggage Items</td></tr>
             <tr><td class="label">Free Child Seats:</td><td class="value">${data.babySeats} Baby Seat(s), ${data.boosterSeats} Booster Seat(s)</td></tr>
             ${data.flightOrTrainNumber ? `<tr><td class="label">Flight/Train Number:</td><td class="value">${data.flightOrTrainNumber} (Live Radar Tracked)</td></tr>` : ''}
-            <tr><td class="label">Total Fare to Pay:</td><td class="value" style="font-size: 18px; color: #ea580c; font-weight: 900;">${formatCurrency(data.totalFareEur)}</td></tr>
+            <tr><td class="label">Total Fare to Pay:</td><td class="value" style="font-size: 18px; color: #0B192C; font-weight: 900;">${formatCurrency(data.totalFareEur)}</td></tr>
           </table>
 
           <div style="background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 12px; margin-top: 16px; font-size: 12px; color: #065f46;">
@@ -94,7 +94,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
           </div>
         </div>
         <div class="footer">
-          FastForward Shuttle • 24/7 Hotline: +33 1 89 40 00 00 • support@fastforwardshuttle.com
+          FranceGo • 24/7 Hotline: +33 1 89 40 00 00 • contact@francego.com
         </div>
       </div>
     </body>
@@ -111,7 +111,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
       <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; border: 1px solid #334155; overflow: hidden; color: #f8fafc; }
-        .header { background: #ea580c; padding: 20px; text-align: center; color: #ffffff; font-weight: bold; }
+        .header { background: #0B192C; padding: 20px; text-align: center; color: #D4AF37; font-weight: bold; border-b: 1px solid #C5A059; }
         .content { padding: 24px; font-size: 14px; line-height: 1.6; }
         .table { width: 100%; border-collapse: collapse; margin: 16px 0; }
         .table td { padding: 10px; border-bottom: 1px solid #334155; }
@@ -145,7 +145,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
           </table>
 
           <div style="text-align: center;">
-            <a href="https://wa.me/?text=${encodeURIComponent(`FastForward Shuttle Alert! Ref: ${data.bookingRef}\nCustomer: ${data.customerName} (${data.customerPhone})\nRoute: ${data.originName} -> ${data.destinationName}\nPickup: ${data.pickupDate} ${data.pickupTime}\nFare: ${data.totalFareEur}€`)}" class="btn">
+            <a href="https://wa.me/?text=${encodeURIComponent(`FranceGo Alert! Ref: ${data.bookingRef}\nCustomer: ${data.customerName} (${data.customerPhone})\nRoute: ${data.originName} -> ${data.destinationName}\nPickup: ${data.pickupDate} ${data.pickupTime}\nFare: ${data.totalFareEur}€`)}" class="btn">
               📲 Dispatch Chauffeur via WhatsApp
             </a>
           </div>
@@ -164,14 +164,14 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
       port: Number(process.env.SMTP_PORT) || 587,
       secure: process.env.SMTP_SECURE === 'true',
       auth: {
-        user: process.env.SMTP_USER || 'demo@fastforwardshuttle.com',
+        user: process.env.SMTP_USER || 'contact@francego.com',
         pass: process.env.SMTP_PASS || 'demopass',
       },
     });
 
     // Dispatch Email to CLIENT (Passenger)
     const clientInfo = await transporter.sendMail({
-      from: '"FastForward Shuttle Dispatch" <noreply@fastforwardshuttle.com>',
+      from: '"FranceGo Dispatch" <noreply@francego.com>',
       to: data.customerEmail,
       subject: `Transfer Confirmation: ${data.bookingRef} (${data.originName} → ${data.destinationName})`,
       html: clientHtml,
@@ -179,7 +179,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
 
     // Dispatch Email to ADMIN OFFICE
     const adminInfo = await transporter.sendMail({
-      from: '"System Booking Alert" <system@fastforwardshuttle.com>',
+      from: '"System Booking Alert" <system@francego.com>',
       to: adminEmail,
       subject: `🚨 NEW BOOKING: ${data.bookingRef} - ${data.customerName} (${formatCurrency(data.totalFareEur)})`,
       html: adminHtml,

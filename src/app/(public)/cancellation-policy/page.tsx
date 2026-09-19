@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CheckCircle2, Clock, CalendarX, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Cancellation & Refund Policy | FastForward Shuttle France',
+  title: 'Cancellation & Refund Policy | FranceGo',
   description:
     'Learn about our zero-risk 24-hour free cancellation policy for airport shuttles and private transfers in Paris.',
 };
@@ -18,7 +18,7 @@ export default function CancellationPolicyPage() {
             <CheckCircle2 className="w-4 h-4" />
             <span>100% Risk-Free Booking</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-serif">
             Cancellation Policy
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto font-medium">
@@ -37,7 +37,7 @@ export default function CancellationPolicyPage() {
               <span>1. Free 24-Hour Cancellation Policy</span>
             </h2>
             <p>
-              We understand that travel plans can change unexpectedly. FastForward Shuttle offers a <strong>100% Free Cancellation Policy</strong> for all private airport transfers, Disneyland shuttles, and custom tours.
+              We understand that travel plans can change unexpectedly. FranceGo offers a <strong>100% Free Cancellation Policy</strong> for all private airport transfers, Disneyland shuttles, and custom tours.
             </p>
             <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-900 space-y-1 font-semibold">
               <p className="font-extrabold text-sm">✓ Zero Cancellation Fees</p>
@@ -53,10 +53,10 @@ export default function CancellationPolicyPage() {
               <CalendarX className="w-5 h-5 text-emerald-600" />
               <span>2. How to Cancel or Modify Your Transfer</span>
             </h2>
-            <p>To cancel or request changes to your booking, simply provide your booking reference number (e.g., <code>#EGS-XXXX</code>) through any of the following channels:</p>
+            <p>To cancel or request changes to your booking, simply provide your booking reference number through any of the following channels:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong>Email:</strong> Send a request to <code>booking@fastforwardshuttle.com</code>
+                <strong>Email:</strong> Send a request to <code>contact@francego.com</code>
               </li>
               <li>
                 <strong>WhatsApp / Hotline:</strong> Message our 24/7 dispatch desk at <code>+33 1 89 40 00 00</code>

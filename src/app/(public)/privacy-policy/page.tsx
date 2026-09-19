@@ -2,9 +2,9 @@ import React from 'react';
 import { ShieldCheck, Lock, Eye, Server, UserCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Privacy Policy | FastForward Shuttle France',
+  title: 'Privacy Policy | FranceGo',
   description:
-    'Learn how FastForward Shuttle protects your personal data, booking details, and privacy in compliance with EU GDPR regulations.',
+    'Learn how FranceGo protects your personal data, booking details, and privacy in compliance with EU GDPR regulations.',
 };
 
 export default function PrivacyPolicyPage() {
@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
             <Lock className="w-4 h-4" />
             <span>GDPR Compliance</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-serif">
             Privacy Policy
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto font-medium">
@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
               <span>1. Introduction & GDPR Commitment</span>
             </h2>
             <p>
-              FastForward Shuttle (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) strictly respects your personal privacy. This Privacy Policy explains how your personal data is handled when you use our transfer reservation platform in accordance with the European Union General Data Protection Regulation (EU GDPR 2016/679) and French data protection legislation.
+              FranceGo (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) strictly respects your personal privacy. This Privacy Policy explains how your personal data is handled when you use our transfer reservation platform in accordance with the European Union General Data Protection Regulation (EU GDPR 2016/679) and French data protection legislation.
             </p>
           </section>
 
@@ -102,7 +102,7 @@ export default function PrivacyPolicyPage() {
               </li>
             </ul>
             <p className="pt-2">
-              To exercise your privacy rights, email our Data Protection Officer at: <strong>privacy@fastforwardshuttle.com</strong>.
+              To exercise your privacy rights, email our Data Protection Officer at: <strong>privacy@francego.com</strong>.
             </p>
           </section>
         </div>

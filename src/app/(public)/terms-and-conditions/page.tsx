@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ShieldCheck, FileText, CheckCircle2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'Terms & Conditions | FastForward Shuttle France',
+  title: 'Terms & Conditions | FranceGo',
   description:
     'Review the official terms and conditions for private airport transfers and shuttle services in Paris and Disneyland Paris.',
 };
@@ -18,11 +18,11 @@ export default function TermsAndConditionsPage() {
             <ShieldCheck className="w-4 h-4" />
             <span>Legal Documentation</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-serif">
             Terms and Conditions
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto font-medium">
-            Effective Date: January 1, 2026 • FastForward Shuttle Paris & Tourism Services
+            Effective Date: January 1, 2026 • FranceGo Paris & Tourism Services
           </p>
         </div>
       </section>
@@ -33,11 +33,11 @@ export default function TermsAndConditionsPage() {
           {/* Section 1 */}
           <section className="space-y-3">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>1. Agreement & Service Overview</span>
             </h2>
             <p>
-              These Terms and Conditions govern the private transfer services provided by <strong>FastForward Shuttle</strong> (&quot;the Company&quot;). By making a reservation via our website or booking widget, you (&quot;the Customer&quot; or &quot;Lead Passenger&quot;) agree to be legally bound by these terms.
+              These Terms and Conditions govern the private transfer services provided by <strong>FranceGo</strong> (&quot;the Company&quot;). By making a reservation via our website or booking widget, you (&quot;the Customer&quot; or &quot;Lead Passenger&quot;) agree to be legally bound by these terms.
             </p>
             <p>
               We provide fixed-rate door-to-door private chauffeur services between Paris Airports (CDG, Orly, Beauvais), Disneyland Paris Hotels & Parks, Paris City Center, and surrounding regions.
@@ -47,11 +47,11 @@ export default function TermsAndConditionsPage() {
           {/* Section 2 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-amber-600" />
+              <CheckCircle2 className="w-5 h-5 text-gold-600" />
               <span>2. Reservations & Instant Confirmation</span>
             </h2>
             <p>
-              All bookings requested through our website are confirmed instantly upon submission. An automated booking voucher containing your unique reference code (e.g., <code>#EGS-XXXX</code>), pickup location details, driver instructions, and total guaranteed price will be dispatched to your provided email address.
+              All bookings requested through our website are confirmed instantly upon submission. An automated booking voucher containing your unique reference code, pickup location details, driver instructions, and total guaranteed price will be dispatched to your provided email address.
             </p>
             <p>
               It is the lead passenger&apos;s responsibility to ensure that all submitted contact details, flight numbers, pickup dates, and luggage counts are accurate.
@@ -61,7 +61,7 @@ export default function TermsAndConditionsPage() {
           {/* Section 3 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>3. Fixed Pricing & Zero Upfront Deposit</span>
             </h2>
             <ul className="list-disc pl-5 space-y-2">
@@ -80,7 +80,7 @@ export default function TermsAndConditionsPage() {
           {/* Section 4 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>4. Airport Meet & Greet and Flight Delay Tracking</span>
             </h2>
             <p>
@@ -99,7 +99,7 @@ export default function TermsAndConditionsPage() {
           {/* Section 5 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>5. Free Baby & Booster Child Seats</span>
             </h2>
             <p>
@@ -110,7 +110,7 @@ export default function TermsAndConditionsPage() {
           {/* Section 6 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>6. Luggage & Vehicle Capacity Limits</span>
             </h2>
             <p>
@@ -121,26 +121,26 @@ export default function TermsAndConditionsPage() {
           {/* Section 7 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>7. Cancellations & Modifications</span>
             </h2>
             <p>
-              Cancellations and booking updates are completely free up to 24 hours prior to scheduled pickup time. Please refer to our full <Link href="/cancellation-policy" className="text-amber-600 font-bold hover:underline">Cancellation Policy</Link> for full details.
+              Cancellations and booking updates are completely free up to 24 hours prior to scheduled pickup time. Please refer to our full <Link href="/cancellation-policy" className="text-gold-700 font-bold hover:underline">Cancellation Policy</Link> for full details.
             </p>
           </section>
 
           {/* Section 8 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-amber-600" />
+              <FileText className="w-5 h-5 text-gold-600" />
               <span>8. Contact Information & Jurisdiction</span>
             </h2>
             <p>
               These Terms and Conditions are governed by the laws of the Republic of France. For inquiries or customer service:
             </p>
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 font-semibold space-y-1 text-xs">
-              <p>FastForward Shuttle Transport & Tourism Services</p>
-              <p>Email: booking@fastforwardshuttle.com</p>
+              <p>FranceGo Transport & Tourism Services</p>
+              <p>Email: contact@francego.com</p>
               <p>24/7 Hotline: +33 1 89 40 00 00</p>
               <p>Location: Paris CDG, Orly & Beauvais Airports, France</p>
             </div>

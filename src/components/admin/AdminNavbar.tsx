@@ -111,7 +111,7 @@ export function AdminNavbar() {
             </div>
             <div>
               <span className="text-xs font-bold text-navy-900 tracking-wider block font-serif">
-                FASTFORWARD BACK-OFFICE
+                FRANCEGO BACK-OFFICE
               </span>
               <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
                 <ShieldCheck className="w-3 h-3 text-emerald-600" />

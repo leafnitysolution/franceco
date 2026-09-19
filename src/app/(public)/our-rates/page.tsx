@@ -6,7 +6,7 @@ import { ensureLocationsSeeded } from '@/lib/seedHelper';
 export const revalidate = 60;
 
 export const metadata = {
-  title: 'Our Rates & Transfer Prices | FastForward Shuttle',
+  title: 'Our Rates & Transfer Prices | FranceGo',
   description:
     'Transparent fixed pricing for private airport transfers between CDG, Orly, Beauvais, Disneyland Paris, and Paris City Center. No meters, free child seats.',
 };

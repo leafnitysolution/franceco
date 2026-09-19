@@ -101,7 +101,7 @@ export default function ContactUsPage() {
                   <div className="text-slate-400 text-[10px] uppercase font-bold">WhatsApp Direct Message</div>
                   <div className="text-emerald-700 font-extrabold text-xs">Instant Driver Assistance</div>
                   <a
-                    href="https://wa.me/33189400000?text=Hello%20FastForward%20Shuttle,%20I%20have%20an%20inquiry%20regarding%20a%20private%20transfer."
+                    href="https://wa.me/33189400000?text=Hello%20FranceGo,%20I%20have%20an%20inquiry%20regarding%20a%20private%20transfer."
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors shadow-xs"
@@ -118,7 +118,7 @@ export default function ContactUsPage() {
                 </div>
                 <div>
                   <div className="text-slate-400 text-[10px] uppercase font-bold">Email Dispatch Desk</div>
-                  <div className="text-navy-900 font-bold text-xs sm:text-sm">booking@fastforwardshuttle.com</div>
+                  <div className="text-navy-900 font-bold text-xs sm:text-sm">contact@francego.com</div>
                   <p className="text-[11px] text-slate-500 font-medium">Instant email confirmations & voucher inquiries</p>
                 </div>
               </div>

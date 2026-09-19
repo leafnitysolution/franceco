@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { FaqAccordion } from '@/components/UI/FaqAccordion';
 
 export const metadata = {
-  title: 'Frequently Asked Questions | FastForward Shuttle',
+  title: 'Frequently Asked Questions | FranceGo',
   description:
     'Answers to common questions regarding airport pickups, child seats, flight delay tracking, and payment methods.',
 };
