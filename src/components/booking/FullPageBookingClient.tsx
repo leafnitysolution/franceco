@@ -202,13 +202,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
             Book your Ride
           </h1>
 
-          <div className="text-xs text-slate-500 font-semibold flex items-center gap-3">
-            <span>EN</span>
-            <span>|</span>
-            <Link href="/ffs-portal-sec-99x/login" className="hover:text-slate-900 transition-colors">
-              Log In
-            </Link>
-          </div>
+
         </div>
 
         {/* 4-Step Progress Stepper Bar */}
@@ -966,8 +960,8 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
       {step < 4 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 py-3.5 px-4 shadow-xl">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div>
-              {step > 1 ? (
+            <div className="flex items-center gap-3">
+              {step > 1 && (
                 <button
                   type="button"
                   onClick={() => setStep((step - 1) as 1 | 2 | 3)}
@@ -975,12 +969,11 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-              ) : (
-                <div className="text-xs font-bold text-slate-800">
-                  <span className="text-slate-400 block text-[10px] uppercase">Your choice</span>
-                  <span>{store.vehicleTier.replace('_', ' ')} (€{totalFare.toFixed(2)})</span>
-                </div>
               )}
+              <div className="text-xs font-bold text-slate-800">
+                <span className="text-slate-400 block text-[10px] uppercase">Your choice</span>
+                <span>{store.vehicleTier.replace('_', ' ')} (€{totalFare.toFixed(2)})</span>
+              </div>
             </div>
 
             <div>
