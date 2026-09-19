@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -68,6 +68,25 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
   // Location selector modal/dropdown triggers
   const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
   const [isEditJourneyModalOpen, setIsEditJourneyModalOpen] = useState(false);
+
+  // Group locations for native select dropdowns
+  const groupedLocations = useMemo(() => {
+    const map: Record<string, LocationItem[]> = {
+      AIRPORT: [],
+      AMUSEMENT_PARK: [],
+      CITY_CENTER: [],
+      TRAIN_STATION: [],
+      PALACE: [],
+      OTHER: [],
+    };
+
+    locations.forEach((loc) => {
+      const cat = loc.category && map[loc.category] ? loc.category : 'OTHER';
+      map[cat].push(loc);
+    });
+
+    return map;
+  }, [locations]);
 
   // Sync initial locations if empty
   useEffect(() => {
@@ -1214,22 +1233,46 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
               </button>
             </div>
 
-            {/* Origin & Destination Selector Buttons */}
+            {/* Origin & Destination Dropdowns */}
             <div className="space-y-3">
               {/* Pickup Location */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700 block">Pickup Location (From)</label>
-                <button
-                  type="button"
-                  onClick={() => setActiveDropdown('ORIGIN')}
-                  className="w-full px-3.5 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 flex items-center justify-between transition-colors text-left"
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <MapPin className="w-4 h-4 text-slate-600 shrink-0" />
-                    <span className="truncate">{store.origin?.name || 'Select Pickup Location...'}</span>
-                  </div>
-                  <span className="text-[10px] font-extrabold uppercase bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Change</span>
-                </button>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-slate-600 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <select
+                    value={store.origin?.id || ''}
+                    onChange={(e) => {
+                      const loc = locations.find((l) => l.id === e.target.value);
+                      if (loc) store.setOrigin(loc);
+                    }}
+                    className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-slate-900 cursor-pointer"
+                  >
+                    <option value="" disabled>Select Pickup Location...</option>
+                    {Object.entries(groupedLocations).map(([catKey, locs]) => {
+                      if (locs.length === 0) return null;
+                      const catLabel =
+                        catKey === 'AIRPORT'
+                          ? '✈️ Paris Airports'
+                          : catKey === 'AMUSEMENT_PARK'
+                          ? '🏰 Euro Disney Paris'
+                          : catKey === 'CITY_CENTER'
+                          ? '📍 Paris City & Hotels'
+                          : catKey === 'TRAIN_STATION'
+                          ? '🚆 Paris Train Stations'
+                          : '🏛️ Excursions & Other';
+                      return (
+                        <optgroup key={catKey} label={catLabel} className="font-bold text-slate-800">
+                          {locs.map((loc) => (
+                            <option key={loc.id} value={loc.id} className="font-medium text-slate-900">
+                              {loc.name} ({loc.shortCode})
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
 
               {/* Swap Button */}
@@ -1237,27 +1280,52 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                 <button
                   type="button"
                   onClick={() => store.swapLocations()}
-                  className="p-2 rounded-full bg-slate-900 text-white hover:bg-amber-600 transition-colors shadow-sm"
+                  className="p-2 rounded-full bg-slate-900 text-white hover:bg-amber-600 transition-colors shadow-sm flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold"
                   title="Swap Pickup & Dropoff Locations"
                 >
                   <ArrowRightLeft className="w-3.5 h-3.5" />
+                  <span>Swap Locations</span>
                 </button>
               </div>
 
               {/* Drop-off Location */}
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700 block">Drop-off Location (To)</label>
-                <button
-                  type="button"
-                  onClick={() => setActiveDropdown('DESTINATION')}
-                  className="w-full px-3.5 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 flex items-center justify-between transition-colors text-left"
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <MapPin className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span className="truncate">{store.destination?.name || 'Select Drop-off Location...'}</span>
-                  </div>
-                  <span className="text-[10px] font-extrabold uppercase bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Change</span>
-                </button>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-amber-600 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <select
+                    value={store.destination?.id || ''}
+                    onChange={(e) => {
+                      const loc = locations.find((l) => l.id === e.target.value);
+                      if (loc) store.setDestination(loc);
+                    }}
+                    className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-slate-900 cursor-pointer"
+                  >
+                    <option value="" disabled>Select Drop-off Location...</option>
+                    {Object.entries(groupedLocations).map(([catKey, locs]) => {
+                      if (locs.length === 0) return null;
+                      const catLabel =
+                        catKey === 'AIRPORT'
+                          ? '✈️ Paris Airports'
+                          : catKey === 'AMUSEMENT_PARK'
+                          ? '🏰 Euro Disney Paris'
+                          : catKey === 'CITY_CENTER'
+                          ? '📍 Paris City & Hotels'
+                          : catKey === 'TRAIN_STATION'
+                          ? '🚆 Paris Train Stations'
+                          : '🏛️ Excursions & Other';
+                      return (
+                        <optgroup key={catKey} label={catLabel} className="font-bold text-slate-800">
+                          {locs.map((loc) => (
+                            <option key={loc.id} value={loc.id} className="font-medium text-slate-900">
+                              {loc.name} ({loc.shortCode})
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
             </div>
 
