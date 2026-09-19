@@ -101,12 +101,8 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
   // Navigation handlers
   const handleNextToStep2 = () => {
     setErrorMsg(null);
-    if (!store.origin || !store.destination) {
-      setErrorMsg('Please select both pickup and drop-off locations.');
-      return;
-    }
-    if (store.origin.id === store.destination.id) {
-      setErrorMsg('Pickup and drop-off locations cannot be identical.');
+    if (!store.vehicleTier) {
+      setErrorMsg('Please select a vehicle to continue.');
       return;
     }
     setStep(2);
@@ -297,15 +293,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
         </div>
       </div>
 
-      {/* Global Error Banner */}
-      {errorMsg && (
-        <div className="max-w-7xl mx-auto px-4 mt-4">
-          <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        </div>
-      )}
+
 
       {/* ========================================================================= */}
       {/* 2. MAIN 2-COLUMN SPLIT CONTAINER */}
@@ -958,8 +946,15 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
       {/* 3. BOTTOM STICKY ACTION BAR */}
       {/* ========================================================================= */}
       {step < 4 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 py-3.5 px-4 shadow-xl">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-xl">
+          {/* Error message in footer */}
+          {errorMsg && (
+            <div className="px-4 py-2 bg-red-50 border-b border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 py-3.5 px-4">
             <div className="flex items-center gap-3">
               {step > 1 && (
                 <button
