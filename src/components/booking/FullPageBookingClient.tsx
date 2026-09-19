@@ -34,6 +34,7 @@ import {
   ArrowRightLeft,
   Edit2,
   Tag,
+  Mail,
 } from 'lucide-react';
 
 interface FullPageBookingClientProps {
@@ -56,6 +57,13 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
   const [showChildSeats, setShowChildSeats] = useState(false);
   const [pickupSignText, setPickupSignText] = useState('');
   const [agreedTerms, setAgreedTerms] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    firstName?: boolean;
+    lastName?: boolean;
+    customerEmail?: boolean;
+    customerPhone?: boolean;
+    agreedTerms?: boolean;
+  }>({});
 
   // Location selector modal/dropdown triggers
   const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
@@ -119,19 +127,22 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
     if (e) e.preventDefault();
     setErrorMsg(null);
 
+    const errors: typeof fieldErrors = {};
+    if (!firstName.trim()) errors.firstName = true;
+    if (!lastName.trim()) errors.lastName = true;
+    if (!store.customerEmail.trim() || !store.customerEmail.includes('@')) errors.customerEmail = true;
+    if (!store.customerPhone.trim()) errors.customerPhone = true;
+    if (!agreedTerms) errors.agreedTerms = true;
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setErrorMsg('Please fill in all highlighted required fields in red and accept the Terms & Conditions.');
+      window.scrollTo({ top: 250, behavior: 'smooth' });
+      return;
+    }
+    setFieldErrors({});
+
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-    if (!fullName) {
-      setErrorMsg('Please enter lead passenger first and last name.');
-      return;
-    }
-    if (!store.customerEmail.trim() || !store.customerEmail.includes('@')) {
-      setErrorMsg('Please enter a valid email address for your booking voucher.');
-      return;
-    }
-    if (!store.customerPhone.trim()) {
-      setErrorMsg('Please enter a valid mobile phone number for driver communication.');
-      return;
-    }
 
     setIsSubmitting(true);
 
@@ -446,7 +457,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                         checkedMax: 12,
                         handMax: 10,
                         price: getVehiclePrice('MINIBUS'),
-                        image: '/images/fleet_minibus.jpg',
+                        image: '/images/service_minibus.jpg',
                       },
                     ].map((item) => {
                       const isSelected = store.vehicleTier === item.tier;
@@ -669,40 +680,67 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                   {/* First Name & Last Name */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700">First name(s) *</label>
+                      <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>First name(s) *</span>
+                        {fieldErrors.firstName && <span className="text-red-600 text-[10px] font-bold">Required</span>}
+                      </label>
                       <input
                         type="text"
-                        required
                         placeholder="Enter first name(s)"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
+                        onChange={(e) => {
+                          setFirstName(e.target.value);
+                          if (fieldErrors.firstName) setFieldErrors({ ...fieldErrors, firstName: false });
+                        }}
+                        className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none transition-all ${
+                          fieldErrors.firstName
+                            ? 'border-red-500 ring-2 ring-red-100 bg-red-50/30'
+                            : 'border-slate-300 focus:border-slate-900'
+                        }`}
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700">Last name *</label>
+                      <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Last name *</span>
+                        {fieldErrors.lastName && <span className="text-red-600 text-[10px] font-bold">Required</span>}
+                      </label>
                       <input
                         type="text"
-                        required
                         placeholder="Enter last name"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
+                        onChange={(e) => {
+                          setLastName(e.target.value);
+                          if (fieldErrors.lastName) setFieldErrors({ ...fieldErrors, lastName: false });
+                        }}
+                        className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none transition-all ${
+                          fieldErrors.lastName
+                            ? 'border-red-500 ring-2 ring-red-100 bg-red-50/30'
+                            : 'border-slate-300 focus:border-slate-900'
+                        }`}
                       />
                     </div>
                   </div>
 
                   {/* Email Address */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Email address *</label>
+                    <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                      <span>Email address *</span>
+                      {fieldErrors.customerEmail && <span className="text-red-600 text-[10px] font-bold">Valid Email Required</span>}
+                    </label>
                     <input
                       type="email"
-                      required
                       placeholder="Enter email address"
                       value={store.customerEmail}
-                      onChange={(e) => store.setCustomerDetails({ name: `${firstName} ${lastName}`.trim(), email: e.target.value, phone: store.customerPhone, notes: store.notes })}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
+                      onChange={(e) => {
+                        store.setCustomerDetails({ name: `${firstName} ${lastName}`.trim(), email: e.target.value, phone: store.customerPhone, notes: store.notes });
+                        if (fieldErrors.customerEmail) setFieldErrors({ ...fieldErrors, customerEmail: false });
+                      }}
+                      className={`w-full px-3.5 py-2.5 bg-white border rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none transition-all ${
+                        fieldErrors.customerEmail
+                          ? 'border-red-500 ring-2 ring-red-100 bg-red-50/30'
+                          : 'border-slate-300 focus:border-slate-900'
+                      }`}
                     />
                     <p className="text-[11px] text-slate-500 font-medium">
                       We&apos;ll send your instant booking confirmation voucher here.
@@ -711,10 +749,17 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
 
                   {/* Mobile Phone Number */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Mobile number *</label>
+                    <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                      <span>Mobile number *</span>
+                      {fieldErrors.customerPhone && <span className="text-red-600 text-[10px] font-bold">Phone Number Required</span>}
+                    </label>
                     <CountryCodePhoneInput
                       value={store.customerPhone}
-                      onChange={(phone) => store.setCustomerDetails({ name: `${firstName} ${lastName}`.trim(), email: store.customerEmail, phone, notes: store.notes })}
+                      hasError={fieldErrors.customerPhone}
+                      onChange={(phone) => {
+                        store.setCustomerDetails({ name: `${firstName} ${lastName}`.trim(), email: store.customerEmail, phone, notes: store.notes });
+                        if (fieldErrors.customerPhone) setFieldErrors({ ...fieldErrors, customerPhone: false });
+                      }}
                     />
                     <p className="text-[11px] text-slate-500 font-medium">
                       Please provide a contact number so our driver can reach the passenger if needed.
@@ -737,19 +782,28 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                   </div>
 
                   {/* Terms & Privacy Acceptance Box */}
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                  <div className={`p-4 border rounded-2xl space-y-2 transition-all ${
+                    fieldErrors.agreedTerms ? 'bg-red-50/50 border-red-500 ring-2 ring-red-100' : 'bg-slate-50 border-slate-200'
+                  }`}>
                     <label className="flex items-start gap-2.5 cursor-pointer">
                       <input
                         type="checkbox"
-                        required
                         checked={agreedTerms}
-                        onChange={(e) => setAgreedTerms(e.target.checked)}
+                        onChange={(e) => {
+                          setAgreedTerms(e.target.checked);
+                          if (fieldErrors.agreedTerms) setFieldErrors({ ...fieldErrors, agreedTerms: false });
+                        }}
                         className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-slate-900 mt-0.5 shrink-0"
                       />
                       <span className="text-xs text-slate-700 font-medium leading-relaxed">
                         By confirming this booking you agree to our <strong className="text-slate-900">Terms and Conditions</strong>, <strong className="text-slate-900">Privacy Policy</strong>, and <strong className="text-slate-900">Cancellation Policy</strong>. Pay driver on arrival.
                       </span>
                     </label>
+                    {fieldErrors.agreedTerms && (
+                      <p className="text-xs text-red-600 font-bold pt-1">
+                        ⚠️ Please check the box to agree to our terms and cancellation policy before proceeding.
+                      </p>
+                    )}
                   </div>
 
                   {/* Inline Action Buttons for Step 3 */}
@@ -803,6 +857,21 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
 
                   {/* Booking Details Breakdown */}
                   <div className="p-6 sm:p-8 space-y-6">
+                    {/* Email Confirmation Notice Alert */}
+                    <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2 text-emerald-900">
+                      <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
+                        <Mail className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                        <span>Instant Confirmation Voucher Sent!</span>
+                      </div>
+                      <p className="text-xs text-emerald-700 leading-relaxed font-medium">
+                        A complete booking summary has been sent to <strong className="text-slate-900 underline">{store.customerEmail}</strong>.
+                      </p>
+                      <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-bold text-amber-800 flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>💡 <u>Spam/Junk Folder Notice</u>: If you don&apos;t see our email in your main inbox shortly, please check your Spam or Junk folder.</span>
+                      </div>
+                    </div>
+
                     {/* Trip Summary */}
                     <div className="space-y-3">
                       <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
@@ -841,9 +910,14 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                     {/* Passenger & Vehicle */}
                     <div className="space-y-3">
                       <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
-                        Passenger & Vehicle
+                        Passenger & Vehicle Specifications
                       </h3>
                       <div className="grid grid-cols-2 gap-3 text-xs font-semibold text-slate-800">
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                          <span className="text-[10px] text-slate-500 uppercase block">Lead Passenger</span>
+                          <span className="font-bold">{store.customerName}</span>
+                        </div>
+
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
                           <span className="text-[10px] text-slate-500 uppercase block">Total Passengers</span>
                           <span className="font-bold">{store.passengers} Pax</span>
@@ -859,9 +933,37 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                           <span className="font-bold">{store.vehicleTier.replace('_', ' ')}</span>
                         </div>
 
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60 col-span-2">
                           <span className="text-[10px] text-slate-500 uppercase block">Payment Method</span>
-                          <span className="font-bold text-emerald-700">Pay Chauffeur on Arrival</span>
+                          <span className="font-bold text-emerald-700">Pay Chauffeur on Arrival (Zero Upfront Deposit)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* User Provided Data Section: Flight #, Notes, Sign, Terms */}
+                    <div className="space-y-3 border-t border-slate-200/80 pt-4">
+                      <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                        User Provided Flight & Special Instructions
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-800">
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                          <span className="text-[10px] text-slate-500 uppercase block">Flight / Train Number</span>
+                          <span className="font-bold text-slate-900">{store.flightOrTrainNumber || 'None specified'}</span>
+                        </div>
+
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                          <span className="text-[10px] text-slate-500 uppercase block">Driver Pickup Sign Text</span>
+                          <span className="font-bold text-slate-900">{pickupSignText || 'Standard Name Sign'}</span>
+                        </div>
+
+                        <div className="sm:col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-200/60 space-y-1">
+                          <span className="text-[10px] text-slate-500 uppercase block">Special Driver Notes</span>
+                          <p className="font-medium text-slate-700 text-xs">{store.notes || 'No special notes provided'}</p>
+                        </div>
+
+                        <div className="sm:col-span-2 bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 text-emerald-900 space-y-1">
+                          <span className="text-[10px] text-emerald-700 uppercase font-black block">Terms & Policy Acceptance</span>
+                          <p className="font-bold text-xs">✓ Terms & Conditions Accepted • Privacy Policy Accepted • 24H Free Cancellation Policy Confirmed</p>
                         </div>
                       </div>
                     </div>

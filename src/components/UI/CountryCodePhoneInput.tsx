@@ -46,6 +46,7 @@ interface CountryCodePhoneInputProps {
   required?: boolean;
   placeholder?: string;
   className?: string;
+  hasError?: boolean;
 }
 
 export function CountryCodePhoneInput({
@@ -54,6 +55,7 @@ export function CountryCodePhoneInput({
   required = false,
   placeholder = '7700 900077',
   className = '',
+  hasError = false,
 }: CountryCodePhoneInputProps) {
   // Parse initial country dial code if present
   const findInitialCountry = () => {
@@ -128,7 +130,11 @@ export function CountryCodePhoneInput({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-2.5 bg-slate-100/90 border border-r-0 border-slate-300 rounded-l-xl text-xs font-bold text-slate-800 hover:bg-slate-200/80 transition-all shrink-0 focus:outline-none"
+        className={`flex items-center gap-1.5 px-3 py-2.5 border border-r-0 rounded-l-xl text-xs font-bold text-slate-800 hover:bg-slate-200/80 transition-all shrink-0 focus:outline-none ${
+          hasError
+            ? 'bg-red-50 border-red-500 text-red-900 ring-1 ring-red-300'
+            : 'bg-slate-100/90 border-slate-300'
+        }`}
       >
         <span className="text-base leading-none">{selectedCountry.flag}</span>
         <span className="font-extrabold text-slate-900">{selectedCountry.dialCode}</span>
@@ -142,7 +148,11 @@ export function CountryCodePhoneInput({
         placeholder={placeholder}
         value={phoneNumber}
         onChange={handlePhoneChange}
-        className="w-full bg-slate-50 border border-slate-300 rounded-r-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-gold-500"
+        className={`w-full border rounded-r-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none ${
+          hasError
+            ? 'bg-red-50/50 border-red-500 ring-2 ring-red-100'
+            : 'bg-slate-50 border-slate-300 focus:border-gold-500'
+        }`}
       />
 
       {/* Scrollable Country Selector Dropdown */}
