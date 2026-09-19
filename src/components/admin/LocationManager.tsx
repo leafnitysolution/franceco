@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createLocationAction, updateLocationAction, deleteLocationAction } from '@/lib/actions/routes';
-import { MapPin, Plus, Building2, CheckCircle2, Loader2, Search, Pencil, Trash2, X, AlertTriangle } from 'lucide-react';
+import { MapPin, Plus, Building2, CheckCircle2, Loader2, Search, Pencil, Trash2, X, AlertTriangle, Tag } from 'lucide-react';
 
 interface LocationItemWithCount {
   id: string;
   name: string;
   shortCode: string;
+  category?: string;
   type?: string;
   originRoutes?: { id: string }[];
   destinationRoutes?: { id: string }[];
@@ -19,6 +20,14 @@ interface LocationManagerProps {
   locations: LocationItemWithCount[];
 }
 
+const CATEGORY_OPTIONS = [
+  { value: 'AIRPORT', label: 'Paris Airports (CDG, ORY, BVA...)' },
+  { value: 'AMUSEMENT_PARK', label: 'Euro Disney Paris (Disneyland Paris Hotels & Parks...)' },
+  { value: 'CITY_CENTER', label: 'Paris (City Center & Arrondissements)' },
+  { value: 'TRAIN_STATION', label: 'Paris Train Stations (Gare du Nord...)' },
+  { value: 'PALACE', label: 'Other (Château de Versailles, etc.)' },
+];
+
 export function LocationManager({ locations }: LocationManagerProps) {
   const router = useRouter();
   const [locList, setLocList] = useState<LocationItemWithCount[]>(locations);
@@ -26,7 +35,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [name, setName] = useState('');
   const [shortCode, setShortCode] = useState('');
-  const [type, setType] = useState('CUSTOM');
+  const [category, setCategory] = useState('AIRPORT');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -35,6 +44,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editShortCode, setEditShortCode] = useState('');
+  const [editCategory, setEditCategory] = useState('AIRPORT');
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Deleting state
@@ -52,7 +62,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
     setSuccessMsg('');
 
     try {
-      const res = await createLocationAction(name.trim(), shortCode.trim(), type);
+      const res = await createLocationAction(name.trim(), shortCode.trim(), category);
       if (res.success && res.location) {
         const created = {
           ...res.location,
@@ -63,6 +73,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
         setLocList([...locList, created].sort((a, b) => a.name.localeCompare(b.name)));
         setName('');
         setShortCode('');
+        setCategory('AIRPORT');
         setShowAddForm(false);
         setSuccessMsg(`Successfully created location hub '${created.name}'.`);
         router.refresh();
@@ -80,6 +91,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
     setEditingLocId(loc.id);
     setEditName(loc.name);
     setEditShortCode(loc.shortCode);
+    setEditCategory(loc.category || loc.type || 'AIRPORT');
     setErrorMsg('');
     setSuccessMsg('');
   };
@@ -88,6 +100,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
     setEditingLocId(null);
     setEditName('');
     setEditShortCode('');
+    setEditCategory('AIRPORT');
   };
 
   const handleUpdate = async (id: string) => {
@@ -101,10 +114,19 @@ export function LocationManager({ locations }: LocationManagerProps) {
     setSuccessMsg('');
 
     try {
-      const res = await updateLocationAction(id, editName.trim(), editShortCode.trim());
+      const res = await updateLocationAction(id, editName.trim(), editShortCode.trim(), editCategory);
       if (res.success && res.location) {
         setLocList(
-          locList.map((loc) => (loc.id === id ? { ...loc, name: res.location.name, shortCode: res.location.shortCode } : loc))
+          locList.map((loc) =>
+            loc.id === id
+              ? {
+                  ...loc,
+                  name: res.location.name,
+                  shortCode: res.location.shortCode,
+                  category: res.location.category,
+                }
+              : loc
+          )
         );
         setEditingLocId(null);
         setSuccessMsg(`Successfully updated location hub '${res.location.name}'.`);
@@ -144,7 +166,8 @@ export function LocationManager({ locations }: LocationManagerProps) {
   const filteredLocations = locList.filter(
     (l) =>
       l.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.shortCode.toLowerCase().includes(searchTerm.toLowerCase())
+      l.shortCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (l.category && l.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -160,7 +183,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
             Location Hubs & Transfer Destinations ({locList.length})
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
-            Create, edit, or delete origin and destination hubs used for fares, dropdowns, and route generation.
+            Create, edit, or delete origin and destination hubs. Assign display categories to control dropdown section headers.
           </p>
         </div>
 
@@ -234,6 +257,21 @@ export function LocationManager({ locations }: LocationManagerProps) {
                 className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500"
               />
             </div>
+
+            <div className="space-y-1 sm:col-span-3">
+              <label className="text-xs font-bold text-slate-700">Display Category (Header Grouping) *</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500 cursor-pointer"
+              >
+                {CATEGORY_OPTIONS.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex justify-end pt-2">
@@ -263,7 +301,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
         <Search className="w-4 h-4 text-slate-400 shrink-0 ml-1" />
         <input
           type="text"
-          placeholder="Filter location hubs by name or short code..."
+          placeholder="Filter location hubs by name, short code, or category..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-transparent text-xs font-semibold text-slate-900 focus:outline-none"
@@ -306,6 +344,20 @@ export function LocationManager({ locations }: LocationManagerProps) {
                       className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500"
                     />
                   </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700">Display Category (Header Grouping)</label>
+                    <select
+                      value={editCategory}
+                      onChange={(e) => setEditCategory(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-gold-500 cursor-pointer"
+                    >
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <option key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-2 pt-1">
@@ -330,13 +382,21 @@ export function LocationManager({ locations }: LocationManagerProps) {
             );
           }
 
+          const currentCatLabel = CATEGORY_OPTIONS.find((c) => c.value === loc.category)?.label.split(' ')[0] || loc.category || 'CUSTOM';
+
           return (
             <div key={loc.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-gold-400 transition-all space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                    {loc.shortCode}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md bg-slate-900 text-white">
+                      {loc.shortCode}
+                    </span>
+                    <span className="text-[10px] font-extrabold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                      <Tag className="w-2.5 h-2.5 text-slate-500" />
+                      <span>{currentCatLabel}</span>
+                    </span>
+                  </div>
                   <h4 className="text-sm font-extrabold text-slate-900 mt-2">{loc.name}</h4>
                 </div>
 
@@ -344,7 +404,7 @@ export function LocationManager({ locations }: LocationManagerProps) {
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
-                    title="Edit Location Hub"
+                    title="Edit Location Hub & Category"
                     onClick={() => startEdit(loc)}
                     className="p-1.5 rounded-lg bg-slate-100 hover:bg-gold-50 text-slate-600 hover:text-gold-700 transition-colors border border-slate-200"
                   >
