@@ -59,6 +59,10 @@ export default async function RoutePage({ params }: RoutePageProps) {
     orderBy: { name: 'asc' },
   });
 
+  const categories = await db.locationCategory.findMany({
+    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+  });
+
   // Customized details per hub location category
   let distanceKm = 45;
   let estDurationMinutes = 45;
@@ -226,6 +230,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
               <BookingWidget
                 compact={true}
                 locations={locations}
+                categories={categories as any}
                 defaultOriginId={currentRoute.originId}
                 defaultDestinationId={currentRoute.destinationId}
                 defaultSedanPrice={currentRoute.sedanPriceEur}

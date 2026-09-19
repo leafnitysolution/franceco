@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { LocationItem } from '@/types';
+import { LocationItem, CategoryItem } from '@/types';
 import {
   Search,
   Plane,
@@ -19,12 +19,13 @@ interface LocationDropdownProps {
   title?: string;
   placeholder?: string;
   locations: LocationItem[];
+  categories?: CategoryItem[];
   selectedLocationId?: string;
   onSelectLocation: (location: LocationItem) => void;
 }
 
-// Category Header Display Names (Simple & Clean)
-const CATEGORY_NAMES: Record<string, string> = {
+// Fallback Category Header Display Names
+const FALLBACK_CATEGORY_NAMES: Record<string, string> = {
   AIRPORT: 'Paris Airports',
   AMUSEMENT_PARK: 'Euro Disney Paris',
   CITY_CENTER: 'Paris',
@@ -38,6 +39,7 @@ export function LocationDropdown({
   title = 'Select Pickup Location...',
   placeholder = 'Search location...',
   locations,
+  categories,
   selectedLocationId,
   onSelectLocation,
 }: LocationDropdownProps) {
@@ -151,7 +153,10 @@ export function LocationDropdown({
           </div>
         ) : (
           sortedCategories.map((catKey) => {
-            const categoryTitle = CATEGORY_NAMES[catKey] || catKey.replace('_', ' ');
+            const matchedCat = categories?.find((c) => c.key === catKey);
+            const categoryTitle = matchedCat
+              ? matchedCat.name
+              : FALLBACK_CATEGORY_NAMES[catKey] || catKey.replace(/_/g, ' ');
             const items = groupedLocations[catKey];
 
             return (

@@ -7,7 +7,7 @@ import { FleetShowcase } from '@/components/UI/FleetShowcase';
 import { CustomerReviews } from '@/components/UI/CustomerReviews';
 import { FaqAccordion } from '@/components/UI/FaqAccordion';
 import { useLanguage } from '@/lib/LanguageContext';
-import { LocationItem } from '@/types';
+import { LocationItem, CategoryItem } from '@/types';
 import {
   ShieldCheck,
   Clock,
@@ -37,11 +37,12 @@ interface RouteData {
 
 interface HomePageClientProps {
   locations: LocationItem[];
+  categories?: CategoryItem[];
   featuredRoutes: RouteData[];
   defaultFaqs: { question: string; answer: string }[];
 }
 
-export function HomePageClient({ locations, featuredRoutes, defaultFaqs }: HomePageClientProps) {
+export function HomePageClient({ locations, categories, featuredRoutes, defaultFaqs }: HomePageClientProps) {
   const { t } = useLanguage();
 
   return (
@@ -104,7 +105,7 @@ export function HomePageClient({ locations, featuredRoutes, defaultFaqs }: HomeP
 
             {/* RIGHT COLUMN: BOOKING ENGINE WIDGET */}
             <div className="lg:col-span-6">
-              <BookingWidget locations={locations} />
+              <BookingWidget locations={locations} categories={categories} />
             </div>
           </div>
         </div>

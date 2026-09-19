@@ -11,6 +11,10 @@ export default async function HomePage() {
     orderBy: { name: 'asc' },
   });
 
+  const categories = await db.locationCategory.findMany({
+    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+  });
+
   const featuredRoutes = await db.route.findMany({
     where: {
       isActive: true,
@@ -50,6 +54,7 @@ export default async function HomePage() {
   return (
     <HomePageClient
       locations={locations}
+      categories={categories as any}
       featuredRoutes={featuredRoutes}
       defaultFaqs={defaultFaqs}
     />

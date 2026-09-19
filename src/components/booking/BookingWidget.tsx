@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createBookingAction } from '@/lib/actions/bookings';
 import { useBookingStore, ServiceMode } from '@/lib/store';
-import { LocationItem } from '@/types';
+import { LocationItem, CategoryItem } from '@/types';
 import { VehicleCard } from './VehicleCard';
 import { LocationDropdown } from './LocationDropdown';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -36,6 +36,7 @@ import {
 
 interface BookingWidgetProps {
   locations: LocationItem[];
+  categories?: CategoryItem[];
   defaultOriginId?: string;
   defaultDestinationId?: string;
   defaultSedanPrice?: number;
@@ -47,6 +48,7 @@ interface BookingWidgetProps {
 
 export function BookingWidget({
   locations,
+  categories,
   defaultOriginId,
   defaultDestinationId,
   defaultSedanPrice = 70,
@@ -320,6 +322,7 @@ export function BookingWidget({
                       title="Select Pickup Location..."
                       placeholder="Search Pickup Location..."
                       locations={locations}
+                      categories={categories}
                       selectedLocationId={store.origin?.id}
                       onSelectLocation={(loc) => store.setOrigin(loc)}
                     />
@@ -374,6 +377,7 @@ export function BookingWidget({
                       title="Select Drop-off Location..."
                       placeholder="Search Drop-off Location..."
                       locations={locations}
+                      categories={categories}
                       selectedLocationId={store.destination?.id}
                       onSelectLocation={(loc) => store.setDestination(loc)}
                     />

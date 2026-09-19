@@ -1,5 +1,12 @@
 export type LocationCategory = 'AIRPORT' | 'AMUSEMENT_PARK' | 'CITY_CENTER' | 'TRAIN_STATION' | 'PALACE' | string;
 
+export interface CategoryItem {
+  id: string;
+  key: string;
+  name: string;
+  sortOrder?: number;
+}
+
 export interface LocationItem {
   id: string;
   name: string;
