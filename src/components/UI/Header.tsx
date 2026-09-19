@@ -265,26 +265,23 @@ export function Header() {
 
                 <div>
                   <h4 className="text-[11px] font-black uppercase tracking-wider text-[#9E7B3B] mb-3">
-                    {t('connect')}
+                    Legal & Policies
                   </h4>
                   <ul className="space-y-2 text-xs font-semibold text-slate-700">
                     <li>
-                      <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-[#C5A059] flex items-center gap-1 py-1 transition-all hover:translate-x-1">
-                        <span>Facebook</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
-                      </a>
+                      <Link href="/terms-and-conditions" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
+                        Terms & Conditions
+                      </Link>
                     </li>
                     <li>
-                      <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#C5A059] flex items-center gap-1 py-1 transition-all hover:translate-x-1">
-                        <span>Instagram</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
-                      </a>
+                      <Link href="/privacy-policy" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
+                        Privacy Policy
+                      </Link>
                     </li>
                     <li>
-                      <a href="https://tripadvisor.com" target="_blank" rel="noreferrer" className="hover:text-[#C5A059] flex items-center gap-1 py-1 transition-all hover:translate-x-1">
-                        <span>TripAdvisor</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
-                      </a>
+                      <Link href="/cancellation-policy" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
+                        Cancellation Policy
+                      </Link>
                     </li>
                   </ul>
                 </div>
