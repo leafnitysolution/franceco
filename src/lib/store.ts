@@ -19,6 +19,7 @@ interface BookingStoreState {
   vehicleTier: VehicleTier;
   passengers: number;
   luggageCount: number;
+  handLuggageCount: number;
   babySeats: number;
   boosterSeats: number;
   customerName: string;
@@ -55,6 +56,7 @@ interface BookingStoreState {
   setVehicleTier: (tier: VehicleTier) => void;
   setPassengers: (pax: number) => void;
   setLuggageCount: (bags: number) => void;
+  setHandLuggageCount: (bags: number) => void;
   setBabySeats: (seats: number) => void;
   setBoosterSeats: (seats: number) => void;
   setRentalHours: (hours: number) => void;
@@ -87,6 +89,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   vehicleTier: 'SEDAN',
   passengers: 2,
   luggageCount: 2,
+  handLuggageCount: 0,
   babySeats: 0,
   boosterSeats: 0,
   customerName: '',
@@ -128,6 +131,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   setVehicleTier: (tier) => set({ vehicleTier: tier }),
   setPassengers: (pax) => set({ passengers: pax }),
   setLuggageCount: (bags) => set({ luggageCount: bags }),
+  setHandLuggageCount: (bags) => set({ handLuggageCount: bags }),
   setBabySeats: (seats) => set({ babySeats: Math.max(0, seats) }),
   setBoosterSeats: (seats) => set({ boosterSeats: Math.max(0, seats) }),
   setRentalHours: (hours) => set({ rentalHours: Math.max(1, hours) }),

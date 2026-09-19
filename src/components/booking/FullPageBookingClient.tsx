@@ -67,6 +67,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
 
   // Location selector modal/dropdown triggers
   const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
+  const [isEditJourneyModalOpen, setIsEditJourneyModalOpen] = useState(false);
 
   // Sync initial locations if empty
   useEffect(() => {
@@ -394,20 +395,20 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-slate-900 font-bold text-sm">
                           <Briefcase className="w-4 h-4 text-slate-500 shrink-0" />
-                          <span>0</span>
+                          <span>{store.handLuggageCount}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
-                            disabled
-                            className="w-6 h-6 rounded bg-slate-300 text-slate-500 font-bold flex items-center justify-center text-xs opacity-50"
+                            onClick={() => store.setHandLuggageCount(Math.max(0, store.handLuggageCount - 1))}
+                            className="w-6 h-6 rounded bg-slate-900 text-white font-bold flex items-center justify-center text-xs hover:bg-slate-800 transition-colors"
                           >
                             -
                           </button>
                           <button
                             type="button"
-                            disabled
-                            className="w-6 h-6 rounded bg-slate-300 text-slate-500 font-bold flex items-center justify-center text-xs opacity-50"
+                            onClick={() => store.setHandLuggageCount(Math.min(16, store.handLuggageCount + 1))}
+                            className="w-6 h-6 rounded bg-slate-900 text-white font-bold flex items-center justify-center text-xs hover:bg-slate-800 transition-colors"
                           >
                             +
                           </button>
@@ -1020,11 +1021,12 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                   {step < 4 && (
                     <button
                       type="button"
-                      onClick={() => setStep(1)}
-                      title="Edit trip details"
-                      className="text-slate-400 hover:text-slate-700"
+                      onClick={() => setIsEditJourneyModalOpen(true)}
+                      title="Edit pickup, dropoff, date or time"
+                      className="text-slate-400 hover:text-amber-600 transition-colors flex items-center gap-1 text-[10px] font-extrabold uppercase bg-slate-200/60 hover:bg-amber-100 px-2 py-1 rounded-lg"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <Edit2 className="w-3 h-3 text-slate-600" />
+                      <span>Edit</span>
                     </button>
                   )}
                 </div>
@@ -1187,6 +1189,179 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
             </div>
           </div>
         </div>
+      )}
+      {/* ========================================================================= */}
+      {/* EDIT JOURNEY MODAL */}
+      {/* ========================================================================= */}
+      {isEditJourneyModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider">
+                  Edit Journey Specifications
+                </span>
+                <h3 className="text-lg font-black text-slate-900">
+                  Pickup, Drop-off & Schedule
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditJourneyModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Origin & Destination Selector Buttons */}
+            <div className="space-y-3">
+              {/* Pickup Location */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700 block">Pickup Location (From)</label>
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown('ORIGIN')}
+                  className="w-full px-3.5 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 flex items-center justify-between transition-colors text-left"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <MapPin className="w-4 h-4 text-slate-600 shrink-0" />
+                    <span className="truncate">{store.origin?.name || 'Select Pickup Location...'}</span>
+                  </div>
+                  <span className="text-[10px] font-extrabold uppercase bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Change</span>
+                </button>
+              </div>
+
+              {/* Swap Button */}
+              <div className="flex justify-center -my-1">
+                <button
+                  type="button"
+                  onClick={() => store.swapLocations()}
+                  className="p-2 rounded-full bg-slate-900 text-white hover:bg-amber-600 transition-colors shadow-sm"
+                  title="Swap Pickup & Dropoff Locations"
+                >
+                  <ArrowRightLeft className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Drop-off Location */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700 block">Drop-off Location (To)</label>
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown('DESTINATION')}
+                  className="w-full px-3.5 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 flex items-center justify-between transition-colors text-left"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <MapPin className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span className="truncate">{store.destination?.name || 'Select Drop-off Location...'}</span>
+                  </div>
+                  <span className="text-[10px] font-extrabold uppercase bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Change</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Date & Time Selectors */}
+            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700 block">Pickup Date</label>
+                <div className="relative">
+                  <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="date"
+                    value={store.pickupDate}
+                    onChange={(e) => store.setPickupDate(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700 block">Pickup Time</label>
+                <div className="relative">
+                  <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="time"
+                    value={store.pickupTime}
+                    onChange={(e) => store.setPickupTime(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Return Trip Toggle */}
+            <div className="p-3 bg-amber-50/60 border border-amber-200/80 rounded-2xl space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-amber-900">Add Return Journey (+10% Discount)</span>
+                <button
+                  type="button"
+                  onClick={() => store.setIsReturn(!store.isReturn)}
+                  className={`w-11 h-6 rounded-full transition-colors relative ${
+                    store.isReturn ? 'bg-amber-600' : 'bg-slate-300'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${
+                    store.isReturn ? 'left-6' : 'left-1'
+                  }`} />
+                </button>
+              </div>
+
+              {store.isReturn && (
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-amber-200/60">
+                  <div>
+                    <label className="text-[10px] font-bold text-amber-800 uppercase block mb-1">Return Date</label>
+                    <input
+                      type="date"
+                      value={store.returnDate}
+                      onChange={(e) => store.setReturnDate(e.target.value)}
+                      className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-amber-800 uppercase block mb-1">Return Time</label>
+                    <input
+                      type="time"
+                      value={store.returnTime}
+                      onChange={(e) => store.setReturnTime(e.target.value)}
+                      className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold text-slate-900"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsEditJourneyModalOpen(false)}
+                className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all w-full"
+              >
+                Save & Update Journey
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Location Selector Dropdown Modal */}
+      {activeDropdown && (
+        <LocationDropdown
+          isOpen={!!activeDropdown}
+          onClose={() => setActiveDropdown(null)}
+          title={activeDropdown === 'ORIGIN' ? 'Select Pickup Location...' : 'Select Drop-off Location...'}
+          locations={locations}
+          categories={categories}
+          selectedLocationId={activeDropdown === 'ORIGIN' ? store.origin?.id : store.destination?.id}
+          onSelectLocation={(loc) => {
+            if (activeDropdown === 'ORIGIN') {
+              store.setOrigin(loc);
+            } else {
+              store.setDestination(loc);
+            }
+            setActiveDropdown(null);
+          }}
+        />
       )}
     </div>
   );
