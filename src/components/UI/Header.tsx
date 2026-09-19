@@ -35,17 +35,17 @@ export function Header() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24 gap-4">
+        <div className="flex items-center justify-between h-20 gap-4">
           {/* Header Logo - FRANCE GO */}
           <Link href="/" className="flex items-center gap-3 group shrink-0 py-1">
-            <div className="relative h-20 sm:h-24 w-64 sm:w-[320px] hover:scale-[1.02] transition-transform duration-200">
+            <div className="relative h-14 sm:h-16 w-56 sm:w-72 hover:scale-[1.02] transition-transform duration-200">
               <Image
                 src="/images/logo.png"
                 alt="FRANCE GO - VIP Transfers & Tours"
                 fill
                 priority
-                sizes="(max-width: 768px) 280px, 350px"
-                className="object-contain object-left scale-110"
+                sizes="(max-width: 768px) 240px, 300px"
+                className="object-contain object-left scale-105"
               />
             </div>
           </Link>

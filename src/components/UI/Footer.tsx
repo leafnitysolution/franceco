@@ -19,26 +19,43 @@ export function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12 border-b border-[#1E2D42] items-start">
           {/* Brand Info & Contact Quick Actions (Col 8) */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <Link
                 href="/"
-                className="inline-block bg-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-white/40 hover:scale-[1.02] transition-all self-start"
+                className="inline-block bg-white rounded-2xl px-4 py-2 shadow-md border border-white/30 hover:scale-[1.02] transition-transform self-start"
               >
-                <div className="relative h-20 sm:h-24 w-72 sm:w-[380px]">
+                <div className="relative h-12 sm:h-14 w-56 sm:w-72">
                   <Image
                     src="/images/logo.png"
                     alt="FranceGo - VIP Transfers & Tours"
                     fill
                     priority
-                    className="object-contain object-left scale-110"
+                    className="object-contain object-left scale-105"
                   />
                 </div>
               </Link>
 
-              {/* Quick Badge */}
-              <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/40 px-4 py-2 rounded-full text-gold-400 text-xs font-black tracking-wider self-start sm:self-center shadow-md">
-                <ShieldCheck className="w-4 h-4 text-gold-400" />
-                <span>OFFICIAL PARIS CHAUFFEUR SERVICE</span>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/30 px-3.5 py-2 rounded-xl text-gold-400 text-xs font-bold shadow-xs">
+                  <ShieldCheck className="w-4 h-4 text-gold-400" />
+                  <span>OFFICIAL PARIS CHAUFFEUR SERVICE</span>
+                </div>
+
+                <Link
+                  href="/book"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-gold-500 via-gold-600 to-amber-600 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <span>Plan a Transfer</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+
+                <Link
+                  href="/contact-us"
+                  className="px-5 py-2.5 rounded-xl bg-[#132338] hover:bg-gold-600 border border-gold-500/40 text-gold-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-gold-400" />
+                  <span>Talk to Us</span>
+                </Link>
               </div>
             </div>
 
@@ -47,8 +64,8 @@ export function Footer() {
             </p>
 
             {/* Quick Contact Details Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2">
-              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
+              <div className="p-3 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
                 <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
                   <Phone className="w-4 h-4 text-gold-400" />
                 </div>
@@ -60,7 +77,7 @@ export function Footer() {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+              <div className="p-3 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
                 <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
                   <Mail className="w-4 h-4 text-gold-400" />
                 </div>
@@ -72,7 +89,7 @@ export function Footer() {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+              <div className="p-3 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
                 <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
                   <MapPin className="w-4 h-4 text-gold-400" />
                 </div>
@@ -81,24 +98,6 @@ export function Footer() {
                   <span className="font-bold text-slate-200">Paris CDG, Orly & DLP</span>
                 </div>
               </div>
-            </div>
-
-            {/* Call to Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link
-                href="/book"
-                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 via-gold-600 to-amber-600 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-gold-950/40 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
-              >
-                <span>Plan a Transfer</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/contact-us"
-                className="px-6 py-3.5 rounded-2xl bg-[#132338] hover:bg-gold-600 border border-gold-500/40 text-gold-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md hover:shadow-gold-900/20 transform hover:-translate-y-0.5"
-              >
-                <MessageSquare className="w-4 h-4 text-gold-400 group-hover:text-white" />
-                <span>Talk to Us</span>
-              </Link>
             </div>
           </div>
 
