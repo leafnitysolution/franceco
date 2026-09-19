@@ -149,9 +149,22 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom copyright section */}
-        <div className="pt-6 border-t border-[#1E2D42] text-center text-[11px] text-slate-400 font-medium flex flex-col md:flex-row justify-between items-center gap-2">
+        {/* Bottom copyright & legal links section */}
+        <div className="pt-6 border-t border-[#1E2D42] text-center text-[11px] text-slate-400 font-medium flex flex-col md:flex-row justify-between items-center gap-3">
           <p>© {new Date().getFullYear()} FastForward Shuttle. {t('rightsReserved')}</p>
+          <div className="flex items-center gap-4 text-xs font-semibold">
+            <Link href="/terms-and-conditions" className="hover:text-gold-400 transition-colors">
+              Terms & Conditions
+            </Link>
+            <span>•</span>
+            <Link href="/privacy-policy" className="hover:text-gold-400 transition-colors">
+              Privacy Policy
+            </Link>
+            <span>•</span>
+            <Link href="/cancellation-policy" className="hover:text-gold-400 transition-colors">
+              Cancellation Policy
+            </Link>
+          </div>
           <p>Official Door-to-Door Private Chauffeur Service</p>
         </div>
       </div>

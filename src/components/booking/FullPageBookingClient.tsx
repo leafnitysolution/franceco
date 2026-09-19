@@ -796,7 +796,19 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                         className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-slate-900 mt-0.5 shrink-0"
                       />
                       <span className="text-xs text-slate-700 font-medium leading-relaxed">
-                        By confirming this booking you agree to our <strong className="text-slate-900">Terms and Conditions</strong>, <strong className="text-slate-900">Privacy Policy</strong>, and <strong className="text-slate-900">Cancellation Policy</strong>. Pay driver on arrival.
+                        By confirming this booking you agree to our{' '}
+                        <Link href="/terms-and-conditions" target="_blank" className="font-bold text-slate-900 underline hover:text-amber-600 transition-colors">
+                          Terms and Conditions
+                        </Link>
+                        ,{' '}
+                        <Link href="/privacy-policy" target="_blank" className="font-bold text-slate-900 underline hover:text-amber-600 transition-colors">
+                          Privacy Policy
+                        </Link>
+                        , and{' '}
+                        <Link href="/cancellation-policy" target="_blank" className="font-bold text-slate-900 underline hover:text-amber-600 transition-colors">
+                          Cancellation Policy
+                        </Link>
+                        . Pay driver on arrival.
                       </span>
                     </label>
                     {fieldErrors.agreedTerms && (
