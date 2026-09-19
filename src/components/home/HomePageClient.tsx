@@ -59,7 +59,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
             sizes="100vw"
             className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B192C]/90 via-[#0B192C]/75 to-[#0B192C]/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B192C]/55 via-[#0B192C]/30 to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-8">
