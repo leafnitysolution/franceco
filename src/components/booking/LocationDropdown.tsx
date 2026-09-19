@@ -5,35 +5,37 @@ import { LocationItem } from '@/types';
 import {
   Search,
   Plane,
-  Sparkles,
-  Train,
   MapPin,
-  Landmark,
-  Building,
+  X,
   Check,
+  Building,
+  Train,
+  Landmark,
 } from 'lucide-react';
 
 interface LocationDropdownProps {
   isOpen: boolean;
   onClose: () => void;
+  title?: string;
   placeholder?: string;
   locations: LocationItem[];
   selectedLocationId?: string;
   onSelectLocation: (location: LocationItem) => void;
 }
 
-// Category Configuration mapping category enum to Label & Lucide Icon
-const CATEGORY_MAP: Record<string, { label: string; icon: any; iconColor: string }> = {
-  AIRPORT: { label: 'Paris Airports', icon: Plane, iconColor: 'text-sky-600' },
-  AMUSEMENT_PARK: { label: 'Disneyland Paris & Resorts', icon: Sparkles, iconColor: 'text-amber-500' },
-  TRAIN_STATION: { label: 'Paris Train Stations', icon: Train, iconColor: 'text-emerald-600' },
-  CITY_CENTER: { label: 'Paris City & Hotels', icon: Building, iconColor: 'text-indigo-600' },
-  PALACE: { label: 'Palaces & Historical Sites', icon: Landmark, iconColor: 'text-purple-600' },
+// Category Header Display Names (Simple & Clean)
+const CATEGORY_NAMES: Record<string, string> = {
+  AIRPORT: 'Paris Airports',
+  AMUSEMENT_PARK: 'Euro Disney Paris',
+  CITY_CENTER: 'Paris',
+  TRAIN_STATION: 'Paris Train Stations',
+  PALACE: 'Other',
 };
 
 export function LocationDropdown({
   isOpen,
   onClose,
+  title = 'Select Pickup Location...',
   placeholder = 'Search location...',
   locations,
   selectedLocationId,
@@ -78,8 +80,8 @@ export function LocationDropdown({
     return acc;
   }, {});
 
-  // Category display order
-  const categoryOrder = ['AIRPORT', 'AMUSEMENT_PARK', 'TRAIN_STATION', 'CITY_CENTER', 'PALACE'];
+  // Pre-defined category order
+  const categoryOrder = ['AIRPORT', 'AMUSEMENT_PARK', 'CITY_CENTER', 'TRAIN_STATION', 'PALACE'];
   const presentCategories = Object.keys(groupedLocations);
   
   const sortedCategories = presentCategories.sort((a, b) => {
@@ -91,13 +93,43 @@ export function LocationDropdown({
     return a.localeCompare(b);
   });
 
+  // Helper to pick a subtle clean grey icon for each item
+  const getItemIcon = (category: string) => {
+    switch (category) {
+      case 'AIRPORT':
+        return Plane;
+      case 'TRAIN_STATION':
+        return Train;
+      case 'CITY_CENTER':
+        return Building;
+      case 'PALACE':
+        return Landmark;
+      default:
+        return MapPin;
+    }
+  };
+
   return (
     <div
       ref={dropdownRef}
-      className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 bg-white rounded-2xl shadow-2xl border border-slate-300 overflow-hidden flex flex-col max-h-[340px] animate-in fade-in zoom-in-95 duration-150"
+      className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[360px] animate-in fade-in duration-150"
     >
-      {/* Compact Search Header */}
-      <div className="p-2 bg-slate-900 shrink-0">
+      {/* Black Top Header Bar (Matching EasyGoShuttle design) */}
+      <div className="bg-black text-white px-3.5 py-2.5 flex items-center justify-between shrink-0">
+        <span className="text-xs sm:text-sm font-bold tracking-tight">
+          {title}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-slate-400 hover:text-white transition-colors"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Light Search Bar Box */}
+      <div className="p-2 bg-slate-50 border-b border-slate-200 shrink-0">
         <div className="relative flex items-center">
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
           <input
@@ -105,40 +137,36 @@ export function LocationDropdown({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={placeholder}
-            className="w-full pl-8 pr-3 py-1.5 bg-slate-800 text-xs font-semibold text-white rounded-lg border border-slate-700 focus:outline-none focus:border-gold-500 placeholder-slate-400"
+            className="w-full pl-8 pr-3 py-1.5 bg-white text-xs text-slate-800 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 placeholder-slate-400 font-medium"
             autoFocus
           />
         </div>
       </div>
 
-      {/* Categorized Options List */}
-      <div className="overflow-y-auto divide-y divide-slate-100 flex-1">
+      {/* Clean Light Categorized List */}
+      <div className="overflow-y-auto flex-1">
         {sortedCategories.length === 0 ? (
-          <div className="p-6 text-center text-slate-500 text-xs font-medium">
+          <div className="p-6 text-center text-slate-400 text-xs font-medium">
             No matching locations found
           </div>
         ) : (
           sortedCategories.map((catKey) => {
-            const catConfig = CATEGORY_MAP[catKey] || {
-              label: catKey.replace('_', ' '),
-              icon: MapPin,
-              iconColor: 'text-slate-600',
-            };
-            const CatIcon = catConfig.icon;
+            const categoryTitle = CATEGORY_NAMES[catKey] || catKey.replace('_', ' ');
             const items = groupedLocations[catKey];
 
             return (
-              <div key={catKey} className="bg-slate-50/50">
-                {/* Distinct Category Header Bar */}
-                <div className="sticky top-0 z-10 px-3 py-1.5 bg-slate-200/90 backdrop-blur-xs text-slate-800 text-[10px] font-black uppercase tracking-wider border-y border-slate-300/70 flex items-center gap-1.5 shadow-xs">
-                  <CatIcon className={`w-3.5 h-3.5 ${catConfig.iconColor} shrink-0`} />
-                  <span>{catConfig.label}</span>
+              <div key={catKey}>
+                {/* Simple Light Grey Category Header */}
+                <div className="px-4 py-2 bg-[#f3f4f6] text-slate-800 text-xs font-bold tracking-tight border-b border-slate-100">
+                  {categoryTitle}
                 </div>
 
-                {/* Indented Options List */}
-                <div className="divide-y divide-slate-100 bg-white">
+                {/* Clean Location Items */}
+                <div>
                   {items.map((loc) => {
                     const isSelected = selectedLocationId === loc.id;
+                    const ItemIcon = getItemIcon(loc.category);
+
                     return (
                       <button
                         key={loc.id}
@@ -147,37 +175,22 @@ export function LocationDropdown({
                           onSelectLocation(loc);
                           onClose();
                         }}
-                        className={`w-full px-3.5 py-2.5 text-left flex items-center justify-between transition-all group ${
+                        className={`w-full px-4 py-3 text-left flex items-center justify-between transition-colors border-b border-slate-100/80 last:border-0 ${
                           isSelected
-                            ? 'bg-slate-900 text-white font-bold'
-                            : 'hover:bg-amber-50/70 text-slate-800'
+                            ? 'bg-slate-50 text-slate-900 font-semibold'
+                            : 'bg-white hover:bg-slate-50/80 text-slate-700'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                          <CatIcon
-                            className={`w-4 h-4 shrink-0 transition-colors ${
-                              isSelected
-                                ? 'text-gold-400'
-                                : `${catConfig.iconColor} group-hover:scale-110`
-                            }`}
-                          />
-                          <span className="text-xs sm:text-sm font-bold truncate">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <ItemIcon className="w-4 h-4 text-slate-600 shrink-0 stroke-[1.8]" />
+                          <span className="text-xs sm:text-sm font-medium text-slate-800 truncate">
                             {loc.name}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span
-                            className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
-                              isSelected
-                                ? 'bg-slate-800 text-gold-400'
-                                : 'bg-slate-100 text-slate-600 border border-slate-200 group-hover:bg-amber-100 group-hover:text-amber-900'
-                            }`}
-                          >
-                            {loc.shortCode}
-                          </span>
-                          {isSelected && <Check className="w-4 h-4 text-gold-400" />}
-                        </div>
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-slate-900 shrink-0 ml-2" />
+                        )}
                       </button>
                     );
                   })}

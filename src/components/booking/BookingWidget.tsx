@@ -299,11 +299,9 @@ export function BookingWidget({
                       <div className="flex items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2 min-w-0">
                           {store.origin?.category === 'AIRPORT' ? (
-                            <Plane className="w-4 h-4 text-sky-600 shrink-0" />
-                          ) : store.origin?.category === 'AMUSEMENT_PARK' ? (
-                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                            <Plane className="w-4 h-4 text-slate-700 shrink-0" />
                           ) : (
-                            <MapPin className="w-4 h-4 text-indigo-600 shrink-0" />
+                            <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
                           )}
                           <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
                             {store.origin ? store.origin.name : 'Select Pickup Location...'}
@@ -319,7 +317,8 @@ export function BookingWidget({
                     <LocationDropdown
                       isOpen={activeDropdown === 'ORIGIN'}
                       onClose={() => setActiveDropdown(null)}
-                      placeholder="Search pickup location or airport..."
+                      title="Select Pickup Location..."
+                      placeholder="Search Pickup Location..."
                       locations={locations}
                       selectedLocationId={store.origin?.id}
                       onSelectLocation={(loc) => store.setOrigin(loc)}
@@ -352,11 +351,11 @@ export function BookingWidget({
                       <div className="flex items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2 min-w-0">
                           {store.destination?.category === 'AIRPORT' ? (
-                            <Plane className="w-4 h-4 text-sky-600 shrink-0" />
+                            <Plane className="w-4 h-4 text-slate-700 shrink-0" />
                           ) : store.destination?.category === 'AMUSEMENT_PARK' ? (
-                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                            <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
                           ) : (
-                            <MapPin className="w-4 h-4 text-indigo-600 shrink-0" />
+                            <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
                           )}
                           <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
                             {store.destination ? store.destination.name : 'Select Drop-off Location...'}
@@ -372,7 +371,8 @@ export function BookingWidget({
                     <LocationDropdown
                       isOpen={activeDropdown === 'DESTINATION'}
                       onClose={() => setActiveDropdown(null)}
-                      placeholder="Search drop-off location or airport..."
+                      title="Select Drop-off Location..."
+                      placeholder="Search Drop-off Location..."
                       locations={locations}
                       selectedLocationId={store.destination?.id}
                       onSelectLocation={(loc) => store.setDestination(loc)}
