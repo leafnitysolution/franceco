@@ -1,7 +1,30 @@
 import { db } from './db';
 
+export async function ensureLocationCategoriesSeeded() {
+  try {
+    const defaultCats = [
+      { key: 'AIRPORT', name: 'Paris Airports', sortOrder: 1 },
+      { key: 'AMUSEMENT_PARK', name: 'Euro Disney Paris', sortOrder: 2 },
+      { key: 'CITY_CENTER', name: 'Paris', sortOrder: 3 },
+      { key: 'TRAIN_STATION', name: 'Paris Train Stations', sortOrder: 4 },
+      { key: 'PALACE', name: 'Other', sortOrder: 5 },
+    ];
+
+    for (const cat of defaultCats) {
+      await db.locationCategory.upsert({
+        where: { key: cat.key },
+        update: {},
+        create: cat,
+      });
+    }
+  } catch (err) {
+    console.error('Error auto-seeding categories:', err);
+  }
+}
+
 export async function ensureLocationsSeeded() {
   try {
+    await ensureLocationCategoriesSeeded();
     const count = await db.location.count();
     if (count > 0) return;
 

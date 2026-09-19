@@ -265,3 +265,103 @@ export async function deleteLocationAction(id: string) {
   }
 }
 
+// Location Category Management Actions
+export async function createCategoryAction(name: string) {
+  try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return { success: false, error: 'Unauthorized: Admin authentication required.' };
+    }
+
+    if (!name || !name.trim()) {
+      return { success: false, error: 'Category display name is required.' };
+    }
+
+    const cleanName = name.trim();
+    const key = cleanName.toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+
+    const category = await db.locationCategory.create({
+      data: {
+        key,
+        name: cleanName,
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/ffs-portal-sec-99x/locations');
+    return { success: true, category };
+  } catch (error: any) {
+    console.error('Error creating category:', error);
+    return { success: false, error: 'Failed to create category. Ensure key/name is unique.' };
+  }
+}
+
+export async function updateCategoryAction(id: string, name: string) {
+  try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return { success: false, error: 'Unauthorized: Admin authentication required.' };
+    }
+
+    if (!id || !name || !name.trim()) {
+      return { success: false, error: 'Category ID and name are required.' };
+    }
+
+    const cleanName = name.trim();
+    const category = await db.locationCategory.update({
+      where: { id },
+      data: {
+        name: cleanName,
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/ffs-portal-sec-99x/locations');
+    return { success: true, category };
+  } catch (error: any) {
+    console.error('Error updating category:', error);
+    return { success: false, error: 'Failed to update category.' };
+  }
+}
+
+export async function deleteCategoryAction(id: string) {
+  try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return { success: false, error: 'Unauthorized: Admin authentication required.' };
+    }
+
+    const category = await db.locationCategory.findUnique({
+      where: { id },
+    });
+
+    if (!category) {
+      return { success: false, error: 'Category not found.' };
+    }
+
+    // Check if any locations are using this category key
+    const locationCount = await db.location.count({
+      where: { category: category.key },
+    });
+
+    if (locationCount > 0) {
+      return {
+        success: false,
+        error: `Cannot delete '${category.name}' because ${locationCount} location hub(s) are currently assigned to this category. Please reassign them first.`,
+      };
+    }
+
+    await db.locationCategory.delete({
+      where: { id },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/ffs-portal-sec-99x/locations');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error deleting category:', error);
+    return { success: false, error: 'Failed to delete category.' };
+  }
+}
+
+
