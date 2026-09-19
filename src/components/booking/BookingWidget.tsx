@@ -493,28 +493,57 @@ export function BookingWidget({
                 </div>
               )}
 
-              {/* PASSENGERS COUNTER (- / + STEPPER matching screenshot) */}
-              <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
-                <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider">
-                  Passengers (including kids)
-                </label>
-                <div className="flex items-center justify-between">
-                  <span className="text-base font-black text-slate-900 pl-1">{store.passengers}</span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => store.setPassengers(Math.max(1, store.passengers - 1))}
-                      className="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-black flex items-center justify-center text-xs shadow-sm transition-all active:scale-95"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => store.setPassengers(Math.min(16, store.passengers + 1))}
-                      className="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-black flex items-center justify-center text-xs shadow-sm transition-all active:scale-95"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
+              {/* PASSENGERS & LUGGAGE COUNTERS (Side-by-Side Split Grid) */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* PASSENGERS COUNTER */}
+                <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
+                  <label className="text-[9px] sm:text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider truncate">
+                    Passengers (inc. kids)
+                  </label>
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-black text-slate-900 pl-1">{store.passengers}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => store.setPassengers(Math.max(1, store.passengers - 1))}
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-black flex items-center justify-center text-xs shadow-sm transition-all active:scale-95"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => store.setPassengers(Math.min(16, store.passengers + 1))}
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-black flex items-center justify-center text-xs shadow-sm transition-all active:scale-95"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* LUGGAGE COUNTER */}
+                <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
+                  <label className="text-[9px] sm:text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider truncate">
+                    Luggage Count
+                  </label>
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-black text-slate-900 pl-1">{store.luggageCount}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => store.setLuggageCount(Math.max(0, store.luggageCount - 1))}
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-black flex items-center justify-center text-xs shadow-sm transition-all active:scale-95"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => store.setLuggageCount(Math.min(16, store.luggageCount + 1))}
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-black flex items-center justify-center text-xs shadow-sm transition-all active:scale-95"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
