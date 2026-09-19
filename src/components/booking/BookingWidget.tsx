@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createBookingAction } from '@/lib/actions/bookings';
 import { useBookingStore, ServiceMode } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
@@ -57,6 +58,7 @@ export function BookingWidget({
   defaultMinibusPrice = 180,
   compact = false,
 }: BookingWidgetProps) {
+  const router = useRouter();
   const store = useBookingStore();
   const { t } = useLanguage();
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -132,7 +134,7 @@ export function BookingWidget({
         return;
       }
     }
-    setStep(2);
+    router.push('/book');
   };
 
   const goToStep3 = () => {
