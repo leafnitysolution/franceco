@@ -15,7 +15,11 @@ import {
   EXCURSIONS_ROUTES,
 } from '@/lib/data/navigationRoutes';
 
-export function Header() {
+interface HeaderProps {
+  routes?: any[];
+}
+
+export function Header({ routes }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
   const pathname = usePathname();
@@ -26,6 +30,74 @@ export function Header() {
   const isDisneyTransfersActive = pathname.includes('disneyland');
   const isToursActive = pathname.startsWith('/tours');
   const isMoreActive = ['/about-us', '/contact-us', '/reviews', '/faqs'].includes(pathname);
+
+  const hasDynamicRoutes = Boolean(routes && routes.length > 0);
+
+  const airportRoutes = hasDynamicRoutes
+    ? routes!
+        .filter((r) => r.origin?.category === 'AIRPORT' || r.destination?.category === 'AIRPORT')
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          slug: r.slug,
+        }))
+    : PARIS_AIRPORT_ROUTES;
+
+  const disneylandRoutes = hasDynamicRoutes
+    ? routes!
+        .filter(
+          (r) =>
+            r.origin?.shortCode === 'DLP' ||
+            r.destination?.shortCode === 'DLP' ||
+            r.slug.includes('disneyland')
+        )
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          slug: r.slug,
+        }))
+    : DISNEYLAND_ROUTES;
+
+  const versaillesRoutes = hasDynamicRoutes
+    ? routes!
+        .filter(
+          (r) =>
+            r.origin?.shortCode === 'VERS' ||
+            r.destination?.shortCode === 'VERS' ||
+            r.slug.includes('versailles')
+        )
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          slug: r.slug,
+        }))
+    : VERSAILLES_ROUTES;
+
+  const trainStationRoutes = hasDynamicRoutes
+    ? routes!
+        .filter(
+          (r) =>
+            r.origin?.category === 'TRAIN_STATION' ||
+            r.destination?.category === 'TRAIN_STATION' ||
+            r.slug.includes('station') ||
+            r.slug.includes('gare')
+        )
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          slug: r.slug,
+        }))
+    : TRAIN_STATION_ROUTES;
+
+  const excursionsRoutes = hasDynamicRoutes
+    ? routes!
+        .filter(
+          (r) =>
+            r.origin?.category === 'PALACE' ||
+            r.destination?.category === 'PALACE' ||
+            ['giverny', 'asterix', 'fontainebleau', 'champagne', 'normandy', 'mont-saint-michel', 'loire'].some((k) => r.slug.includes(k))
+        )
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          slug: r.slug,
+        }))
+    : EXCURSIONS_ROUTES;
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200/80 shadow-sm transition-all duration-300">
@@ -83,7 +155,7 @@ export function Header() {
                     Paris Airport Transfers
                   </h4>
                   <ul className="space-y-2 text-xs font-semibold text-slate-700">
-                    {PARIS_AIRPORT_ROUTES.map((r) => (
+                    {airportRoutes.map((r) => (
                       <li key={r.slug}>
                         <Link href={`/transfers/${r.slug}`} className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
                           {r.label}
@@ -99,7 +171,7 @@ export function Header() {
                       Versailles Transfers
                     </h4>
                     <ul className="space-y-2 text-xs font-semibold text-slate-700">
-                      {VERSAILLES_ROUTES.map((r) => (
+                      {versaillesRoutes.map((r) => (
                         <li key={r.slug}>
                           <Link href={`/transfers/${r.slug}`} className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
                             {r.label}
@@ -109,20 +181,22 @@ export function Header() {
                     </ul>
                   </div>
 
-                  <div>
-                    <h4 className="text-[11px] font-black uppercase tracking-wider text-[#9E7B3B] mb-3">
-                      Train Station Transfers
-                    </h4>
-                    <ul className="space-y-2 text-xs font-semibold text-slate-700">
-                      {TRAIN_STATION_ROUTES.map((r) => (
-                        <li key={r.slug}>
-                          <Link href={`/transfers/${r.slug}`} className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
-                            {r.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {trainStationRoutes.length > 0 && (
+                    <div>
+                      <h4 className="text-[11px] font-black uppercase tracking-wider text-[#9E7B3B] mb-3">
+                        Train Station Transfers
+                      </h4>
+                      <ul className="space-y-2 text-xs font-semibold text-slate-700">
+                        {trainStationRoutes.map((r) => (
+                          <li key={r.slug}>
+                            <Link href={`/transfers/${r.slug}`} className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
+                              {r.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -145,7 +219,7 @@ export function Header() {
                   Disneyland Paris Transfers
                 </h4>
                 <ul className="grid grid-cols-1 gap-2 text-xs font-semibold text-slate-700">
-                  {DISNEYLAND_ROUTES.map((r) => (
+                  {disneylandRoutes.map((r) => (
                     <li key={r.slug}>
                       <Link href={`/transfers/${r.slug}`} className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
                         {r.label}
@@ -173,7 +247,7 @@ export function Header() {
                 <h4 className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#9E7B3B]">
                   Excursions & Day Trips
                 </h4>
-                {EXCURSIONS_ROUTES.map((r) => (
+                {excursionsRoutes.map((r) => (
                   <Link
                     key={r.slug}
                     href={`/transfers/${r.slug}`}

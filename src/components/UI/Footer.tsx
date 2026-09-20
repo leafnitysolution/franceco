@@ -5,8 +5,52 @@ import Image from 'next/image';
 import { Phone, Mail, MapPin, ShieldCheck, Clock, Award, Star, ExternalLink, ArrowRight, MessageSquare, Send } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
-export function Footer() {
+interface FooterProps {
+  routes?: any[];
+}
+
+export function Footer({ routes }: FooterProps) {
   const { t } = useLanguage();
+
+  const hasDynamicRoutes = Boolean(routes && routes.length > 0);
+
+  const transferLinks = hasDynamicRoutes
+    ? routes!
+        .filter((r) => r.origin?.category !== 'PALACE' && r.destination?.category !== 'PALACE')
+        .slice(0, 8)
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          href: `/transfers/${r.slug}`,
+        }))
+    : [
+        { label: 'Paris Airport Transfers', href: '/transfers/cdg-to-paris-city' },
+        { label: 'Disneyland Paris Transfers', href: '/transfers/cdg-to-disneyland-paris' },
+        { label: 'Orly Airport Transfers', href: '/transfers/orly-to-disneyland-paris' },
+        { label: 'Beauvais Airport Transfers', href: '/transfers/beauvais-to-disneyland-paris' },
+        { label: 'Versailles Transfers', href: '/transfers/paris-to-versailles' },
+      ];
+
+  const tourLinks = hasDynamicRoutes
+    ? routes!
+        .filter(
+          (r) =>
+            r.origin?.category === 'PALACE' ||
+            r.destination?.category === 'PALACE' ||
+            ['giverny', 'asterix', 'fontainebleau', 'champagne', 'normandy', 'mont-saint-michel', 'loire'].some((k) => r.slug.includes(k))
+        )
+        .slice(0, 8)
+        .map((r) => ({
+          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          href: `/transfers/${r.slug}`,
+        }))
+    : [
+        { label: 'Paris to Giverny (Monet Gardens)', href: '/transfers/paris-to-giverny' },
+        { label: 'Versailles Palace Excursions', href: '/transfers/paris-to-versailles' },
+        { label: 'Normandy Day Trips', href: '/transfers/paris-to-normandy' },
+        { label: 'Reims Champagne Tours', href: '/transfers/paris-to-champagne' },
+        { label: 'Loire Valley Castles Tour', href: '/transfers/paris-to-loire-valley' },
+        { label: 'Mont Saint-Michel Excursions', href: '/transfers/paris-to-mont-saint-michel' },
+      ];
 
   return (
     <footer className="bg-[#0B192C] text-slate-300 pt-16 pb-8 border-t border-[#1E2D42] relative overflow-hidden">
@@ -52,9 +96,9 @@ export function Footer() {
                   <Phone className="w-4 h-4 text-gold-400" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">24/7 Hotline</div>
-                  <a href="tel:+33189400000" className="font-extrabold text-white hover:text-gold-400 transition-colors">
-                    +33 1 89 40 00 00
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">24/7 Hotline & WhatsApp</div>
+                  <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="font-extrabold text-white hover:text-gold-400 transition-colors">
+                    +33 7 81 11 83 94
                   </a>
                 </div>
               </div>
@@ -65,8 +109,8 @@ export function Footer() {
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Email Dispatch</div>
-                  <a href="mailto:contact@francego.com" className="font-extrabold text-white hover:text-gold-400 transition-colors">
-                    contact@francego.com
+                  <a href="mailto:projet15df@outlook.fr" className="font-extrabold text-white hover:text-gold-400 transition-colors">
+                    projet15df@outlook.fr
                   </a>
                 </div>
               </div>
@@ -147,41 +191,13 @@ export function Footer() {
               TRANSFERS
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
-              <li>
-                <Link href="/transfers/cdg-to-paris-city" className="hover:text-gold-400 transition-colors">
-                  Paris Airport Transfers
-                </Link>
-              </li>
-              <li>
-                <Link href="/transfers/cdg-to-disneyland-paris" className="hover:text-gold-400 transition-colors">
-                  Disneyland Paris Transfers
-                </Link>
-              </li>
-              <li>
-                <Link href="/transfers/paris-to-chateau-de-versailles" className="hover:text-gold-400 transition-colors">
-                  Paris Train Station Transfers
-                </Link>
-              </li>
-              <li>
-                <Link href="/transfers/cdg-to-disneyland-paris" className="hover:text-gold-400 transition-colors">
-                  CDG Airport Transfers
-                </Link>
-              </li>
-              <li>
-                <Link href="/transfers/orly-to-disneyland-paris" className="hover:text-gold-400 transition-colors">
-                  Orly Airport Transfers
-                </Link>
-              </li>
-              <li>
-                <Link href="/transfers/beauvais-to-disneyland-paris" className="hover:text-gold-400 transition-colors">
-                  Beauvais Airport Transfers
-                </Link>
-              </li>
-              <li>
-                <Link href="/transfers/paris-to-chateau-de-versailles" className="hover:text-gold-400 transition-colors">
-                  Versailles Transfers
-                </Link>
-              </li>
+              {transferLinks.map((link, idx) => (
+                <li key={idx}>
+                  <Link href={link.href} className="hover:text-gold-400 transition-colors block truncate">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -191,36 +207,13 @@ export function Footer() {
               TOURS & DAY TRIPS
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
-              <li>
-                <Link href="/tours/paris-city-tour" className="hover:text-gold-400 transition-colors">
-                  Paris City Tours
-                </Link>
-              </li>
-              <li>
-                <Link href="/tours/versailles-palace-tour" className="hover:text-gold-400 transition-colors">
-                  Versailles Palace Tours
-                </Link>
-              </li>
-              <li>
-                <Link href="/tours/normandy-landing-beaches-tour" className="hover:text-gold-400 transition-colors">
-                  Normandy Day Trips
-                </Link>
-              </li>
-              <li>
-                <Link href="/tours/champagne-region-reims-tour" className="hover:text-gold-400 transition-colors">
-                  Reims Champagne Tours
-                </Link>
-              </li>
-              <li>
-                <Link href="/tours/loire-valley-castles-tour" className="hover:text-gold-400 transition-colors">
-                  Loire Valley Castles Tour
-                </Link>
-              </li>
-              <li>
-                <Link href="/tours/mont-saint-michel-tour" className="hover:text-gold-400 transition-colors">
-                  Mont Saint Michel Excursions
-                </Link>
-              </li>
+              {tourLinks.map((link, idx) => (
+                <li key={idx}>
+                  <Link href={link.href} className="hover:text-gold-400 transition-colors block truncate">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
