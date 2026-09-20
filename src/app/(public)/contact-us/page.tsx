@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Phone, Mail, MapPin, Clock, Send, MessageSquare, CheckCircle2, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { CountryCodePhoneInput } from '@/components/UI/CountryCodePhoneInput';
 
 export default function ContactUsPage() {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ export default function ContactUsPage() {
         <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
           <Image
             src="/images/meet_greet_driver.jpg"
-            alt="Contact FastForward Shuttle Paris"
+            alt="Contact FranceGo VIP Transfers & Tours"
             fill
             priority
             className="object-cover object-center"
@@ -86,8 +87,8 @@ export default function ContactUsPage() {
                   <Phone className="w-5 h-5 text-gold-600" />
                 </div>
                 <div>
-                  <div className="text-slate-400 text-[10px] uppercase font-bold">24/7 Hotline Call Desk</div>
-                  <div className="text-navy-900 font-extrabold text-sm sm:text-base">+33 1 89 40 00 00</div>
+                  <div className="text-slate-400 text-[10px] uppercase font-bold">24/7 Hotline & WhatsApp</div>
+                  <div className="text-navy-900 font-extrabold text-sm sm:text-base">+33 7 81 11 83 94</div>
                   <p className="text-[11px] text-slate-500 font-medium">Bilingual English & French operators available 24/7</p>
                 </div>
               </div>
@@ -101,7 +102,7 @@ export default function ContactUsPage() {
                   <div className="text-slate-400 text-[10px] uppercase font-bold">WhatsApp Direct Message</div>
                   <div className="text-emerald-700 font-extrabold text-xs">Instant Driver Assistance</div>
                   <a
-                    href="https://wa.me/33189400000?text=Hello%20FranceGo,%20I%20have%20an%20inquiry%20regarding%20a%20private%20transfer."
+                    href="https://wa.me/33781118394?text=Hello%20FranceGo,%20I%20have%20an%20inquiry%20regarding%20a%20private%20transfer."
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors shadow-xs"
@@ -118,7 +119,7 @@ export default function ContactUsPage() {
                 </div>
                 <div>
                   <div className="text-slate-400 text-[10px] uppercase font-bold">Email Dispatch Desk</div>
-                  <div className="text-navy-900 font-bold text-xs sm:text-sm">contact@francego.com</div>
+                  <div className="text-navy-900 font-bold text-xs sm:text-sm">projet15df@outlook.fr</div>
                   <p className="text-[11px] text-slate-500 font-medium">Instant email confirmations & voucher inquiries</p>
                 </div>
               </div>
@@ -197,13 +198,11 @@ export default function ContactUsPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700">Phone / Mobile Number</label>
-                    <input
-                      type="tel"
-                      placeholder="+33 6 00 00 00 00"
+                    <label className="text-xs font-bold text-slate-700">Phone / Mobile Number *</label>
+                    <CountryCodePhoneInput
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full bg-[#F5F3ED] border border-[#E5D7BC] rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-navy-900 focus:outline-none focus:border-gold-500"
+                      onChange={(val) => setFormData({ ...formData, phone: val })}
+                      placeholder="7 81 11 83 94"
                     />
                   </div>
 
@@ -251,3 +250,4 @@ export default function ContactUsPage() {
     </div>
   );
 }
+
