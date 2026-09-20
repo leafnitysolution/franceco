@@ -12,6 +12,7 @@ import {
   DISNEYLAND_ROUTES,
   VERSAILLES_ROUTES,
   TRAIN_STATION_ROUTES,
+  EXCURSIONS_ROUTES,
 } from '@/lib/data/navigationRoutes';
 
 export function Header() {
@@ -168,25 +169,19 @@ export function Header() {
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#C5A059] transition-transform duration-300 group-hover:rotate-180" />
               </button>
 
-              <div className="absolute top-full left-0 w-56 bg-white border border-[#E5D7BC] rounded-2xl p-3 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform group-hover:translate-y-0 translate-y-2 z-50 space-y-1">
-                <Link
-                  href="/tours/paris-city-tour"
-                  className="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#F7F2E7] hover:text-[#9E7B3B] transition-all duration-150"
-                >
-                  Paris City Tour
-                </Link>
-                <Link
-                  href="/tours/france-day-trips"
-                  className="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#F7F2E7] hover:text-[#9E7B3B] transition-all duration-150"
-                >
-                  France Day Trips
-                </Link>
-                <Link
-                  href="/tours/outside-paris-tours"
-                  className="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#F7F2E7] hover:text-[#9E7B3B] transition-all duration-150"
-                >
-                  Outside Paris Tours
-                </Link>
+              <div className="absolute top-full left-0 w-64 bg-white border border-[#E5D7BC] rounded-2xl p-3 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform group-hover:translate-y-0 translate-y-2 z-50 space-y-1">
+                <h4 className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#9E7B3B]">
+                  Excursions & Day Trips
+                </h4>
+                {EXCURSIONS_ROUTES.map((r) => (
+                  <Link
+                    key={r.slug}
+                    href={`/transfers/${r.slug}`}
+                    className="block px-3 py-1.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-[#F7F2E7] hover:text-[#9E7B3B] transition-all duration-150"
+                  >
+                    {r.label}
+                  </Link>
+                ))}
               </div>
             </div>
 
