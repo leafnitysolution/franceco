@@ -48,7 +48,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
   return (
     <div className="space-y-16 pb-20 bg-[#FBF9F5] text-navy-900">
       {/* HERO SECTION WITH BACKGROUND IMAGE */}
-      <section className="relative pt-12 pb-20 overflow-hidden min-h-[620px] flex items-center">
+      <section className="relative pt-6 lg:pt-12 pb-12 lg:pb-20 overflow-hidden lg:min-h-[620px] flex items-center">
         {/* Background Image & Gradient Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -65,8 +65,8 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-8">
           {/* Main 2-Column Split Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* LEFT COLUMN: HEADLINE & BADGES */}
-            <div className="lg:col-span-6 space-y-6 text-white">
+            {/* LEFT COLUMN: HEADLINE & BADGES (Hidden on Mobile/Android, Visible on Desktop) */}
+            <div className="hidden lg:block lg:col-span-6 space-y-6 text-white">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gold-300 text-xs font-bold shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-gold-400" />
                 <span className="uppercase tracking-wider">{t('heroBadge')}</span>
