@@ -35,6 +35,7 @@ import {
   Edit2,
   Tag,
   Mail,
+  Info,
 } from 'lucide-react';
 
 interface FullPageBookingClientProps {
@@ -902,6 +903,17 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                         <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
                         <span>💡 <u>Spam/Junk Folder Notice</u>: If you don&apos;t see our email in your main inbox shortly, please check your Spam or Junk folder.</span>
                       </div>
+                    </div>
+
+                    {/* Driver Meetup Instructions Banner */}
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl space-y-1 text-blue-900">
+                      <div className="flex items-center gap-2 font-black text-xs uppercase tracking-wider text-blue-900">
+                        <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                        <span>Driver Pickup Meeting Point</span>
+                      </div>
+                      <p className="text-xs font-bold text-blue-900 leading-relaxed">
+                        For trains/airport pick up please meet your driver on the platform/exit gate with a sign and your name on it
+                      </p>
                     </div>
 
                     {/* Trip Summary */}
