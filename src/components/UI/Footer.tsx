@@ -14,12 +14,36 @@ export function Footer({ routes }: FooterProps) {
 
   const hasDynamicRoutes = Boolean(routes && routes.length > 0);
 
+  function formatCleanRouteLabel(r: any) {
+    const cleanName = (name?: string, shortCode?: string) => {
+      if (!name) return shortCode || '';
+      return name
+        .replace('Paris Charles de Gaulle Airport', 'CDG Airport')
+        .replace('Paris Orly Airport', 'Orly Airport')
+        .replace('Paris Beauvais Tillé Airport', 'Beauvais Airport')
+        .replace('Disneyland Paris Hotels & Parks', 'Disneyland Paris')
+        .replace('Paris City Center (All Arrondissements)', 'Paris City')
+        .replace('Gare du Nord & Paris Train Stations', 'Gare du Nord')
+        .replace('Fondation Claude Monet Giverny & Village', 'Giverny (Monet)')
+        .replace('Château de Versailles & Hotels', 'Versailles Palace')
+        .replace('Château de Fontainebleau & Barbizon', 'Fontainebleau')
+        .replace('Champagne Region & Reims Cathedral', 'Champagne & Reims')
+        .replace('Normandy D-Day Beaches & Caen', 'Normandy Beaches')
+        .replace('Mont Saint-Michel Abbey & Bay', 'Mont Saint-Michel')
+        .replace('Loire Valley Châteaux & Amboise', 'Loire Valley Castles');
+    };
+
+    const from = cleanName(r.origin?.name, r.origin?.shortCode);
+    const to = cleanName(r.destination?.name, r.destination?.shortCode);
+    return `${from} → ${to}`;
+  }
+
   const transferLinks = hasDynamicRoutes
     ? routes!
         .filter((r) => r.origin?.category !== 'PALACE' && r.destination?.category !== 'PALACE')
         .slice(0, 8)
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           href: `/transfers/${r.slug}`,
         }))
     : [
@@ -40,7 +64,7 @@ export function Footer({ routes }: FooterProps) {
         )
         .slice(0, 8)
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           href: `/transfers/${r.slug}`,
         }))
     : [

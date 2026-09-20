@@ -33,11 +33,35 @@ export function Header({ routes }: HeaderProps) {
 
   const hasDynamicRoutes = Boolean(routes && routes.length > 0);
 
+  function formatCleanRouteLabel(r: any) {
+    const cleanName = (name?: string, shortCode?: string) => {
+      if (!name) return shortCode || '';
+      return name
+        .replace('Paris Charles de Gaulle Airport', 'CDG Airport')
+        .replace('Paris Orly Airport', 'Orly Airport')
+        .replace('Paris Beauvais Tillé Airport', 'Beauvais Airport')
+        .replace('Disneyland Paris Hotels & Parks', 'Disneyland Paris')
+        .replace('Paris City Center (All Arrondissements)', 'Paris City')
+        .replace('Gare du Nord & Paris Train Stations', 'Gare du Nord')
+        .replace('Fondation Claude Monet Giverny & Village', 'Giverny (Monet)')
+        .replace('Château de Versailles & Hotels', 'Versailles Palace')
+        .replace('Château de Fontainebleau & Barbizon', 'Fontainebleau')
+        .replace('Champagne Region & Reims Cathedral', 'Champagne & Reims')
+        .replace('Normandy D-Day Beaches & Caen', 'Normandy Beaches')
+        .replace('Mont Saint-Michel Abbey & Bay', 'Mont Saint-Michel')
+        .replace('Loire Valley Châteaux & Amboise', 'Loire Valley Castles');
+    };
+
+    const from = cleanName(r.origin?.name, r.origin?.shortCode);
+    const to = cleanName(r.destination?.name, r.destination?.shortCode);
+    return `${from} → ${to}`;
+  }
+
   const airportRoutes = hasDynamicRoutes
     ? routes!
         .filter((r) => r.origin?.category === 'AIRPORT' || r.destination?.category === 'AIRPORT')
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           slug: r.slug,
         }))
     : PARIS_AIRPORT_ROUTES;
@@ -51,7 +75,7 @@ export function Header({ routes }: HeaderProps) {
             r.slug.includes('disneyland')
         )
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           slug: r.slug,
         }))
     : DISNEYLAND_ROUTES;
@@ -65,7 +89,7 @@ export function Header({ routes }: HeaderProps) {
             r.slug.includes('versailles')
         )
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           slug: r.slug,
         }))
     : VERSAILLES_ROUTES;
@@ -80,7 +104,7 @@ export function Header({ routes }: HeaderProps) {
             r.slug.includes('gare')
         )
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           slug: r.slug,
         }))
     : TRAIN_STATION_ROUTES;
@@ -94,7 +118,7 @@ export function Header({ routes }: HeaderProps) {
             ['giverny', 'asterix', 'fontainebleau', 'champagne', 'normandy', 'mont-saint-michel', 'loire'].some((k) => r.slug.includes(k))
         )
         .map((r) => ({
-          label: r.h1Heading || `${r.origin?.name} to ${r.destination?.name}`,
+          label: formatCleanRouteLabel(r),
           slug: r.slug,
         }))
     : EXCURSIONS_ROUTES;
