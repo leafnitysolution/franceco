@@ -142,16 +142,8 @@ export function AdminNavbar() {
             })}
           </nav>
 
-          {/* User Profile & Idle Timer Badge & Logout */}
+          {/* User Profile & Logout */}
           <div className="flex items-center gap-3">
-            <div
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[10px] font-extrabold text-slate-600"
-              title="Session automatically logs out after 20 minutes of inactivity"
-            >
-              <Clock className="w-3 h-3 text-gold-600" />
-              <span>20m Idle Timer</span>
-            </div>
-
             <Link
               href="/"
               target="_blank"
