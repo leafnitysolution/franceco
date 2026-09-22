@@ -570,13 +570,13 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                   {/* Flight / Train Number */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-700 block">
-                      Arrival flight number <span className="text-rose-500">*</span>
+                      Arrival flight number / Train number <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
                       <Plane className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
-                        placeholder="e.g. LH1868 (Outward Journey)"
+                        placeholder="e.g. LH1868 or TGV 6911"
                         value={store.flightOrTrainNumber}
                         onChange={(e) => store.setFlightOrTrainNumber(e.target.value)}
                         className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-slate-900"
@@ -987,7 +987,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                     {/* User Provided Data Section: Flight #, Notes, Sign, Terms */}
                     <div className="space-y-3 border-t border-slate-200/80 pt-4">
                       <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
-                        User Provided Flight & Special Instructions
+                        User Provided Flight / Train & Special Instructions
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-800">
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
