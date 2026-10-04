@@ -108,8 +108,7 @@ Returns all active locations, categories, and routes with their live admin-confi
       "id": "clx...",
       "shortCode": "CDG",
       "name": "Paris Charles de Gaulle Airport",
-      "category": "AIRPORT",
-      "slug": "paris-cdg-airport"
+      "category": "AIRPORT"
     }
   ],
   "routes": [

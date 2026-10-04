@@ -61,7 +61,6 @@ export async function GET(req: NextRequest) {
         shortCode: loc.shortCode,
         name: loc.name,
         category: loc.category,
-        slug: loc.slug,
       })),
       routes: routes.map((r) => ({
         id: r.id,
