@@ -38,6 +38,7 @@ import {
 interface BookingWidgetProps {
   locations: LocationItem[];
   categories?: CategoryItem[];
+  routes?: any[];
   defaultOriginId?: string;
   defaultDestinationId?: string;
   defaultSedanPrice?: number;
@@ -50,6 +51,7 @@ interface BookingWidgetProps {
 export function BookingWidget({
   locations,
   categories,
+  routes,
   defaultOriginId,
   defaultDestinationId,
   defaultSedanPrice = 70,
@@ -91,6 +93,27 @@ export function BookingWidget({
       minibus: defaultMinibusPrice,
     });
   }, [defaultOriginId, defaultDestinationId, defaultSedanPrice, defaultEconomyVanPrice, defaultBusinessVanPrice, defaultMinibusPrice, locations]);
+
+  // Dynamically sync route pricing from Admin Panel database routes whenever origin/destination changes
+  useEffect(() => {
+    if (routes && routes.length > 0 && store.origin && store.destination) {
+      const matched = routes.find(
+        (r) =>
+          (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
+          (r.originId === store.destination?.id && r.destinationId === store.origin?.id) ||
+          (r.origin?.shortCode === store.origin?.shortCode && r.destination?.shortCode === store.destination?.shortCode) ||
+          (r.origin?.shortCode === store.destination?.shortCode && r.destination?.shortCode === store.origin?.shortCode)
+      );
+      if (matched) {
+        store.setRoutePricing({
+          sedan: matched.sedanPriceEur ?? defaultSedanPrice,
+          economyVan: matched.economyVanPriceEur ?? defaultEconomyVanPrice,
+          businessVan: matched.businessVanPriceEur ?? defaultBusinessVanPrice,
+          minibus: matched.minibusPriceEur ?? defaultMinibusPrice,
+        });
+      }
+    }
+  }, [store.origin, store.destination, routes, defaultSedanPrice, defaultEconomyVanPrice, defaultBusinessVanPrice, defaultMinibusPrice]);
 
   // Calculate prices dynamically based on Service Mode
   const getVehiclePrice = (tier: string): number => {

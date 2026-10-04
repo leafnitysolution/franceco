@@ -13,18 +13,23 @@ export const metadata = {
 export default async function BookPage() {
   await ensureLocationsSeeded();
 
-  const locations = await db.location.findMany({
-    orderBy: { name: 'asc' },
-  });
-
-  const categories = await db.locationCategory.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-  });
+  const [locations, categories, routes] = await Promise.all([
+    db.location.findMany({
+      orderBy: { name: 'asc' },
+    }),
+    db.locationCategory.findMany({
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+    }),
+    db.route.findMany({
+      where: { isActive: true },
+    }),
+  ]);
 
   return (
     <FullPageBookingClient
       locations={locations as any}
       categories={categories as any}
+      routes={routes as any}
     />
   );
 }

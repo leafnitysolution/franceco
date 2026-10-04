@@ -105,7 +105,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
 
             {/* RIGHT COLUMN: BOOKING ENGINE WIDGET */}
             <div className="lg:col-span-6">
-              <BookingWidget locations={locations} categories={categories} />
+              <BookingWidget locations={locations} categories={categories} routes={featuredRoutes as any} />
             </div>
           </div>
         </div>

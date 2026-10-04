@@ -41,9 +41,10 @@ import {
 interface FullPageBookingClientProps {
   locations: LocationItem[];
   categories?: CategoryItem[];
+  routes?: any[];
 }
 
-export function FullPageBookingClient({ locations, categories }: FullPageBookingClientProps) {
+export function FullPageBookingClient({ locations, categories, routes }: FullPageBookingClientProps) {
   const router = useRouter();
   const store = useBookingStore();
 
@@ -69,6 +70,25 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
   // Location selector modal/dropdown triggers
   const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
   const [isEditJourneyModalOpen, setIsEditJourneyModalOpen] = useState(false);
+
+  // Dynamically sync route pricing from Admin Panel database routes whenever origin/destination changes
+  useEffect(() => {
+    if (routes && routes.length > 0 && store.origin && store.destination) {
+      const matched = routes.find(
+        (r) =>
+          (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
+          (r.originId === store.destination?.id && r.destinationId === store.origin?.id)
+      );
+      if (matched) {
+        store.setRoutePricing({
+          sedan: matched.sedanPriceEur ?? 70,
+          economyVan: matched.economyVanPriceEur ?? 90,
+          businessVan: matched.businessVanPriceEur ?? 120,
+          minibus: matched.minibusPriceEur ?? 180,
+        });
+      }
+    }
+  }, [store.origin, store.destination, routes]);
 
   // Group locations for native select dropdowns
   const groupedLocations = useMemo(() => {

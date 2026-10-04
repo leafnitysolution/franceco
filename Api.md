@@ -9,6 +9,7 @@ This document details all supported external third-party APIs, B2B Partner API c
 2. [Secure B2B Partner API Channel](#2-secure-b2b-partner-api-channel)
    - [Authentication Header](#authentication-header)
    - [Supported Location Codes & Vehicle Tiers](#supported-location-codes--vehicle-tiers)
+   - [`GET /api/v1/partner/routes` (Fetch Live Locations, Routes & Prices)](#get-apiv1partnerroutes-fetch-live-locations-routes--prices)
    - [`POST /api/v1/partner/bookings` (Create Booking)](#post-apiv1partnerbookings-create-booking)
    - [`GET /api/v1/partner/bookings/[bookingRef]` (Get Booking Status)](#get-apiv1partnerbookingsbookingref-get-booking-status)
 3. [External Third-Party APIs](#3-external-third-party-apis)
@@ -34,7 +35,7 @@ FranceGo provides a secure, enterprise B2B API gateway enabling 2nd-party partne
 
 | API Service | Integration Purpose | Status | Auth Method |
 |---|---|---|---|
-| **B2B Partner API** | Secure transfer reservation transmission & status tracking | Live | API Key (`X-API-Key` or `Bearer`) |
+| **B2B Partner API** | Live route/pricing catalog, reservation transmission & status tracking | Live | API Key (`X-API-Key` or `Bearer`) |
 | **TripAdvisor Content API** | Live customer reviews & official rating badge (e.g., 4.9/5.0 score) | Supported | API Key (`TRIPADVISOR_API_KEY`) |
 | **Google Places API** | Google business profile ratings & reviews sync | Supported | API Key (`GOOGLE_PLACES_API_KEY`) |
 | **Transactional Email API** | Passenger HTML receipts & Admin WhatsApp dispatch alerts | Live | SMTP / App Password |
@@ -47,6 +48,8 @@ FranceGo provides a secure, enterprise B2B API gateway enabling 2nd-party partne
 
 Partner platforms transmit reservation payloads to FranceGo. Bookings automatically populate the Admin Back-Office (`/ffs-portal-sec-99x/bookings`), calculate route fares dynamically from the database, trigger dual HTML email dispatch (Passenger Voucher + Admin Dispatch Alert), and allow live status polling.
 
+> **Live Admin Panel Sync:** Whenever an administrator creates, edits, or updates locations (`/ffs-portal-sec-99x/locations`), categories, or route prices (`/ffs-portal-sec-99x/routes`) in the Admin Panel, those changes are immediately stored in Prisma (`db.location` and `db.route`). Both the Website Booking Engine and the Partner API read directly from this live database—no redeployment or code changes required.
+
 ### Authentication Header
 All B2B Partner requests MUST include the secret `X-API-Key` header (validated using constant-time `crypto.timingSafeEqual` comparison):
 
@@ -57,7 +60,7 @@ X-API-Key: ffs_partner_live_secret_key_2026
 
 ### Supported Location Codes & Vehicle Tiers
 
-#### Available `originCode` / `destinationCode` Short Codes:
+#### Default `originCode` / `destinationCode` Short Codes:
 | Short Code | Location Name | Category |
 |---|---|---|
 | `CDG` | Paris Charles de Gaulle Airport | `AIRPORT` |
@@ -82,6 +85,53 @@ X-API-Key: ffs_partner_live_secret_key_2026
 - `ECONOMY_VAN` — Economy Minivan (1–8 Passengers, 8 Bags)
 - `BUSINESS_VAN` — VIP Business Van (1–7 Passengers, 7 Bags)
 - `MINIBUS` — Executive Group Minibus (1–16 Passengers, 16 Bags)
+
+---
+
+### `GET /api/v1/partner/routes` (Fetch Live Locations, Routes & Prices)
+
+Returns all active locations, categories, and routes with their live admin-configured prices (`SEDAN`, `ECONOMY_VAN`, `BUSINESS_VAN`, `MINIBUS`) directly from the database.
+
+#### Request Headers
+- `X-API-Key: ffs_partner_live_secret_key_2026`
+
+#### Response Payload (`200 OK`)
+```json
+{
+  "success": true,
+  "updatedAt": "2026-10-05T00:55:00.000Z",
+  "categories": [
+    { "key": "AIRPORT", "name": "Paris Airports", "sortOrder": 1 }
+  ],
+  "locations": [
+    {
+      "id": "clx...",
+      "shortCode": "CDG",
+      "name": "Paris Charles de Gaulle Airport",
+      "category": "AIRPORT",
+      "slug": "paris-cdg-airport"
+    }
+  ],
+  "routes": [
+    {
+      "id": "clx...",
+      "slug": "cdg-to-disneyland-paris",
+      "originCode": "CDG",
+      "originName": "Paris Charles de Gaulle Airport",
+      "destinationCode": "DLP",
+      "destinationName": "Disneyland Paris Hotels & Parks",
+      "distanceKm": 45,
+      "estDurationMinutes": 45,
+      "pricingEur": {
+        "SEDAN": 70,
+        "ECONOMY_VAN": 90,
+        "BUSINESS_VAN": 120,
+        "MINIBUS": 180
+      }
+    }
+  ]
+}
+```
 
 ---
 
