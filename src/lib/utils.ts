@@ -19,7 +19,7 @@ export function generateBookingRef(): string {
   for (let i = 0; i < 4; i++) {
     randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return `EGS-${randomCode}`;
+  return `FGO-${randomCode}`;
 }
 
 export function buildWhatsAppUrl(booking: {
@@ -48,9 +48,11 @@ export function buildWhatsAppUrl(booking: {
       ? 'Berline Sedan (1-3 Pax)'
       : booking.vehicleTier === 'BUSINESS_VAN'
       ? 'VIP Business Van (1-7 Pax)'
+      : booking.vehicleTier === 'MINIBUS'
+      ? 'Executive Minibus (1-16 Pax)'
       : 'Economy Minivan (1-8 Pax)';
 
-  const text = `🚕 *EASY GO SHUTTLE - DISPATCH ORDER*
+  const text = `🚕 *FRANCEGO - DISPATCH ORDER*
 ----------------------------------------
 *Ref:* ${booking.bookingRef}
 *Date/Time:* ${formattedDate}
@@ -72,3 +74,4 @@ Please confirm driver assignment.`;
 
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
+

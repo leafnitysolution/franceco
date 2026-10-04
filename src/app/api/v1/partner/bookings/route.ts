@@ -1,14 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { db } from '@/lib/db';
 import { sendBookingConfirmationEmails } from '@/lib/email';
 import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
-export async function POST(req: NextRequest) {
-  // 1. Authenticate Partner API Key
-  const apiKey = req.headers.get('X-API-Key') || req.headers.get('x-api-key') || req.headers.get('authorization')?.replace('Bearer ', '');
+function verifyPartnerApiKey(req: NextRequest): boolean {
+  const apiKey =
+    req.headers.get('X-API-Key') ||
+    req.headers.get('x-api-key') ||
+    req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
   const expectedKey = process.env.PARTNER_API_KEY || 'ffs_partner_live_secret_key_2026';
 
-  if (!apiKey || apiKey !== expectedKey) {
+  if (!apiKey || !expectedKey) return false;
+  const bufA = Buffer.from(apiKey, 'utf-8');
+  const bufB = Buffer.from(expectedKey, 'utf-8');
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+const VALID_VEHICLE_TIERS = ['SEDAN', 'ECONOMY_VAN', 'BUSINESS_VAN', 'MINIBUS'] as const;
+
+export async function POST(req: NextRequest) {
+  if (!verifyPartnerApiKey(req)) {
     return NextResponse.json(
       {
         success: false,
@@ -41,7 +54,6 @@ export async function POST(req: NextRequest) {
       partnerReference,
     } = body;
 
-    // 2. Validate Required Fields
     if (!originCode || !destinationCode || !pickupAddress || !dropoffAddress || !pickupDateTime || !customerName || !customerEmail || !customerPhone) {
       return NextResponse.json(
         {
@@ -52,18 +64,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Auto-seed if database has 0 locations
+    if (!VALID_VEHICLE_TIERS.includes(vehicleTier)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid vehicleTier. Must be one of: ${VALID_VEHICLE_TIERS.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const parsedPassengers = Math.max(1, Math.min(50, Math.floor(Number(passengers) || 1)));
+    const parsedLuggage = Math.max(0, Math.min(50, Math.floor(Number(luggageCount) || 0)));
+    const parsedBabySeats = Math.max(0, Math.min(10, Math.floor(Number(babySeats) || 0)));
+    const parsedBoosterSeats = Math.max(0, Math.min(10, Math.floor(Number(boosterSeats) || 0)));
+
     await ensureLocationsSeeded();
 
-    const cleanOriginCode = originCode.trim().toUpperCase();
-    const cleanDestCode = destinationCode.trim().toUpperCase();
+    const cleanOriginCode = String(originCode).trim().toUpperCase();
+    const cleanDestCode = String(destinationCode).trim().toUpperCase();
 
-    // 3. Resolve Origin & Destination Locations
     let originLoc = await db.location.findFirst({
       where: {
         OR: [
           { shortCode: cleanOriginCode },
-          { id: originCode },
+          { id: String(originCode) },
         ],
       },
     });
@@ -74,7 +99,7 @@ export async function POST(req: NextRequest) {
         (l) =>
           l.shortCode.toUpperCase() === cleanOriginCode ||
           l.id === originCode ||
-          l.name.toLowerCase().includes(originCode.toLowerCase())
+          l.name.toLowerCase().includes(String(originCode).toLowerCase())
       ) || null;
     }
 
@@ -82,7 +107,7 @@ export async function POST(req: NextRequest) {
       where: {
         OR: [
           { shortCode: cleanDestCode },
-          { id: destinationCode },
+          { id: String(destinationCode) },
         ],
       },
     });
@@ -93,7 +118,7 @@ export async function POST(req: NextRequest) {
         (l) =>
           l.shortCode.toUpperCase() === cleanDestCode ||
           l.id === destinationCode ||
-          l.name.toLowerCase().includes(destinationCode.toLowerCase())
+          l.name.toLowerCase().includes(String(destinationCode).toLowerCase())
       ) || null;
     }
 
@@ -101,17 +126,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Invalid route location codes. Origin '${originCode}' or Destination '${destinationCode}' not found. Available codes: CDG, ORY, BVA, DLP, PAR, GDN, VERS.`,
+          error: `Invalid route location codes. Origin '${originCode}' or Destination '${destinationCode}' not found.`,
         },
         { status: 400 }
       );
     }
 
-    // 4. Calculate Route Pricing
     const route = await db.route.findFirst({
       where: {
-        originId: originLoc.id,
-        destinationId: destLoc.id,
+        OR: [
+          { originId: originLoc.id, destinationId: destLoc.id },
+          { originId: destLoc.id, destinationId: originLoc.id },
+        ],
       },
     });
 
@@ -132,34 +158,32 @@ export async function POST(req: NextRequest) {
     const isReturn = Boolean(returnDateTime);
     const totalFareEur = isReturn ? basePrice * 2 : basePrice;
 
-    // 5. Generate Unique Partner Booking Reference (e.g., FFS-B2B-894102)
     const randomRef = Math.floor(100000 + Math.random() * 900000);
-    const bookingRef = `FFS-B2B-${randomRef}`;
+    const bookingRef = `FGO-B2B-${randomRef}`;
 
     const formattedNotes = `[B2B Partner Booking | Ref: ${partnerReference || 'N/A'}] ${notes || ''}`.trim();
 
-    // 6. Insert Booking Record into Database via Prisma
     const newBooking = await db.booking.create({
       data: {
         bookingRef,
         status: 'PENDING',
         originId: originLoc.id,
         destinationId: destLoc.id,
-        pickupAddress,
-        dropoffAddress,
+        pickupAddress: String(pickupAddress).trim().slice(0, 300),
+        dropoffAddress: String(dropoffAddress).trim().slice(0, 300),
         pickupDateTime: new Date(pickupDateTime),
         returnDateTime: returnDateTime ? new Date(returnDateTime) : null,
-        flightOrTrainNumber: flightNumber || null,
+        flightOrTrainNumber: flightNumber ? String(flightNumber).trim().slice(0, 50) : null,
         vehicleTier,
-        passengers: Number(passengers),
-        luggageCount: Number(luggageCount),
-        babySeats: Number(babySeats),
-        boosterSeats: Number(boosterSeats),
+        passengers: parsedPassengers,
+        luggageCount: parsedLuggage,
+        babySeats: parsedBabySeats,
+        boosterSeats: parsedBoosterSeats,
         totalFareEur,
-        customerName,
-        customerEmail,
-        customerPhone,
-        notes: formattedNotes,
+        customerName: String(customerName).trim().slice(0, 120),
+        customerEmail: String(customerEmail).trim().toLowerCase().slice(0, 150),
+        customerPhone: String(customerPhone).trim().slice(0, 40),
+        notes: formattedNotes.slice(0, 1000),
       },
       include: {
         origin: true,
@@ -167,7 +191,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 7. Dispatch Automated Dual Confirmation Emails
     const dateObj = new Date(pickupDateTime);
     const pickupDateStr = dateObj.toISOString().split('T')[0];
     const pickupTimeStr = dateObj.toTimeString().slice(0, 5);
@@ -208,12 +231,12 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating partner B2B booking:', error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to create partner booking: ' + (error?.message || 'Server Error'),
+        error: 'Failed to create partner booking',
       },
       { status: 500 }
     );

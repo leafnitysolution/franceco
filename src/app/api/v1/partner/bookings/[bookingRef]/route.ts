@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { db } from '@/lib/db';
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ bookingRef: string }> }) {
-  // 1. Authenticate Partner API Key
-  const apiKey = req.headers.get('X-API-Key') || req.headers.get('x-api-key') || req.headers.get('authorization')?.replace('Bearer ', '');
+function verifyPartnerApiKey(req: NextRequest): boolean {
+  const apiKey =
+    req.headers.get('X-API-Key') ||
+    req.headers.get('x-api-key') ||
+    req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
   const expectedKey = process.env.PARTNER_API_KEY || 'ffs_partner_live_secret_key_2026';
 
-  if (!apiKey || apiKey !== expectedKey) {
+  if (!apiKey || !expectedKey) return false;
+  const bufA = Buffer.from(apiKey, 'utf-8');
+  const bufB = Buffer.from(expectedKey, 'utf-8');
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ bookingRef: string }> }) {
+  if (!verifyPartnerApiKey(req)) {
     return NextResponse.json(
       {
         success: false,
@@ -57,12 +68,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ book
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching partner B2B booking status:', error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch booking status: ' + (error?.message || 'Server Error'),
+        error: 'Failed to fetch booking status',
       },
       { status: 500 }
     );

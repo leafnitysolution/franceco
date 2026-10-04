@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer';
 import { formatCurrency } from './utils';
 
 interface EmailPayload {
@@ -24,8 +25,19 @@ interface EmailPayload {
   notes?: string;
 }
 
+function escapeHtml(unsafe?: string): string {
+  if (!unsafe) return '';
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function sendBookingConfirmationEmails(data: EmailPayload) {
-  const adminEmail = process.env.ADMIN_DISPATCH_EMAIL || 'admin@francego.com';
+  const adminEmail = process.env.ADMIN_DISPATCH_EMAIL || 'projet15df@outlook.fr';
+  const smtpSender = process.env.SMTP_USER || 'noreply@francego.com';
 
   const vehicleName =
     data.vehicleTier === 'SEDAN'
@@ -36,13 +48,27 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
       ? 'Executive Minibus (1-16 Pax)'
       : 'Economy Minivan (1-8 Pax)';
 
-  // 1. HTML Email for PASSENGER (Client)
+  const safeRef = escapeHtml(data.bookingRef);
+  const safeName = escapeHtml(data.customerName);
+  const safeEmail = escapeHtml(data.customerEmail);
+  const safePhone = escapeHtml(data.customerPhone);
+  const safeOrigin = escapeHtml(data.originName);
+  const safeDest = escapeHtml(data.destinationName);
+  const safePickupAddr = escapeHtml(data.pickupAddress);
+  const safeDropoffAddr = escapeHtml(data.dropoffAddress);
+  const safePickupDate = escapeHtml(data.pickupDate);
+  const safePickupTime = escapeHtml(data.pickupTime);
+  const safeReturnDate = escapeHtml(data.returnDate);
+  const safeReturnTime = escapeHtml(data.returnTime);
+  const safeFlight = escapeHtml(data.flightOrTrainNumber);
+  const safeNotes = escapeHtml(data.notes);
+
   const clientHtml = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Booking Confirmation - ${data.bookingRef}</title>
+      <title>Booking Confirmation - ${safeRef}</title>
       <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; }
@@ -62,52 +88,51 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
       <div class="container">
         <div class="header">
           <h1>FRANCEGO</h1>
-          <p style="margin: 4px 0 0; font-size: 13px; color: #e2e8f0;">Private Airport & Disneyland Paris Transfers</p>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #e2e8f0;">Private Airport &amp; Disneyland Paris Transfers</p>
         </div>
         <div class="content">
-          <p>Dear <strong>${data.customerName}</strong>,</p>
+          <p>Dear <strong>${safeName}</strong>,</p>
           <p>Thank you for choosing FranceGo! Your private transfer reservation has been confirmed and registered with our dispatch team.</p>
 
           <div class="ref-box">
             <div style="font-size: 12px; font-weight: bold; color: #64748b;">YOUR BOOKING REFERENCE:</div>
-            <div class="ref-code">${data.bookingRef}</div>
+            <div class="ref-code">${safeRef}</div>
             <div style="font-size: 12px; color: #16a34a; font-weight: bold; margin-top: 4px;">Status: CONFIRMED • Pay Driver on Arrival</div>
           </div>
 
           <h3 style="color: #0f172a; border-bottom: 2px solid #C5A059; padding-bottom: 4px;">Trip Specifications</h3>
           <table class="details-table">
-            <tr><td class="label">Route:</td><td class="value">${data.originName} → ${data.destinationName}</td></tr>
-            <tr><td class="label">Pickup Location:</td><td class="value">${data.pickupAddress}</td></tr>
-            <tr><td class="label">Dropoff Address:</td><td class="value">${data.dropoffAddress}</td></tr>
-            <tr><td class="label">Pickup Date & Time:</td><td class="value">${data.pickupDate} at ${data.pickupTime}</td></tr>
-            ${data.isReturn ? `<tr><td class="label">Return Date & Time:</td><td class="value">${data.returnDate} at ${data.returnTime}</td></tr>` : ''}
+            <tr><td class="label">Route:</td><td class="value">${safeOrigin} → ${safeDest}</td></tr>
+            <tr><td class="label">Pickup Location:</td><td class="value">${safePickupAddr}</td></tr>
+            <tr><td class="label">Dropoff Address:</td><td class="value">${safeDropoffAddr}</td></tr>
+            <tr><td class="label">Pickup Date &amp; Time:</td><td class="value">${safePickupDate} at ${safePickupTime}</td></tr>
+            ${data.isReturn ? `<tr><td class="label">Return Date &amp; Time:</td><td class="value">${safeReturnDate} at ${safeReturnTime}</td></tr>` : ''}
             <tr><td class="label">Vehicle Class:</td><td class="value">${vehicleName}</td></tr>
-            <tr><td class="label">Passengers & Bags:</td><td class="value">${data.passengers} Passengers, ${data.luggageCount} Luggage Items</td></tr>
-            <tr><td class="label">Free Child Seats:</td><td class="value">${data.babySeats} Baby Seat(s), ${data.boosterSeats} Booster Seat(s)</td></tr>
-            ${data.flightOrTrainNumber ? `<tr><td class="label">Flight/Train Number:</td><td class="value">${data.flightOrTrainNumber} (Live Radar Tracked)</td></tr>` : ''}
+            <tr><td class="label">Passengers &amp; Bags:</td><td class="value">${Number(data.passengers)} Passengers, ${Number(data.luggageCount)} Luggage Items</td></tr>
+            <tr><td class="label">Free Child Seats:</td><td class="value">${Number(data.babySeats)} Baby Seat(s), ${Number(data.boosterSeats)} Booster Seat(s)</td></tr>
+            ${safeFlight ? `<tr><td class="label">Flight/Train Number:</td><td class="value">${safeFlight} (Live Radar Tracked)</td></tr>` : ''}
             <tr><td class="label">Total Fare to Pay:</td><td class="value" style="font-size: 18px; color: #0B192C; font-weight: 900;">${formatCurrency(data.totalFareEur)}</td></tr>
           </table>
 
           <div style="background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 12px; margin-top: 16px; font-size: 12px; color: #065f46;">
-            <strong>👋 Driver Arrival & Meet & Greet:</strong><br>
+            <strong>👋 Driver Arrival &amp; Meet &amp; Greet:</strong><br>
             Your English-speaking driver will monitor your flight in real-time and wait inside the airport terminal gate holding a greeting board with your name. No upfront deposit required — pay your driver in cash or card upon arrival.
           </div>
         </div>
         <div class="footer">
-          FranceGo • 24/7 Hotline: +33 1 89 40 00 00 • contact@francego.com
+          FranceGo • 24/7 Hotline &amp; WhatsApp: +33 7 81 11 83 94 • projet15df@outlook.fr
         </div>
       </div>
     </body>
     </html>
   `;
 
-  // 2. HTML Email for ADMIN / DISPATCH OFFICE
   const adminHtml = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <title>NEW BOOKING ALERT - ${data.bookingRef}</title>
+      <title>NEW BOOKING ALERT - ${safeRef}</title>
       <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: #1e293b; border-radius: 16px; border: 1px solid #334155; overflow: hidden; color: #f8fafc; }
@@ -123,24 +148,24 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
     <body>
       <div class="container">
         <div class="header">
-          🚨 NEW RESERVATION RECEIVED: ${data.bookingRef}
+          🚨 NEW RESERVATION RECEIVED: ${safeRef}
         </div>
         <div class="content">
           <p style="font-size: 16px; color: #C5A059; font-weight: bold;">New Transfer Action Required!</p>
           <table class="table">
-            <tr><td class="lbl">Customer Name:</td><td class="val">${data.customerName}</td></tr>
-            <tr><td class="lbl">Customer Email:</td><td class="val">${data.customerEmail}</td></tr>
-            <tr><td class="lbl">Customer Phone:</td><td class="val">${data.customerPhone}</td></tr>
-            <tr><td class="lbl">Route:</td><td class="val">${data.originName} → ${data.destinationName}</td></tr>
-            <tr><td class="lbl">Pickup Address:</td><td class="val">${data.pickupAddress}</td></tr>
-            <tr><td class="lbl">Dropoff Address:</td><td class="val">${data.dropoffAddress}</td></tr>
-            <tr><td class="lbl">Pickup Date/Time:</td><td class="val">${data.pickupDate} at ${data.pickupTime}</td></tr>
-            ${data.isReturn ? `<tr><td class="lbl">Return Date/Time:</td><td class="val">${data.returnDate} at ${data.returnTime}</td></tr>` : ''}
+            <tr><td class="lbl">Customer Name:</td><td class="val">${safeName}</td></tr>
+            <tr><td class="lbl">Customer Email:</td><td class="val">${safeEmail}</td></tr>
+            <tr><td class="lbl">Customer Phone:</td><td class="val">${safePhone}</td></tr>
+            <tr><td class="lbl">Route:</td><td class="val">${safeOrigin} → ${safeDest}</td></tr>
+            <tr><td class="lbl">Pickup Address:</td><td class="val">${safePickupAddr}</td></tr>
+            <tr><td class="lbl">Dropoff Address:</td><td class="val">${safeDropoffAddr}</td></tr>
+            <tr><td class="lbl">Pickup Date/Time:</td><td class="val">${safePickupDate} at ${safePickupTime}</td></tr>
+            ${data.isReturn ? `<tr><td class="lbl">Return Date/Time:</td><td class="val">${safeReturnDate} at ${safeReturnTime}</td></tr>` : ''}
             <tr><td class="lbl">Vehicle Class:</td><td class="val">${vehicleName}</td></tr>
-            <tr><td class="lbl">Passengers / Bags:</td><td class="val">${data.passengers} Pax / ${data.luggageCount} Bags</td></tr>
-            <tr><td class="lbl">Child Seats:</td><td class="val">${data.babySeats} Baby, ${data.boosterSeats} Booster</td></tr>
-            <tr><td class="lbl">Flight/Train #:</td><td class="val">${data.flightOrTrainNumber || 'N/A'}</td></tr>
-            <tr><td class="lbl">Notes:</td><td class="val">${data.notes || 'None'}</td></tr>
+            <tr><td class="lbl">Passengers / Bags:</td><td class="val">${Number(data.passengers)} Pax / ${Number(data.luggageCount)} Bags</td></tr>
+            <tr><td class="lbl">Child Seats:</td><td class="val">${Number(data.babySeats)} Baby, ${Number(data.boosterSeats)} Booster</td></tr>
+            <tr><td class="lbl">Flight/Train #:</td><td class="val">${safeFlight || 'N/A'}</td></tr>
+            <tr><td class="lbl">Notes:</td><td class="val">${safeNotes || 'None'}</td></tr>
             <tr><td class="lbl">Total Fare to Collect:</td><td class="val" style="color: #22c55e; font-size: 20px;">${formatCurrency(data.totalFareEur)}</td></tr>
           </table>
 
@@ -156,9 +181,6 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
   `;
 
   try {
-    // Dynamic import to prevent Webpack JSON bundling issues on server runtime
-    const nodemailer = eval('require')('nodemailer');
-    
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.ethereal.email',
       port: Number(process.env.SMTP_PORT) || 587,
@@ -169,26 +191,24 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
       },
     });
 
-    // Dispatch Email to CLIENT (Passenger)
     const clientInfo = await transporter.sendMail({
-      from: '"FranceGo Dispatch" <noreply@francego.com>',
+      from: `"FranceGo Dispatch" <${smtpSender}>`,
       to: data.customerEmail,
       subject: `Transfer Confirmation: ${data.bookingRef} (${data.originName} → ${data.destinationName})`,
       html: clientHtml,
     });
 
-    // Dispatch Email to ADMIN OFFICE
     const adminInfo = await transporter.sendMail({
-      from: '"System Booking Alert" <system@francego.com>',
+      from: `"FranceGo Booking Alert" <${smtpSender}>`,
       to: adminEmail,
       subject: `🚨 NEW BOOKING: ${data.bookingRef} - ${data.customerName} (${formatCurrency(data.totalFareEur)})`,
       html: adminHtml,
     });
 
-    console.log(`[EMAIL DISPATCH] Sent booking ${data.bookingRef} confirmation to Client (${data.customerEmail}) & Admin (${adminEmail}).`);
     return { success: true, clientMsgId: clientInfo.messageId, adminMsgId: adminInfo.messageId };
   } catch (err) {
-    console.warn(`[EMAIL DISPATCH NOTICE] Email confirmation rendered. Transporter log notice:`, err);
+    console.warn('[EMAIL DISPATCH NOTICE] SMTP transport unavailable:', err);
     return { success: true, warning: 'Emails generated & logged.' };
   }
 }
+

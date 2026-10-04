@@ -116,7 +116,7 @@ export function LocationDropdown({
       ref={dropdownRef}
       className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[360px] animate-in fade-in duration-150"
     >
-      {/* Black Top Header Bar (Matching EasyGoShuttle design) */}
+      {/* Top Header Bar */}
       <div className="bg-black text-white px-3.5 py-2.5 flex items-center justify-between shrink-0">
         <span className="text-xs sm:text-sm font-bold tracking-tight">
           {title}

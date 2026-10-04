@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { PhoneCall, ShieldCheck, Car, Menu, X, ChevronDown, Sparkles, ExternalLink } from 'lucide-react';
+import { ShieldCheck, Menu, X, ChevronDown, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';

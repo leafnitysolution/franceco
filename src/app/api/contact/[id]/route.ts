@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getAdminSession } from '@/lib/auth';
 
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Admin authentication required.' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     if (!id) {
       return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
@@ -19,10 +28,10 @@ export async function DELETE(
       success: true,
       message: 'Contact message deleted successfully.',
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error deleting contact message:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete message: ' + (error?.message || 'Server error') },
+      { success: false, error: 'Failed to delete message.' },
       { status: 500 }
     );
   }
@@ -33,6 +42,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Admin authentication required.' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const body = await req.json();
     const { isRead } = body;
@@ -48,7 +65,7 @@ export async function PATCH(
       success: true,
       submission: updated,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error updating contact message:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update message.' },
@@ -56,3 +73,4 @@ export async function PATCH(
     );
   }
 }
+

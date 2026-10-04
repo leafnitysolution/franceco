@@ -22,11 +22,19 @@ export async function ensureLocationCategoriesSeeded() {
   }
 }
 
-export async function ensureLocationsSeeded() {
-  try {
-    await ensureLocationCategoriesSeeded();
+let hasVerifiedSeed = false;
 
-    console.log('Ensuring default locations and routes are seeded...');
+export async function ensureLocationsSeeded() {
+  if (hasVerifiedSeed) return;
+  try {
+    const existingLocationCount = await db.location.count();
+    const existingRouteCount = await db.route.count();
+    if (existingLocationCount >= 14 && existingRouteCount >= 14) {
+      hasVerifiedSeed = true;
+      return;
+    }
+
+    await ensureLocationCategoriesSeeded();
 
     // 1. Hub Locations (Airports, Theme Parks, City, Stations, Excursions)
     const cdg = await db.location.upsert({
@@ -447,12 +455,7 @@ export async function ensureLocationsSeeded() {
     for (const r of routesData) {
       await db.route.upsert({
         where: { slug: r.slug },
-        update: {
-          sedanPriceEur: r.sedanPriceEur,
-          economyVanPriceEur: r.economyVanPriceEur,
-          businessVanPriceEur: r.businessVanPriceEur,
-          minibusPriceEur: r.minibusPriceEur,
-        },
+        update: {},
         create: r,
       });
     }
@@ -486,9 +489,10 @@ export async function ensureLocationsSeeded() {
         ],
       });
     }
-    console.log('Default destinations and routes auto-seeding completed.');
+    hasVerifiedSeed = true;
   } catch (err) {
     console.error('Error auto-seeding default locations:', err);
   }
 }
+
 

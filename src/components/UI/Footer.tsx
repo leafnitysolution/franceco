@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, Mail, MapPin, ShieldCheck, Clock, Award, Star, ExternalLink, ArrowRight, MessageSquare, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, ShieldCheck, Award, Star, ArrowRight, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
 interface FooterProps {
