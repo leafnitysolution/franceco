@@ -464,53 +464,57 @@ export function BookingWidget({
 
               {/* PICKUP DATE & PICKUP TIME (Side-by-Side) */}
               <div className="grid grid-cols-2 gap-2">
-                <div className="bg-slate-100/90 rounded-xl p-2 border border-slate-200/80 space-y-0.5">
+                <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
                   <label className="text-[9px] font-extrabold text-slate-500 block uppercase tracking-wider">
                     Pickup date
                   </label>
-                  <div className="relative flex items-center gap-1.5">
-                    <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
-                    {!store.pickupDate && (
-                      <span className="pointer-events-none absolute left-4.5 text-xs font-semibold text-slate-400 select-none">
-                        Select date
-                      </span>
-                    )}
-                    <input
-                      type="date"
-                      value={store.pickupDate}
-                      onClick={(e) => (e.currentTarget as any).showPicker?.()}
-                      onChange={(e) => store.setPickupDate(e.target.value)}
-                      className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
-                        store.pickupDate
-                          ? 'font-black text-slate-900'
-                          : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
-                      }`}
-                    />
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <div className="relative flex-1 flex items-center">
+                      {!store.pickupDate && (
+                        <span className="pointer-events-none absolute left-0 text-xs font-semibold text-slate-400 select-none">
+                          Select date
+                        </span>
+                      )}
+                      <input
+                        type="date"
+                        value={store.pickupDate}
+                        onClick={(e) => (e.currentTarget as any).showPicker?.()}
+                        onChange={(e) => store.setPickupDate(e.target.value)}
+                        className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
+                          store.pickupDate
+                            ? 'font-black text-slate-900'
+                            : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-slate-100/90 rounded-xl p-2 border border-slate-200/80 space-y-0.5">
+                <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
                   <label className="text-[9px] font-extrabold text-slate-500 block uppercase tracking-wider">
                     Pickup time
                   </label>
-                  <div className="relative flex items-center gap-1.5">
-                    <Clock className="w-3 h-3 text-slate-500 shrink-0" />
-                    {!store.pickupTime && (
-                      <span className="pointer-events-none absolute left-4.5 text-xs font-semibold text-slate-400 select-none">
-                        Select time
-                      </span>
-                    )}
-                    <input
-                      type="time"
-                      value={store.pickupTime}
-                      onClick={(e) => (e.currentTarget as any).showPicker?.()}
-                      onChange={(e) => store.setPickupTime(e.target.value)}
-                      className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
-                        store.pickupTime
-                          ? 'font-black text-slate-900'
-                          : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
-                      }`}
-                    />
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <div className="relative flex-1 flex items-center">
+                      {!store.pickupTime && (
+                        <span className="pointer-events-none absolute left-0 text-xs font-semibold text-slate-400 select-none">
+                          Select time
+                        </span>
+                      )}
+                      <input
+                        type="time"
+                        value={store.pickupTime}
+                        onClick={(e) => (e.currentTarget as any).showPicker?.()}
+                        onChange={(e) => store.setPickupTime(e.target.value)}
+                        className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
+                          store.pickupTime
+                            ? 'font-black text-slate-900'
+                            : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -542,53 +546,57 @@ export function BookingWidget({
                   {/* RETURN DATE & RETURN TIME (Expanded when isReturn === true) */}
                   {store.isReturn && (
                     <div className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <div className="bg-slate-100/90 rounded-xl p-2 border border-slate-200/80 space-y-0.5">
+                      <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
                         <label className="text-[9px] font-extrabold text-slate-500 block uppercase tracking-wider">
                           Return date
                         </label>
-                        <div className="relative flex items-center gap-1.5">
-                          <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
-                          {!store.returnDate && (
-                            <span className="pointer-events-none absolute left-4.5 text-xs font-semibold text-slate-400 select-none">
-                              Select date
-                            </span>
-                          )}
-                          <input
-                            type="date"
-                            value={store.returnDate}
-                            onClick={(e) => (e.currentTarget as any).showPicker?.()}
-                            onChange={(e) => store.setReturnDate(e.target.value)}
-                            className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
-                              store.returnDate
-                                ? 'font-black text-slate-900'
-                                : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
-                            }`}
-                          />
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <div className="relative flex-1 flex items-center">
+                            {!store.returnDate && (
+                              <span className="pointer-events-none absolute left-0 text-xs font-semibold text-slate-400 select-none">
+                                Select date
+                              </span>
+                            )}
+                            <input
+                              type="date"
+                              value={store.returnDate}
+                              onClick={(e) => (e.currentTarget as any).showPicker?.()}
+                              onChange={(e) => store.setReturnDate(e.target.value)}
+                              className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
+                                store.returnDate
+                                  ? 'font-black text-slate-900'
+                                  : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                              }`}
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      <div className="bg-slate-100/90 rounded-xl p-2 border border-slate-200/80 space-y-0.5">
+                      <div className="bg-slate-100/90 rounded-xl p-2.5 border border-slate-200/80 space-y-0.5">
                         <label className="text-[9px] font-extrabold text-slate-500 block uppercase tracking-wider">
                           Return time
                         </label>
-                        <div className="relative flex items-center gap-1.5">
-                          <Clock className="w-3 h-3 text-slate-500 shrink-0" />
-                          {!store.returnTime && (
-                            <span className="pointer-events-none absolute left-4.5 text-xs font-semibold text-slate-400 select-none">
-                              Select time
-                            </span>
-                          )}
-                          <input
-                            type="time"
-                            value={store.returnTime}
-                            onClick={(e) => (e.currentTarget as any).showPicker?.()}
-                            onChange={(e) => store.setReturnTime(e.target.value)}
-                            className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
-                              store.returnTime
-                                ? 'font-black text-slate-900'
-                                : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
-                            }`}
-                          />
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <div className="relative flex-1 flex items-center">
+                            {!store.returnTime && (
+                              <span className="pointer-events-none absolute left-0 text-xs font-semibold text-slate-400 select-none">
+                                Select time
+                              </span>
+                            )}
+                            <input
+                              type="time"
+                              value={store.returnTime}
+                              onClick={(e) => (e.currentTarget as any).showPicker?.()}
+                              onChange={(e) => store.setReturnTime(e.target.value)}
+                              className={`w-full bg-transparent text-xs focus:outline-none cursor-pointer ${
+                                store.returnTime
+                                  ? 'font-black text-slate-900'
+                                  : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                              }`}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>

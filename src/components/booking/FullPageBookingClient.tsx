@@ -1418,7 +1418,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                     <label className="text-[10px] font-bold text-amber-800 uppercase block mb-1">Return Date</label>
                     <div className="relative">
                       {!store.returnDate && (
-                        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
                           Select date
                         </span>
                       )}
@@ -1427,7 +1427,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                         value={store.returnDate}
                         onClick={(e) => (e.currentTarget as any).showPicker?.()}
                         onChange={(e) => store.setReturnDate(e.target.value)}
-                        className={`w-full p-2 bg-white border border-amber-300 rounded-lg text-xs cursor-pointer ${
+                        className={`w-full px-3 py-2 bg-white border border-amber-300 rounded-lg text-xs cursor-pointer ${
                           store.returnDate
                             ? 'font-bold text-slate-900'
                             : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
@@ -1439,7 +1439,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                     <label className="text-[10px] font-bold text-amber-800 uppercase block mb-1">Return Time</label>
                     <div className="relative">
                       {!store.returnTime && (
-                        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
                           Select time
                         </span>
                       )}
@@ -1448,7 +1448,7 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                         value={store.returnTime}
                         onClick={(e) => (e.currentTarget as any).showPicker?.()}
                         onChange={(e) => store.setReturnTime(e.target.value)}
-                        className={`w-full p-2 bg-white border border-amber-300 rounded-lg text-xs cursor-pointer ${
+                        className={`w-full px-3 py-2 bg-white border border-amber-300 rounded-lg text-xs cursor-pointer ${
                           store.returnTime
                             ? 'font-bold text-slate-900'
                             : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
