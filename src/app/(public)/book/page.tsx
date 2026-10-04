@@ -5,7 +5,7 @@ import { ensureLocationsSeeded } from '@/lib/seedHelper';
 export const revalidate = 0;
 
 export const metadata = {
-  title: 'Book your Transfer | FastForward Shuttle',
+  title: 'Book your Transfer | FranceGo',
   description:
     'Complete your private transfer reservation in France with fixed rates, free child seats, zero deposit, and payment on arrival.',
 };

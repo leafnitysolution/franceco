@@ -69,26 +69,22 @@ interface BookingStoreState {
   resetForm: () => void;
 }
 
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-const defaultDateStr = tomorrow.toISOString().split('T')[0];
-
 export const useBookingStore = create<BookingStoreState>((set, get) => ({
   serviceMode: 'TRANSFER',
   origin: null,
   destination: null,
   pickupAddress: '',
   dropoffAddress: '',
-  pickupDate: defaultDateStr,
-  pickupTime: '10:00',
+  pickupDate: '',
+  pickupTime: '',
   isReturn: false,
-  returnDate: defaultDateStr,
-  returnTime: '16:00',
+  returnDate: '',
+  returnTime: '',
   flightOrTrainNumber: '',
   returnFlightNumber: '',
   vehicleTier: 'SEDAN',
-  passengers: 2,
-  luggageCount: 2,
+  passengers: 1,
+  luggageCount: 1,
   handLuggageCount: 0,
   babySeats: 0,
   boosterSeats: 0,
@@ -160,9 +156,16 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       destination: null,
       pickupAddress: '',
       dropoffAddress: '',
+      pickupDate: '',
+      pickupTime: '',
+      returnDate: '',
+      returnTime: '',
       flightOrTrainNumber: '',
       returnFlightNumber: '',
       isReturn: false,
+      passengers: 1,
+      luggageCount: 1,
+      handLuggageCount: 0,
       babySeats: 0,
       boosterSeats: 0,
       customerName: '',

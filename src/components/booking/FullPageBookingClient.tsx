@@ -89,20 +89,6 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
     return map;
   }, [locations]);
 
-  // Sync initial locations if empty
-  useEffect(() => {
-    if (locations && locations.length > 0) {
-      if (!store.origin) {
-        const orig = locations.find((l) => l.shortCode === 'CDG') || locations[0];
-        store.setOrigin(orig);
-      }
-      if (!store.destination) {
-        const dest = locations.find((l) => l.shortCode === 'DLP') || locations[1] || locations[0];
-        store.setDestination(dest);
-      }
-    }
-  }, [locations]);
-
   // Vehicle prices calculation
   const getVehiclePrice = (tier: VehicleTier): number => {
     if (store.serviceMode === 'HOURLY_TOUR') {
@@ -130,6 +116,21 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
   // Navigation handlers
   const handleNextToStep2 = () => {
     setErrorMsg(null);
+    if (!store.origin || !store.destination) {
+      setErrorMsg('Please select both pickup and drop-off locations.');
+      setIsEditJourneyModalOpen(true);
+      return;
+    }
+    if (!store.pickupDate || !store.pickupTime) {
+      setErrorMsg('Please select your pickup date and pickup time.');
+      setIsEditJourneyModalOpen(true);
+      return;
+    }
+    if (store.isReturn && (!store.returnDate || !store.returnTime)) {
+      setErrorMsg('Please select both return date and return time.');
+      setIsEditJourneyModalOpen(true);
+      return;
+    }
     if (!store.vehicleTier) {
       setErrorMsg('Please select a vehicle to continue.');
       return;
@@ -1065,18 +1066,22 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                 <div className="space-y-2 text-xs font-bold text-slate-900">
                   <div className="flex items-start gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-slate-900 shrink-0 mt-1" />
-                    <span>{store.origin?.name || 'Pickup Location'}</span>
+                    <span className={store.origin ? 'text-slate-900' : 'text-slate-400 font-semibold'}>
+                      {store.origin?.name || 'Please select pickup location'}
+                    </span>
                   </div>
 
                   <div className="flex items-start gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 mt-1" />
-                    <span>{store.destination?.name || 'Drop-off Location'}</span>
+                    <span className={store.destination ? 'text-slate-900' : 'text-slate-400 font-semibold'}>
+                      {store.destination?.name || 'Please select drop-off destination'}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600 border-t border-slate-200/60 pt-2">
-                  <span>{store.pickupDate} • {store.pickupTime}</span>
-                  <span>{store.passengers} Passengers</span>
+                  <span>{store.pickupDate || 'Select date'} • {store.pickupTime || 'Select time'}</span>
+                  <span>{store.passengers} {store.passengers === 1 ? 'Passenger' : 'Passengers'}</span>
                 </div>
 
                 <div className="pt-1">
@@ -1347,11 +1352,21 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                 <label className="text-xs font-bold text-slate-700 block">Pickup Date</label>
                 <div className="relative">
                   <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  {!store.pickupDate && (
+                    <span className="pointer-events-none absolute left-9 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
+                      Select date
+                    </span>
+                  )}
                   <input
                     type="date"
                     value={store.pickupDate}
+                    onClick={(e) => (e.currentTarget as any).showPicker?.()}
                     onChange={(e) => store.setPickupDate(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                    className={`w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:border-slate-900 cursor-pointer ${
+                      store.pickupDate
+                        ? 'font-bold text-slate-900'
+                        : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                    }`}
                   />
                 </div>
               </div>
@@ -1360,11 +1375,21 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                 <label className="text-xs font-bold text-slate-700 block">Pickup Time</label>
                 <div className="relative">
                   <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  {!store.pickupTime && (
+                    <span className="pointer-events-none absolute left-9 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
+                      Select time
+                    </span>
+                  )}
                   <input
                     type="time"
                     value={store.pickupTime}
+                    onClick={(e) => (e.currentTarget as any).showPicker?.()}
                     onChange={(e) => store.setPickupTime(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                    className={`w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:border-slate-900 cursor-pointer ${
+                      store.pickupTime
+                        ? 'font-bold text-slate-900'
+                        : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                    }`}
                   />
                 </div>
               </div>
@@ -1391,21 +1416,45 @@ export function FullPageBookingClient({ locations, categories }: FullPageBooking
                 <div className="grid grid-cols-2 gap-2 pt-1 border-t border-amber-200/60">
                   <div>
                     <label className="text-[10px] font-bold text-amber-800 uppercase block mb-1">Return Date</label>
-                    <input
-                      type="date"
-                      value={store.returnDate}
-                      onChange={(e) => store.setReturnDate(e.target.value)}
-                      className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold text-slate-900"
-                    />
+                    <div className="relative">
+                      {!store.returnDate && (
+                        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
+                          Select date
+                        </span>
+                      )}
+                      <input
+                        type="date"
+                        value={store.returnDate}
+                        onClick={(e) => (e.currentTarget as any).showPicker?.()}
+                        onChange={(e) => store.setReturnDate(e.target.value)}
+                        className={`w-full p-2 bg-white border border-amber-300 rounded-lg text-xs cursor-pointer ${
+                          store.returnDate
+                            ? 'font-bold text-slate-900'
+                            : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                        }`}
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-amber-800 uppercase block mb-1">Return Time</label>
-                    <input
-                      type="time"
-                      value={store.returnTime}
-                      onChange={(e) => store.setReturnTime(e.target.value)}
-                      className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold text-slate-900"
-                    />
+                    <div className="relative">
+                      {!store.returnTime && (
+                        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 select-none">
+                          Select time
+                        </span>
+                      )}
+                      <input
+                        type="time"
+                        value={store.returnTime}
+                        onClick={(e) => (e.currentTarget as any).showPicker?.()}
+                        onChange={(e) => store.setReturnTime(e.target.value)}
+                        className={`w-full p-2 bg-white border border-amber-300 rounded-lg text-xs cursor-pointer ${
+                          store.returnTime
+                            ? 'font-bold text-slate-900'
+                            : 'text-transparent [&::-webkit-datetime-edit]:opacity-0'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
