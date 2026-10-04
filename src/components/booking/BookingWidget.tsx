@@ -72,17 +72,15 @@ export function BookingWidget({
       if (defaultOriginId) {
         const orig = locations.find((l) => l.id === defaultOriginId || l.shortCode === defaultOriginId);
         if (orig) store.setOrigin(orig);
-      } else if (!store.origin) {
-        const orig = locations.find((l) => l.shortCode === 'CDG') || locations[0];
-        store.setOrigin(orig);
+      } else {
+        store.setOrigin(null);
       }
 
       if (defaultDestinationId) {
         const dest = locations.find((l) => l.id === defaultDestinationId || l.shortCode === defaultDestinationId);
         if (dest) store.setDestination(dest);
-      } else if (!store.destination) {
-        const dest = locations.find((l) => l.shortCode === 'DLP') || locations[1] || locations[0];
-        store.setDestination(dest);
+      } else {
+        store.setDestination(null);
       }
     }
 
@@ -305,10 +303,14 @@ export function BookingWidget({
                           {store.origin?.category === 'AIRPORT' ? (
                             <Plane className="w-4 h-4 text-slate-700 shrink-0" />
                           ) : (
-                            <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
+                            <MapPin className={`w-4 h-4 shrink-0 ${store.origin ? 'text-slate-700' : 'text-slate-400'}`} />
                           )}
-                          <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
-                            {store.origin ? store.origin.name : 'Select Pickup Location...'}
+                          <span
+                            className={`text-xs sm:text-sm truncate ${
+                              store.origin ? 'font-black text-slate-900' : 'font-semibold text-slate-400'
+                            }`}
+                          >
+                            {store.origin ? store.origin.name : 'Please select pickup location...'}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-200 shrink-0 ${
@@ -321,8 +323,8 @@ export function BookingWidget({
                     <LocationDropdown
                       isOpen={activeDropdown === 'ORIGIN'}
                       onClose={() => setActiveDropdown(null)}
-                      title="Select Pickup Location..."
-                      placeholder="Search Pickup Location..."
+                      title="Please select pickup location"
+                      placeholder="Type airport, hotel, or station..."
                       locations={locations}
                       categories={categories}
                       selectedLocationId={store.origin?.id}
@@ -357,13 +359,15 @@ export function BookingWidget({
                         <div className="flex items-center gap-2 min-w-0">
                           {store.destination?.category === 'AIRPORT' ? (
                             <Plane className="w-4 h-4 text-slate-700 shrink-0" />
-                          ) : store.destination?.category === 'AMUSEMENT_PARK' ? (
-                            <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
                           ) : (
-                            <MapPin className="w-4 h-4 text-slate-700 shrink-0" />
+                            <MapPin className={`w-4 h-4 shrink-0 ${store.destination ? 'text-slate-700' : 'text-slate-400'}`} />
                           )}
-                          <span className="text-xs sm:text-sm font-black text-slate-900 truncate">
-                            {store.destination ? store.destination.name : 'Select Drop-off Location...'}
+                          <span
+                            className={`text-xs sm:text-sm truncate ${
+                              store.destination ? 'font-black text-slate-900' : 'font-semibold text-slate-400'
+                            }`}
+                          >
+                            {store.destination ? store.destination.name : 'Please select drop-off destination...'}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-200 shrink-0 ${
@@ -376,8 +380,8 @@ export function BookingWidget({
                     <LocationDropdown
                       isOpen={activeDropdown === 'DESTINATION'}
                       onClose={() => setActiveDropdown(null)}
-                      title="Select Drop-off Location..."
-                      placeholder="Search Drop-off Location..."
+                      title="Please select drop-off destination"
+                      placeholder="Type destination, hotel, or park..."
                       locations={locations}
                       categories={categories}
                       selectedLocationId={store.destination?.id}

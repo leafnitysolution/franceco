@@ -156,6 +156,8 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   resetForm: () =>
     set({
       serviceMode: 'TRANSFER',
+      origin: null,
+      destination: null,
       pickupAddress: '',
       dropoffAddress: '',
       flightOrTrainNumber: '',

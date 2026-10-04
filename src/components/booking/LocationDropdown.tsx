@@ -36,8 +36,8 @@ const FALLBACK_CATEGORY_NAMES: Record<string, string> = {
 export function LocationDropdown({
   isOpen,
   onClose,
-  title = 'Select Pickup Location...',
-  placeholder = 'Search location...',
+  title = 'Please select pickup location',
+  placeholder = 'Type location name or code...',
   locations,
   categories,
   selectedLocationId,
