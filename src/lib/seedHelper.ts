@@ -24,7 +24,11 @@ export async function ensureLocationCategoriesSeeded() {
 
 let hasVerifiedSeed = false;
 
-export async function ensureLocationsSeeded() {
+export async function ensureLocationsSeeded(forceManual = false) {
+  // Disabled automatic runtime data upload in production
+  if (!forceManual && process.env.ENABLE_AUTO_SEED !== 'true') {
+    return;
+  }
   if (hasVerifiedSeed) return;
   try {
     const existingLocationCount = await db.location.count();

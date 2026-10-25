@@ -2,8 +2,8 @@ import { ensureLocationsSeeded } from '../src/lib/seedHelper';
 import { db } from '../src/lib/db';
 
 async function main() {
-  console.log('Seeding database for FranceGo (safe upsert mode — bookings preserved)...');
-  await ensureLocationsSeeded();
+  console.log('Seeding database manually for FranceGo (PostgreSQL mode)...');
+  await ensureLocationsSeeded(true);
   console.log('Seeding completed successfully!');
 }
 
