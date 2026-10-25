@@ -7,6 +7,11 @@ const nextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.join(__dirname),
   serverExternalPackages: ['nodemailer'],
+  images: {
+    dangerouslyAllowSVG: false,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
   async headers() {
     return [
       {

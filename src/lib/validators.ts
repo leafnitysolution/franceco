@@ -24,7 +24,7 @@ export const routeSchema = z
     metaTitle: z.string().trim().min(5, 'SEO Meta Title required').max(150),
     metaDescription: z.string().trim().min(10, 'SEO Meta Description required').max(350),
     overviewText: z.string().trim().min(10, 'Route overview text required').max(5000),
-    faqs: z.array(faqSchema),
+    faqs: z.array(faqSchema).max(50),
     isActive: z.boolean().default(true),
     isFeatured: z.boolean().default(false),
   })
