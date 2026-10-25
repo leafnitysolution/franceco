@@ -15,6 +15,7 @@ This comprehensive guide details the complete end-to-end architecture, user jour
 8. [Database Schema & Entity Relationships](#8-database-schema--entity-relationships)
 9. [Enterprise Security Architecture (OWASP Compliance)](#9-enterprise-security-architecture-owasp-compliance)
 10. [Operations, Troubleshooting & Maintenance Playbook](#10-operations-troubleshooting--maintenance-playbook)
+11. [Code-Level Content Customization Guide](#11-code-level-content-customization-guide)
 
 ---
 
@@ -395,3 +396,144 @@ When running on SQLite:
   ```bash
   cp dev.db "dev_backup_$(date +%Y%m%d_%H%M%S).db"
   ```
+
+---
+
+## 11. Code-Level Content Customization Guide
+
+This section provides an exact, step-by-step developer guide on how to modify static website copy, legal policies, navigation menus, contact cards, and language dictionaries directly in the source code.
+
+### A. Quick File Mapping Reference
+
+| Page / Section | Source File | What You Can Edit |
+|---|---|---|
+| **Top Navigation Header** | `src/components/UI/Header.tsx` | Top banner text, logo image, navigation menu links, and book button. |
+| **Main Footer & Legal Bar** | `src/components/UI/Footer.tsx` | Company bio, WhatsApp hotline, email desk, hubs, awards, footer link columns, and copyright. |
+| **Floating WhatsApp Widget** | `src/components/UI/FloatingWhatsApp.tsx` | Green floating button phone number and pre-filled chat greeting message. |
+| **Contact Us Page** | `src/app/(public)/contact-us/page.tsx` | Header banner, hotline phone, dispatch email, physical office hubs, and contact inquiry form. |
+| **Privacy Policy Page** | `src/app/(public)/privacy-policy/page.tsx` | GDPR data collection rules, user rights, data retention terms, and privacy contact email. |
+| **Terms & Conditions Page** | `src/app/(public)/terms-and-conditions/page.tsx` | Booking agreements, payment on arrival terms, baggage limits, flight delay policies. |
+| **Cancellation Policy Page** | `src/app/(public)/cancellation-policy/page.tsx` | Free cancellation timeframes (e.g. 12h/24h), missed flight rules, and refund guidelines. |
+| **About Us Page** | `src/app/(public)/about-us/page.tsx` | Company story, founding values, fleet statistics, and concierge promises. |
+| **FAQs Page** | `src/app/(public)/faqs/page.tsx` | Frequently asked questions across Airport Pickups, Pricing, Child Seats, and Disneyland. |
+| **Our Rates Page** | `src/app/(public)/our-rates/page.tsx` | Base rate tables, vehicle tier specs (luggage/passenger limits), and inclusive perks. |
+| **Homepage Hero & Sections** | `src/app/(public)/page.tsx` | Main hero title, subtitle, fleet overview cards, trust badges, and reviews showcase. |
+| **Multi-Language Dictionaries** | `src/lib/LanguageContext.tsx` | Translations for English (`en`), French (`fr`), Spanish (`es`), Italian (`it`), German (`de`), and Portuguese (`pt`). |
+| **Email HTML Templates** | `src/lib/email.ts` | Passenger confirmation voucher layout and Admin WhatsApp dispatch alert layout. |
+
+---
+
+### B. Detailed Step-by-Step Customization Instructions
+
+#### 1. Changing Header Content (`src/components/UI/Header.tsx`)
+- **Top Dark Announcement Bar**:
+  - Located around line 38: `"OFFICIAL PARIS CHAUFFEUR SERVICE"` and `"+33 7 81 11 83 94"`.
+  - Edit the phone number or announcement text directly in the JSX.
+- **Brand Logo**:
+  - Located around line 65: `<Image src="/images/logo.png" ... />`.
+  - To change the logo, replace the image file at `public/images/logo.png` or update the path in `Header.tsx`.
+- **Navigation Dropdowns & Links**:
+  - Located around lines 90–150: Update link titles or paths for `Transfers`, `Tours & Day Trips`, `Transfer Rates`, `Fleet`, `Reviews`, and `Contact Us`.
+
+#### 2. Changing Footer Content (`src/components/UI/Footer.tsx`)
+- **Tagline & Company Overview**:
+  - Lines 112–114: Change the descriptive bio (`"Premium private transfers and curated day trips..."`).
+- **Contact Cards**:
+  - Lines 124–126: WhatsApp hotline number (`+33 7 81 11 83 94`).
+  - Lines 136–138: Email dispatch desk (`projet15df@outlook.fr`).
+  - Line 148: Head office & operating hubs (`Paris CDG, Orly & DLP`).
+- **TripAdvisor & Reviews Trust Box**:
+  - Lines 188–206: Update the award title (`"Travellers' Choice Award"`), score (`"4.9 / 5.0 Rating"`), and review count (`"1,400+ Reviews"`).
+- **Navigation Columns (Transfers, Tours, Company, Help)**:
+  - Lines 211–301: Add, delete, or rename links in the 4 footer columns.
+- **Copyright Bar**:
+  - Line 305: `© {new Date().getFullYear()} FranceGo. All rights reserved.`
+  - Line 319: Tagline (`"Official Door-to-Door Private Chauffeur & Shuttle Service in France"`).
+
+#### 3. Changing Floating WhatsApp Button (`src/components/UI/FloatingWhatsApp.tsx`)
+- Located on line 12:
+  ```typescript
+  phoneNumber = '33781118394',
+  defaultMessage = 'Hello FRANCE GO! I would like to inquire about a private airport transfer.',
+  ```
+- Change `phoneNumber` to your new international number (without `+` or spaces).
+- Change `defaultMessage` to modify the initial text that appears in WhatsApp when a user taps the button.
+
+#### 4. Changing Contact Us Page (`src/app/(public)/contact-us/page.tsx`)
+- **Hero Title & Subtitle**: Lines 60–72: Change the heading (`"Contact FranceGo VIP Transfers"`) and intro text.
+- **Direct Contact Information Cards**:
+  - Lines 90–93: 24/7 Hotline phone number.
+  - Lines 104–106: Direct WhatsApp chat link and pre-filled inquiry text.
+  - Lines 121–124: Email dispatch address.
+  - Lines 133–136: Hubs & airport coverage description.
+- **Form Behavior**: The contact form automatically posts submissions to `/api/contact` and saves them in the database for admin review under `/ffs-portal-sec-99x/inquiries`.
+
+#### 5. Changing Privacy Policy (`src/app/(public)/privacy-policy/page.tsx`)
+- **Company Name & Controller**: Line 39: Update company identity (`FranceGo`) and legal jurisdiction.
+- **Collected Data Categories**: Lines 50–75: Edit the list of personal data collected (passenger names, phone numbers, flight numbers).
+- **GDPR Rights & Inquiries**: Lines 95–110: Update the contact email for data access or deletion requests (`projet15df@outlook.fr`).
+
+#### 6. Changing Terms & Conditions (`src/app/(public)/terms-and-conditions/page.tsx`)
+- **Payment & Booking Terms**:
+  - Lines 50–90: Details the **"Pay Chauffeur upon Arrival"** policy and accepted payment methods (Cash in EUR, Visa, Mastercard, Amex).
+- **Driver Meet & Greet & Waiting Time**:
+  - Lines 95–130: Free airport waiting time rules (e.g., 60 minutes free waiting time after flight touchdown).
+- **Luggage Allowance & Vehicle Sizing**:
+  - Lines 135–160: Standard luggage dimensions and passenger seat limits for Sedans, Minivans, and Minibuses.
+
+#### 7. Changing Cancellation Policy (`src/app/(public)/cancellation-policy/page.tsx`)
+- **Free Cancellation Window**:
+  - Lines 45–70: Edit cancellation notice requirements (e.g., free cancellation up to 12 hours or 24 hours before scheduled pickup).
+- **Flight Cancellations & Delays**:
+  - Lines 75–110: Outlines automatic rescheduling without penalties when flights are delayed or cancelled by the airline.
+
+#### 8. Changing About Us Page (`src/app/(public)/about-us/page.tsx`)
+- **Mission Statement**: Lines 45–65: Update the brand narrative and customer commitment.
+- **Fleet & Experience Numbers**: Lines 80–120: Update statistics (e.g. `10+ Years Experience`, `50,000+ Happy Passengers`, `100% Guaranteed Punctuality`).
+- **Core Pillars**: Lines 130–180: Edit the 4 value pillars (Fixed Pricing, Free Child Seats, Flight Monitoring, Professional Bilingual Chauffeurs).
+
+#### 9. Changing Frequently Asked Questions (`src/app/(public)/faqs/page.tsx`)
+- **Categories & Questions**:
+  - Located throughout lines 35–180: Grouped into accordion sections.
+  - To add a question, add an object `{ q: "Your Question?", a: "Your detailed answer." }` to the respective category list.
+
+#### 10. Changing Multi-Language Translations (`src/lib/LanguageContext.tsx`)
+- The platform supports 6 languages: `en` (English), `fr` (French), `es` (Spanish), `it` (Italian), `de` (German), and `pt` (Portuguese).
+- Inside `LanguageContext.tsx`, look for the `translations` dictionary object.
+- To change or add a translated phrase:
+  ```typescript
+  hero_title: {
+    en: "Private Airport & Disneyland Paris Transfers",
+    fr: "Transferts Privés Aéroports & Disneyland Paris",
+    es: "Traslados Privados Aeropuertos y Disneyland París",
+    it: "Trasferimenti Privati Aeroporti e Disneyland Parigi",
+    de: "Private Flughafentransfers & Disneyland Paris",
+    pt: "Transfers Privados Aeroportos e Disneyland Paris",
+  }
+  ```
+
+#### 11. Changing Email Layouts (`src/lib/email.ts`)
+- **Passenger Voucher Template**: Lines 66–128 (`clientHtml`):
+  - Change colors, brand header (`FRANCEGO`), greeting messages, or payment instructions.
+- **Admin Dispatch Alert Template**: Lines 130–181 (`adminHtml`):
+  - Change dispatch team alert styling or modify the pre-filled WhatsApp message formula on line 173.
+
+---
+
+### C. How to Save and Deploy Code Changes
+
+Whenever you modify any file:
+
+1. **Test locally (if running local development)**:
+   ```bash
+   npm run build
+   ```
+2. **Commit and push to your GitHub repository**:
+   ```bash
+   git add .
+   git commit -m "content: update contact information and footer copy"
+   git push origin main
+   ```
+3. **Automatic Live Update**:
+   - Hostinger will detect the new commit on `main`, run `npm run build`, and deploy your updated content within 1–2 minutes automatically with zero downtime.
+
