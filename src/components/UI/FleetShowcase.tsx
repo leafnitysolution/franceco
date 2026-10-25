@@ -99,7 +99,7 @@ export function FleetShowcase({
     <div className="space-y-10">
       <div className="text-center space-y-3">
         <span className="text-xs font-bold uppercase tracking-widest text-gold-700 bg-[#F7F2E7] px-3.5 py-1.5 rounded-full border border-[#E5D7BC]">
-          FLEET CAPACITY & SPECIFICATIONS
+          {t('fleetCapacityBadge')}
         </span>
         <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight">
           {t('fleetTitle')}
@@ -122,7 +122,7 @@ export function FleetShowcase({
             {v.isPopular && (
               <div className="absolute top-3 right-3 z-10 bg-gold-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>FAMILY FAVORITE</span>
+                <span>{t('familyFavorite')}</span>
               </div>
             )}
 
@@ -162,7 +162,7 @@ export function FleetShowcase({
                   </span>
                   <span className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg text-emerald-700 font-bold text-[11px]">
                     <Baby className="w-3 h-3 text-emerald-600" />
-                    <span>Free Seats</span>
+                    <span>{t('freeSeatsBadge')}</span>
                   </span>
                 </div>
 

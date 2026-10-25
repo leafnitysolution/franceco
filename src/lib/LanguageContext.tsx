@@ -130,6 +130,47 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     footerDesc: 'Door-to-door private transfers, airport shuttles, and Disneyland Paris transfers with zero upfront deposit.',
     quickLinks: 'Quick Links',
     rightsReserved: 'All rights reserved. Premium Airport & Disneyland Paris Private Transfers.',
+
+    // Additional UI & Card Translations
+    popularRoutesBadge: 'POPULAR ROUTES & FARES',
+    viewRoute: 'View Route',
+    averageRating: 'Average Rating',
+    verifiedReviewsCount: 'Verified Reviews',
+    travelersChoice: "Travelers' Choice",
+    fixedPricingBadge: 'Fixed Pricing',
+    noHiddenFees: 'No hidden fees',
+    zeroDeposit: 'Zero Deposit',
+    payOnArrivalBadge: 'Pay on arrival',
+    freeChildSeats: 'Free Child Seats',
+    includedAlways: 'Included always',
+    fleetCapacityBadge: 'FLEET CAPACITY & SPECIFICATIONS',
+    familyFavorite: 'FAMILY FAVORITE',
+    freeSeatsBadge: 'Free Seats',
+    gotQuestions: 'GOT QUESTIONS?',
+    faqsTitle: 'Frequently Asked Questions',
+    faqsSubtitle: 'Everything you need to know about our airport pickup process, zero deposit policy, and child seat options.',
+    bottomCtaTitle: 'Your Paris Journey Starts Here',
+    bottomCtaSubtitle: 'Book your private chauffeur today with fixed pricing, zero deposit, and payment on arrival.',
+    fromLabel: 'From',
+    toLabel: 'To',
+    selectPickupPlaceholder: 'Please select pickup location...',
+    selectDropoffPlaceholder: 'Please select drop-off destination...',
+    swapLocations: 'Swap Locations',
+    bookNowBtn: 'BOOK NOW',
+    trainStationTransfersHeading: 'Train Station Transfers',
+    disneylandTransfersHeading: 'Disneyland Paris Transfers',
+    excursionsHeading: 'Excursions & Day Trips',
+    ourServices: 'Our Services',
+    ourFleet: 'Our Fleet',
+    legalPolicies: 'Legal & Policies',
+    termsConditions: 'Terms & Conditions',
+    privacyPolicy: 'Privacy Policy',
+    cancellationPolicy: 'Cancellation Policy',
+    officialChauffeurService: 'OFFICIAL PARIS CHAUFFEUR SERVICE',
+    planTransferBtn: 'Plan a Transfer',
+    talkToUsBtn: 'Talk to Us',
+    awardsAndTrust: 'AWARDS & TRUST',
+    verifiedBadge: 'VERIFIED',
   },
   es: {
     // Header & Nav
@@ -230,6 +271,47 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     footerDesc: 'Traslados privados puerta a puerta, shuttles de aeropuerto y traslados a Disneyland París sin depósito previo.',
     quickLinks: 'Enlaces Rápidos',
     rightsReserved: 'Todos los derechos reservados. Traslados Privados de Lujo en París y Disneyland.',
+
+    // Additional UI & Card Translations
+    popularRoutesBadge: 'RUTAS POPULARES Y TARIFAS',
+    viewRoute: 'Ver Ruta',
+    averageRating: 'Puntuación Media',
+    verifiedReviewsCount: 'Reseñas Verificadas',
+    travelersChoice: 'Elección de los Viajeros',
+    fixedPricingBadge: 'Precios Fijos',
+    noHiddenFees: 'Sin cargos ocultos',
+    zeroDeposit: 'Sin Depósito',
+    payOnArrivalBadge: 'Pago a la llegada',
+    freeChildSeats: 'Sillas de Niño Gratis',
+    includedAlways: 'Siempre incluido',
+    fleetCapacityBadge: 'CAPACIDAD DE LA FLOTA Y ESPECIFICACIONES',
+    familyFavorite: 'FAVORITO DE FAMILIAS',
+    freeSeatsBadge: 'Sillas Gratis',
+    gotQuestions: '¿TIENES PREGUNTAS?',
+    faqsTitle: 'Preguntas Frecuentes',
+    faqsSubtitle: 'Todo lo que necesitas saber sobre recogidas en aeropuerto, política sin depósito y sillas infantiles.',
+    bottomCtaTitle: 'Tu Viaje a París Comienza Aquí',
+    bottomCtaSubtitle: 'Reserve su chófer privado hoy con tarifas fijas, sin depósito y pago a la llegada.',
+    fromLabel: 'Desde',
+    toLabel: 'Hasta',
+    selectPickupPlaceholder: 'Seleccione lugar de recogida...',
+    selectDropoffPlaceholder: 'Seleccione lugar de destino...',
+    swapLocations: 'Intercambiar ubicaciones',
+    bookNowBtn: 'RESERVAR',
+    trainStationTransfersHeading: 'Traslados Estaciones de Tren',
+    disneylandTransfersHeading: 'Traslados Disneyland París',
+    excursionsHeading: 'Excursiones y Visitas',
+    ourServices: 'Nuestros Servicios',
+    ourFleet: 'Nuestra Flota',
+    legalPolicies: 'Legal y Políticas',
+    termsConditions: 'Términos y Condiciones',
+    privacyPolicy: 'Política de Privacidad',
+    cancellationPolicy: 'Política de Cancelación',
+    officialChauffeurService: 'SERVICIO OFICIAL DE CHÓFER EN PARÍS',
+    planTransferBtn: 'Planificar un Traslado',
+    talkToUsBtn: 'Contactar con Nosotros',
+    awardsAndTrust: 'PREMIOS Y CONFIANZA',
+    verifiedBadge: 'VERIFICADO',
   },
   fr: {
     // Header & Nav
@@ -330,6 +412,47 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     footerDesc: 'Transferts privés porte-à-porte, navettes aéroports et trajets Disneyland Paris sans aucun acompte.',
     quickLinks: 'Liens Rapides',
     rightsReserved: 'Tous droits réservés. Transferts Privés de Prestige à Paris & Disneyland.',
+
+    // Additional UI & Card Translations
+    popularRoutesBadge: 'TRAJETS POPULAIRES & TARIFS',
+    viewRoute: 'Voir le Trajet',
+    averageRating: 'Note Moyenne',
+    verifiedReviewsCount: 'Avis Vérifiés',
+    travelersChoice: 'Choix des Voyageurs',
+    fixedPricingBadge: 'Tarifs Fixes',
+    noHiddenFees: 'Sans frais cachés',
+    zeroDeposit: 'Zéro Acompte',
+    payOnArrivalBadge: 'Paiement à l’arrivée',
+    freeChildSeats: 'Sièges Enfant Gratuits',
+    includedAlways: 'Toujours inclus',
+    fleetCapacityBadge: 'CAPACITÉ DE LA FLOTTE & SPÉCIFICATIONS',
+    familyFavorite: 'FAVORI DES FAMILLES',
+    freeSeatsBadge: 'Sièges Gratuits',
+    gotQuestions: 'DES QUESTIONS ?',
+    faqsTitle: 'Foire Aux Questions',
+    faqsSubtitle: 'Tout ce que vous devez savoir sur la prise en charge à l’aéroport, notre politique sans acompte et les sièges enfant.',
+    bottomCtaTitle: 'Votre Séjour à Paris Commence Ici',
+    bottomCtaSubtitle: 'Réservez votre chauffeur privé dès aujourd’hui avec tarifs fixes, zéro acompte et paiement à l’arrivée.',
+    fromLabel: 'De',
+    toLabel: 'Vers',
+    selectPickupPlaceholder: 'Sélectionnez le lieu de prise en charge...',
+    selectDropoffPlaceholder: 'Sélectionnez la destination...',
+    swapLocations: 'Inverser les lieux',
+    bookNowBtn: 'RÉSERVER',
+    trainStationTransfersHeading: 'Gares Parisiennes',
+    disneylandTransfersHeading: 'Transferts Disneyland Paris',
+    excursionsHeading: 'Excursions & Visites',
+    ourServices: 'Nos Services',
+    ourFleet: 'Notre Flotte',
+    legalPolicies: 'Mentions Légales & Politiques',
+    termsConditions: 'Conditions Générales',
+    privacyPolicy: 'Politique de Confidentialité',
+    cancellationPolicy: 'Politique d’Annulation',
+    officialChauffeurService: 'SERVICE DE CHAUFFEUR OFFICIEL PARIS',
+    planTransferBtn: 'Planifier un Transfert',
+    talkToUsBtn: 'Nous Contacter',
+    awardsAndTrust: 'PRIX & CONFIANCE',
+    verifiedBadge: 'VÉRIFIÉ',
   },
   it: {
     // Header & Nav
@@ -430,6 +553,47 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     footerDesc: 'Trasferimenti privati porta a porta, navette aeroportuali e Disneyland Parigi senza anticipo.',
     quickLinks: 'Link Rapidi',
     rightsReserved: 'Tutti i diritti riservati. Trasferimenti Privati di Lusso a Parigi e Disneyland.',
+
+    // Additional UI & Card Translations
+    popularRoutesBadge: 'ROTTE POPOLARI E TARIFFE',
+    viewRoute: 'Vedi Percorso',
+    averageRating: 'Valutazione Media',
+    verifiedReviewsCount: 'Recensioni Verificate',
+    travelersChoice: 'Scelta dei Viaggiatori',
+    fixedPricingBadge: 'Prezzi Fissi',
+    noHiddenFees: 'Nessun costo nascosto',
+    zeroDeposit: 'Zero Anticipo',
+    payOnArrivalBadge: 'Paga all’arrivo',
+    freeChildSeats: 'Seggiolini Gratis',
+    includedAlways: 'Sempre inclusi',
+    fleetCapacityBadge: 'CAPACITÀ DELLA FLOTTA E SPECIFICHE',
+    familyFavorite: 'PREFERITO DALLE FAMIGLIE',
+    freeSeatsBadge: 'Seggiolini Gratis',
+    gotQuestions: 'HAI DOMANDE?',
+    faqsTitle: 'Domande Frequenti',
+    faqsSubtitle: 'Tutto quello che devi sapere su pick-up aeroporto, cancellazione e seggiolini inclusi.',
+    bottomCtaTitle: 'Il Tuo Viaggio a Parigi Inizia Qui',
+    bottomCtaSubtitle: 'Prenota oggi il tuo autista privato con prezzi fissi, zero anticipo e pagamento all’arrivo.',
+    fromLabel: 'Da',
+    toLabel: 'A',
+    selectPickupPlaceholder: 'Seleziona luogo di ritiro...',
+    selectDropoffPlaceholder: 'Seleziona destinazione...',
+    swapLocations: 'Inverti posizioni',
+    bookNowBtn: 'PRENOTA ORA',
+    trainStationTransfersHeading: 'Stazioni Ferroviarie di Parigi',
+    disneylandTransfersHeading: 'Trasferimenti Disneyland Parigi',
+    excursionsHeading: 'Escursioni e Tour di un Giorno',
+    ourServices: 'I Nostri Servizi',
+    ourFleet: 'La Nostra Flotta',
+    legalPolicies: 'Legale e Politiche',
+    termsConditions: 'Termini e Condizioni',
+    privacyPolicy: 'Informativa sulla Privacy',
+    cancellationPolicy: 'Politica di Cancellazione',
+    officialChauffeurService: 'SERVIZIO UFFICIALE DI AUTISTA A PARIGI',
+    planTransferBtn: 'Pianifica Trasferimento',
+    talkToUsBtn: 'Contattaci',
+    awardsAndTrust: 'PREMI E FIDUCIA',
+    verifiedBadge: 'VERIFICATO',
   },
   de: {
     // Header & Nav
@@ -530,6 +694,47 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     footerDesc: 'Privattransfers von Tür zu Tür, Flughafen-Shuttles und Disneyland Paris ohne Anzahlung.',
     quickLinks: 'Schnelllinks',
     rightsReserved: 'Alle Rechte vorbehalten. Premium Flughafentransfers in Paris & Disneyland.',
+
+    // Additional UI & Card Translations
+    popularRoutesBadge: 'BELIEBTE ROUTEN & PREISE',
+    viewRoute: 'Route ansehen',
+    averageRating: 'Durchschnittliche Bewertung',
+    verifiedReviewsCount: 'Verifizierte Bewertungen',
+    travelersChoice: "Travelers' Choice",
+    fixedPricingBadge: 'Feste Preise',
+    noHiddenFees: 'Keine versteckten Gebühren',
+    zeroDeposit: 'Keine Anzahlung',
+    payOnArrivalBadge: 'Zahlung bei Ankunft',
+    freeChildSeats: 'Kostenlose Kindersitze',
+    includedAlways: 'Immer inklusive',
+    fleetCapacityBadge: 'KAPAZITÄT DER FLOTTE & SPEZIFIKATIONEN',
+    familyFavorite: 'FAMILIENLIEBLING',
+    freeSeatsBadge: 'Kostenlose Sitze',
+    gotQuestions: 'FRAGEN?',
+    faqsTitle: 'Häufig gestellte Fragen',
+    faqsSubtitle: 'Alles, was Sie über unsere Flughafenabholung, Null-Anzahlung und Kindersitze wissen müssen.',
+    bottomCtaTitle: 'Ihre Paris-Reise beginnt hier',
+    bottomCtaSubtitle: 'Buchen Sie noch heute Ihren Privat-Chauffeur mit Festpreisen, ohne Anzahlung und Zahlung bei Ankunft.',
+    fromLabel: 'Von',
+    toLabel: 'Nach',
+    selectPickupPlaceholder: 'Bitte Abholort wählen...',
+    selectDropoffPlaceholder: 'Bitte Zielort wählen...',
+    swapLocations: 'Orte tauschen',
+    bookNowBtn: 'JETZT BUCHEN',
+    trainStationTransfersHeading: 'Bahnhofstransfers',
+    disneylandTransfersHeading: 'Disneyland Paris Transfers',
+    excursionsHeading: 'Ausflüge & Tagestouren',
+    ourServices: 'Unsere Leistungen',
+    ourFleet: 'Unsere Flotte',
+    legalPolicies: 'Rechtliches & Richtlinien',
+    termsConditions: 'AGB',
+    privacyPolicy: 'Datenschutzerklärung',
+    cancellationPolicy: 'Stornierungsbedingungen',
+    officialChauffeurService: 'OFFIZIELLER PARISER CHAUFFEURSERVICE',
+    planTransferBtn: 'Transfer planen',
+    talkToUsBtn: 'Sprechen Sie mit uns',
+    awardsAndTrust: 'AUSZEICHNUNGEN & VERTRAUEN',
+    verifiedBadge: 'VERIFIZIERT',
   },
   pt: {
     // Header & Nav
@@ -630,6 +835,47 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     footerDesc: 'Transfers privados porta a porta, shuttles de aeroporto e transfers para Disneyland Paris sem depósito prévio.',
     quickLinks: 'Links Rápidos',
     rightsReserved: 'Todos os direitos reservados. Transfers Privados de Luxo em Paris e Disneyland.',
+
+    // Additional UI & Card Translations
+    popularRoutesBadge: 'ROTAS POPULARES E TARIFAS',
+    viewRoute: 'Ver Rota',
+    averageRating: 'Avaliação Média',
+    verifiedReviewsCount: 'Avaliações Verificadas',
+    travelersChoice: 'Escolha dos Viajantes',
+    fixedPricingBadge: 'Preços Fixos',
+    noHiddenFees: 'Sem taxas ocultas',
+    zeroDeposit: 'Sem Depósito',
+    payOnArrivalBadge: 'Pagamento na chegada',
+    freeChildSeats: 'Cadeirinhas Grátis',
+    includedAlways: 'Sempre incluído',
+    fleetCapacityBadge: 'CAPACIDADE DA FROTA E ESPECIFICAÇÕES',
+    familyFavorite: 'FAVORITO DAS FAMÍLIAS',
+    freeSeatsBadge: 'Assentos Grátis',
+    gotQuestions: 'DÚVIDAS?',
+    faqsTitle: 'Perguntas Frequentes',
+    faqsSubtitle: 'Tudo o que você precisa saber sobre busca no aeroporto, política sem depósito e cadeirinhas infantis.',
+    bottomCtaTitle: 'Sua Viagem a Paris Começa Aqui',
+    bottomCtaSubtitle: 'Reserve hoje o seu motorista privado com preço fixo, sem depósito e pagamento na chegada.',
+    fromLabel: 'De',
+    toLabel: 'Para',
+    selectPickupPlaceholder: 'Selecione o local de partida...',
+    selectDropoffPlaceholder: 'Selecione o destino...',
+    swapLocations: 'Inverter locais',
+    bookNowBtn: 'RESERVAR',
+    trainStationTransfersHeading: 'Estações de Trem de Paris',
+    disneylandTransfersHeading: 'Transfers Disneyland Paris',
+    excursionsHeading: 'Excursões e Passeios',
+    ourServices: 'Nossos Serviços',
+    ourFleet: 'Nossa Frota',
+    legalPolicies: 'Legal e Políticas',
+    termsConditions: 'Termos e Condições',
+    privacyPolicy: 'Política de Privacidade',
+    cancellationPolicy: 'Política de Cancelamento',
+    officialChauffeurService: 'SERVIÇO OFICIAL DE MOTORISTA EM PARIS',
+    planTransferBtn: 'Planejar um Transfer',
+    talkToUsBtn: 'Fale Conosco',
+    awardsAndTrust: 'PRÊMIOS E CONFIANÇA',
+    verifiedBadge: 'VERIFICADO',
   },
 };
 
@@ -649,12 +895,42 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguageState] = useState<LanguageOption>(LANGUAGES[0]);
   const [mounted, setMounted] = useState(false);
 
+  // Sync Google Translate cookie helper
+  const syncGoogleTranslateCookie = (langCode: LanguageCode) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const hostname = window.location.hostname;
+      if (langCode === 'en') {
+        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${hostname};`;
+        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${hostname};`;
+      } else {
+        const val = `/en/${langCode}`;
+        document.cookie = `googtrans=${val}; path=/;`;
+        document.cookie = `googtrans=${val}; path=/; domain=${hostname};`;
+        document.cookie = `googtrans=${val}; path=/; domain=.${hostname};`;
+      }
+
+      // If Google Translate select is rendered in DOM, trigger change
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      if (select && select.value !== langCode) {
+        select.value = langCode;
+        select.dispatchEvent(new Event('change'));
+      }
+    } catch {
+      // Ignore cookie errors
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem('fastforward_lang') as LanguageCode;
     if (saved) {
       const found = LANGUAGES.find((l) => l.code === saved);
-      if (found) setCurrentLanguageState(found);
+      if (found) {
+        setCurrentLanguageState(found);
+        syncGoogleTranslateCookie(saved);
+      }
     }
   }, []);
 
@@ -663,6 +939,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (found) {
       setCurrentLanguageState(found);
       localStorage.setItem('fastforward_lang', langCode);
+      syncGoogleTranslateCookie(langCode);
     }
   };
 

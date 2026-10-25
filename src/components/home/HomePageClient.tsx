@@ -119,32 +119,32 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
               <Star className="w-3.5 h-3.5 fill-amber-400" />
               <span className="font-bold text-navy-900 text-sm">4.9 / 5</span>
             </div>
-            <div className="text-[10px] text-slate-500 font-medium">Average Rating</div>
+            <div className="text-[10px] text-slate-500 font-medium">{t('averageRating')}</div>
           </div>
 
           <div className="p-2 space-y-0.5">
             <div className="font-bold text-navy-900 text-sm">3,444+</div>
-            <div className="text-[10px] text-slate-500 font-medium">Verified Reviews</div>
+            <div className="text-[10px] text-slate-500 font-medium">{t('verifiedReviewsCount')}</div>
           </div>
 
           <div className="p-2 space-y-0.5">
             <div className="font-bold text-gold-700 text-xs uppercase tracking-wider">Tripadvisor</div>
-            <div className="text-[10px] text-slate-500 font-medium">Travelers' Choice</div>
+            <div className="text-[10px] text-slate-500 font-medium">{t('travelersChoice')}</div>
           </div>
 
           <div className="p-2 space-y-0.5">
-            <div className="font-bold text-navy-900 text-xs">Fixed Pricing</div>
-            <div className="text-[10px] text-slate-500 font-medium">No hidden fees</div>
+            <div className="font-bold text-navy-900 text-xs">{t('fixedPricingBadge')}</div>
+            <div className="text-[10px] text-slate-500 font-medium">{t('noHiddenFees')}</div>
           </div>
 
           <div className="p-2 space-y-0.5">
-            <div className="font-bold text-navy-900 text-xs">Zero Deposit</div>
-            <div className="text-[10px] text-slate-500 font-medium">Pay on arrival</div>
+            <div className="font-bold text-navy-900 text-xs">{t('zeroDeposit')}</div>
+            <div className="text-[10px] text-slate-500 font-medium">{t('payOnArrivalBadge')}</div>
           </div>
 
           <div className="p-2 space-y-0.5">
-            <div className="font-bold text-navy-900 text-xs">Free Child Seats</div>
-            <div className="text-[10px] text-slate-500 font-medium">Included always</div>
+            <div className="font-bold text-navy-900 text-xs">{t('freeChildSeats')}</div>
+            <div className="text-[10px] text-slate-500 font-medium">{t('includedAlways')}</div>
           </div>
         </div>
       </section>
@@ -153,13 +153,13 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-2">
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 bg-[#F7F2E7] px-3.5 py-1 rounded-full border border-[#E5D7BC]">
-            POPULAR ROUTES & FARES
+            {t('popularRoutesBadge')}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight">
-            Popular Transfer Routes & Fixed Fares
+            {t('featuredRoutesTitle')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 font-medium">
-            Instant fixed pricing for top airport and Disneyland Paris private transfers.
+            {t('featuredRoutesSubtitle')}
           </p>
         </div>
 
@@ -175,7 +175,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
                   <MapPin className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-gold-800 bg-[#F7F2E7] px-2.5 py-1 rounded-md border border-[#E5D7BC]">
-                  From {formatCurrency(route.sedanPriceEur)}
+                  {t('from')} {formatCurrency(route.sedanPriceEur)}
                 </span>
               </div>
 
@@ -195,12 +195,12 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-gold-600" />
-                  <span>~{route.estDurationMinutes} mins</span>
+                  <span>~{route.estDurationMinutes} {t('mins')}</span>
                 </div>
               </div>
 
               <div className="pt-2 text-xs font-bold text-gold-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                <span>View Route</span>
+                <span>{t('viewRoute')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </Link>
@@ -222,13 +222,13 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
       <section id="faqs" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 bg-[#F7F2E7] px-3.5 py-1 rounded-full border border-[#E5D7BC]">
-            GOT QUESTIONS?
+            {t('gotQuestions')}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight">
-            Frequently Asked Questions
+            {t('faqsTitle')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 font-medium">
-            Everything you need to know about our airport pickup process, zero deposit policy, and child seat options.
+            {t('faqsSubtitle')}
           </p>
         </div>
 
@@ -242,10 +242,10 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
         <div className="bg-[#0B192C] text-white rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-2xl relative overflow-hidden">
           <div className="space-y-3 max-w-2xl mx-auto">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight">
-              Your Paris Journey Starts Here
+              {t('bottomCtaTitle')}
             </h2>
             <p className="text-sm text-slate-300 font-medium leading-relaxed">
-              Book your private chauffeur today with fixed pricing, zero deposit, and payment on arrival.
+              {t('bottomCtaSubtitle')}
             </p>
           </div>
 

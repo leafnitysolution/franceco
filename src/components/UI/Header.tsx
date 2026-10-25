@@ -208,7 +208,7 @@ export function Header({ routes }: HeaderProps) {
                   {trainStationRoutes.length > 0 && (
                     <div>
                       <h4 className="text-[11px] font-black uppercase tracking-wider text-[#9E7B3B] mb-3">
-                        Train Station Transfers
+                        {t('trainStationTransfersHeading')}
                       </h4>
                       <ul className="space-y-2 text-xs font-semibold text-slate-700">
                         {trainStationRoutes.map((r) => (
@@ -240,7 +240,7 @@ export function Header({ routes }: HeaderProps) {
 
               <div className="absolute top-full left-0 w-[450px] bg-white border border-[#E5D7BC] rounded-3xl p-6 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform group-hover:translate-y-0 translate-y-2 z-50 space-y-4">
                 <h4 className="text-[11px] font-black uppercase tracking-wider text-[#9E7B3B]">
-                  Disneyland Paris Transfers
+                  {t('disneylandTransfersHeading')}
                 </h4>
                 <ul className="grid grid-cols-1 gap-2 text-xs font-semibold text-slate-700">
                   {disneylandRoutes.map((r) => (
@@ -269,7 +269,7 @@ export function Header({ routes }: HeaderProps) {
 
               <div className="absolute top-full left-0 w-64 bg-white border border-[#E5D7BC] rounded-2xl p-3 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform group-hover:translate-y-0 translate-y-2 z-50 space-y-1">
                 <h4 className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#9E7B3B]">
-                  Excursions & Day Trips
+                  {t('excursionsHeading')}
                 </h4>
                 {excursionsRoutes.map((r) => (
                   <Link
@@ -322,12 +322,12 @@ export function Header({ routes }: HeaderProps) {
                     </li>
                     <li>
                       <Link href="/#services" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
-                        Our Services
+                        {t('ourServices')}
                       </Link>
                     </li>
                     <li>
                       <Link href="/#fleet" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
-                        Our Fleet
+                        {t('ourFleet')}
                       </Link>
                     </li>
                   </ul>
@@ -358,22 +358,22 @@ export function Header({ routes }: HeaderProps) {
 
                 <div>
                   <h4 className="text-[11px] font-black uppercase tracking-wider text-[#9E7B3B] mb-3">
-                    Legal & Policies
+                    {t('legalPolicies')}
                   </h4>
                   <ul className="space-y-2 text-xs font-semibold text-slate-700">
                     <li>
                       <Link href="/terms-and-conditions" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
-                        Terms & Conditions
+                        {t('termsConditions')}
                       </Link>
                     </li>
                     <li>
                       <Link href="/privacy-policy" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
-                        Privacy Policy
+                        {t('privacyPolicy')}
                       </Link>
                     </li>
                     <li>
                       <Link href="/cancellation-policy" className="hover:text-[#C5A059] hover:translate-x-1 transition-all duration-150 block py-1">
-                        Cancellation Policy
+                        {t('cancellationPolicy')}
                       </Link>
                     </li>
                   </ul>
@@ -390,7 +390,7 @@ export function Header({ routes }: HeaderProps) {
               href="#booking-widget"
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] text-slate-900 font-black text-xs uppercase tracking-wider hover:brightness-105 hover:scale-105 active:scale-95 transition-all shadow-md shadow-amber-900/10"
             >
-              <span>BOOK NOW</span>
+              <span>{t('bookNowBtn')}</span>
             </a>
           </div>
 

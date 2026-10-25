@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/lib/LanguageContext';
 import { FloatingWhatsApp } from '@/components/UI/FloatingWhatsApp';
+import { GoogleTranslateBridge } from '@/components/UI/GoogleTranslateBridge';
 import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 
 const serifFont = Playfair_Display({
@@ -43,6 +44,7 @@ export default function RootLayout({
         <LanguageProvider>
           {children}
           <FloatingWhatsApp />
+          <GoogleTranslateBridge />
         </LanguageProvider>
       </body>
     </html>

@@ -257,10 +257,10 @@ export function BookingWidget({
       {/* FORM TITLE IN ELEGANT SERIF */}
       <div className="text-center space-y-1">
         <h2 className="font-serif text-lg sm:text-xl font-bold text-navy-900 tracking-wider uppercase">
-          BOOK YOUR PRIVATE TRANSFER
+          {t('bookNow')}
         </h2>
         <p className="text-[11px] text-slate-500 font-medium">
-          Fixed prices • Zero deposit • Pay driver on arrival
+          {t('noDepositRequired')}
         </p>
       </div>
 
@@ -335,7 +335,7 @@ export function BookingWidget({
                       }`}
                     >
                       <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
-                        From
+                        {t('fromLabel')}
                       </label>
                       <div className="flex items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2 min-w-0">
@@ -349,7 +349,7 @@ export function BookingWidget({
                               store.origin ? 'font-black text-slate-900' : 'font-semibold text-slate-400'
                             }`}
                           >
-                            {store.origin ? store.origin.name : 'Please select pickup location...'}
+                            {store.origin ? store.origin.name : t('selectPickupPlaceholder')}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-200 shrink-0 ${
@@ -362,7 +362,7 @@ export function BookingWidget({
                     <LocationDropdown
                       isOpen={activeDropdown === 'ORIGIN'}
                       onClose={() => setActiveDropdown(null)}
-                      title="Please select pickup location"
+                      title={t('selectPickupPlaceholder')}
                       placeholder="Type airport, hotel, or station..."
                       locations={locations}
                       categories={categories}
@@ -376,7 +376,7 @@ export function BookingWidget({
                     <button
                       type="button"
                       onClick={() => store.swapLocations()}
-                      title="Swap Locations"
+                      title={t('swapLocations')}
                       className="w-7 h-7 rounded-full bg-white border border-slate-300 hover:border-slate-400 text-slate-700 shadow-sm flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
                     >
                       <ArrowRightLeft className="w-3 h-3 rotate-90" />
@@ -392,7 +392,7 @@ export function BookingWidget({
                       }`}
                     >
                       <label className="text-[10px] font-extrabold text-slate-500 block uppercase tracking-wider cursor-pointer">
-                        To
+                        {t('toLabel')}
                       </label>
                       <div className="flex items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2 min-w-0">
@@ -406,7 +406,7 @@ export function BookingWidget({
                               store.destination ? 'font-black text-slate-900' : 'font-semibold text-slate-400'
                             }`}
                           >
-                            {store.destination ? store.destination.name : 'Please select drop-off destination...'}
+                            {store.destination ? store.destination.name : t('selectDropoffPlaceholder')}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-200 shrink-0 ${

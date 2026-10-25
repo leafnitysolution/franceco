@@ -105,12 +105,12 @@ export function Footer({ routes }: FooterProps) {
               {/* Quick Badge */}
               <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/30 px-3.5 py-1.5 rounded-full text-gold-400 text-xs font-bold self-start">
                 <ShieldCheck className="w-4 h-4 text-gold-400" />
-                <span>OFFICIAL PARIS CHAUFFEUR SERVICE</span>
+                <span>{t('officialChauffeurService')}</span>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl font-medium">
-              Premium private transfers and curated day trips across Paris, its airports, and the most loved destinations in France. Booked in advance, executed with concierge-level care 24/7.
+              {t('footerDesc')}
             </p>
 
             {/* Quick Contact Details Cards */}
@@ -120,7 +120,7 @@ export function Footer({ routes }: FooterProps) {
                   <Phone className="w-4 h-4 text-gold-400" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">24/7 Hotline & WhatsApp</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold">{t('hotline')}</div>
                   <div className="flex items-center gap-2">
                     <a href="tel:+33781118394" className="font-extrabold text-white hover:text-gold-400 transition-colors">
                       +33 7 81 11 83 94
@@ -162,7 +162,7 @@ export function Footer({ routes }: FooterProps) {
                 href="/book"
                 className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 via-gold-600 to-amber-600 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-gold-950/40 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
               >
-                <span>Plan a Transfer</span>
+                <span>{t('planTransferBtn')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -170,7 +170,7 @@ export function Footer({ routes }: FooterProps) {
                 className="px-6 py-3.5 rounded-2xl bg-[#132338] hover:bg-gold-600 border border-gold-500/40 text-gold-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md hover:shadow-gold-900/20 transform hover:-translate-y-0.5"
               >
                 <MessageSquare className="w-4 h-4 text-gold-400 group-hover:text-white" />
-                <span>Talk to Us</span>
+                <span>{t('talkToUsBtn')}</span>
               </Link>
             </div>
           </div>
@@ -179,10 +179,10 @@ export function Footer({ routes }: FooterProps) {
           <div className="lg:col-span-4 bg-[#0F1E36] border border-[#1E2D42] rounded-3xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
             <div className="flex items-center justify-between">
               <div className="text-[10px] uppercase font-black text-gold-400 tracking-wider">
-                AWARDS & TRUST
+                {t('awardsAndTrust')}
               </div>
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
-                VERIFIED
+                {t('verifiedBadge')}
               </span>
             </div>
 
@@ -270,7 +270,7 @@ export function Footer({ routes }: FooterProps) {
               </li>
               <li>
                 <Link href="/contact-us" className="hover:text-gold-400 transition-colors">
-                  Contact Us
+                  {t('contactUs')}
                 </Link>
               </li>
             </ul>
@@ -279,27 +279,27 @@ export function Footer({ routes }: FooterProps) {
           {/* Column 4: Help & Policies */}
           <div className="space-y-3">
             <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
-              HELP & POLICIES
+              {t('legalPolicies')}
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
               <li>
                 <Link href="/faqs" className="hover:text-gold-400 transition-colors">
-                  Frequently Asked Questions (FAQs)
+                  {t('faqs')}
                 </Link>
               </li>
               <li>
                 <Link href="/terms-and-conditions" className="hover:text-gold-400 transition-colors">
-                  Terms & Conditions
+                  {t('termsConditions')}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy-policy" className="hover:text-gold-400 transition-colors">
-                  Privacy Policy
+                  {t('privacyPolicy')}
                 </Link>
               </li>
               <li>
                 <Link href="/cancellation-policy" className="hover:text-gold-400 transition-colors">
-                  Cancellation Policy
+                  {t('cancellationPolicy')}
                 </Link>
               </li>
             </ul>
@@ -308,18 +308,18 @@ export function Footer({ routes }: FooterProps) {
 
         {/* BOTTOM COPYRIGHT & LEGAL BAR */}
         <div className="pt-8 border-t border-[#1E2D42] text-center text-[11px] text-slate-400 font-medium flex flex-col md:flex-row justify-between items-center gap-3">
-          <p>© {new Date().getFullYear()} FranceGo. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} FranceGo. {t('rightsReserved')}</p>
           <div className="flex items-center gap-4 text-xs font-semibold">
             <Link href="/terms-and-conditions" className="hover:text-gold-400 transition-colors">
-              Terms & Conditions
+              {t('termsConditions')}
             </Link>
             <span>•</span>
             <Link href="/privacy-policy" className="hover:text-gold-400 transition-colors">
-              Privacy Policy
+              {t('privacyPolicy')}
             </Link>
             <span>•</span>
             <Link href="/cancellation-policy" className="hover:text-gold-400 transition-colors">
-              Cancellation Policy
+              {t('cancellationPolicy')}
             </Link>
           </div>
           <p>Official Door-to-Door Private Chauffeur & Shuttle Service in France</p>

@@ -74,3 +74,37 @@
   background-size: 200% 100%;
   animation: shimmer 2.5s infinite;
 }
+
+/* Google Translate Clean Integration - Hide Default Banner & Popup Frames */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#google_translate_element,
+.skiptranslate:not(.goog-te-gadget) {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  display: none !important;
+}
+
