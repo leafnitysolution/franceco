@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Lock, Eye, Server, UserCheck } from 'lucide-react';
+import { ShieldCheck, Lock, Eye, Server, UserCheck, Phone, Mail } from 'lucide-react';
 
 export const metadata = {
   title: 'Privacy Policy | FranceGo',
@@ -102,8 +102,22 @@ export default function PrivacyPolicyPage() {
               </li>
             </ul>
             <p className="pt-2">
-              To exercise your privacy rights, email our Data Protection Officer at: <strong>privacy@francego.com</strong>.
+              To exercise your privacy rights, request data updates or permanent removal, contact our Data Protection and Customer Support team:
             </p>
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3 font-semibold text-xs sm:text-sm mt-3">
+              <div className="flex items-center gap-2.5 text-slate-700">
+                <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  Hotline & WhatsApp: <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="text-emerald-700 font-extrabold hover:underline">+33 7 81 11 83 94</a>
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5 text-slate-700">
+                <Mail className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  Email: <a href="mailto:projet15df@outlook.fr" className="text-emerald-700 font-bold hover:underline">projet15df@outlook.fr</a>
+                </span>
+              </div>
+            </div>
           </section>
         </div>
       </main>

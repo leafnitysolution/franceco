@@ -121,9 +121,15 @@ export function Footer({ routes }: FooterProps) {
                 </div>
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold">24/7 Hotline & WhatsApp</div>
-                  <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="font-extrabold text-white hover:text-gold-400 transition-colors">
-                    +33 7 81 11 83 94
-                  </a>
+                  <div className="flex items-center gap-2">
+                    <a href="tel:+33781118394" className="font-extrabold text-white hover:text-gold-400 transition-colors">
+                      +33 7 81 11 83 94
+                    </a>
+                    <span className="text-slate-500">•</span>
+                    <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-bold text-[11px] underline">
+                      WhatsApp
+                    </a>
+                  </div>
                 </div>
               </div>
 

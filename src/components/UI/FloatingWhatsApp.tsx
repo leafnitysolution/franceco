@@ -18,7 +18,7 @@ export function FloatingWhatsApp({
     <div className="fixed bottom-6 right-6 z-50 flex items-center group">
       {/* Tooltip hint on hover */}
       <span className="hidden sm:inline-block mr-3 px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-white text-xs font-bold shadow-xl border border-slate-700 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0 pointer-events-none">
-        Chat with Dispatch 💬
+        Chat with Dispatch (+33 7 81 11 83 94) 💬
       </span>
 
       {/* Floating Green WhatsApp Button */}
@@ -26,7 +26,7 @@ export function FloatingWhatsApp({
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
+        aria-label="Chat on WhatsApp +33 7 81 11 83 94"
         className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-emerald-500 to-green-400 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 ring-4 ring-emerald-500/20 group"
       >
         {/* Animated Pulse Glow Ring */}

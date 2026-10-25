@@ -88,7 +88,9 @@ export default function ContactUsPage() {
                 </div>
                 <div>
                   <div className="text-slate-400 text-[10px] uppercase font-bold">24/7 Hotline & WhatsApp</div>
-                  <div className="text-navy-900 font-extrabold text-sm sm:text-base">+33 7 81 11 83 94</div>
+                  <a href="tel:+33781118394" className="text-navy-900 hover:text-gold-600 font-extrabold text-sm sm:text-base transition-colors">
+                    +33 7 81 11 83 94
+                  </a>
                   <p className="text-[11px] text-slate-500 font-medium">Bilingual English & French operators available 24/7</p>
                 </div>
               </div>

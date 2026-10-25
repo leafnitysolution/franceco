@@ -56,10 +56,10 @@ export default function CancellationPolicyPage() {
             <p>To cancel or request changes to your booking, simply provide your booking reference number through any of the following channels:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong>Email:</strong> Send a request to <code>contact@francego.com</code>
+                <strong>Email:</strong> Send a request to <code>projet15df@outlook.fr</code>
               </li>
               <li>
-                <strong>WhatsApp / Hotline:</strong> Message our 24/7 dispatch desk at <code>+33 1 89 40 00 00</code>
+                <strong>WhatsApp / Hotline:</strong> Message our 24/7 dispatch desk at <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="font-bold text-emerald-700 hover:underline">+33 7 81 11 83 94</a>
               </li>
             </ul>
           </section>
