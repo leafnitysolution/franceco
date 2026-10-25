@@ -13,7 +13,7 @@ export async function ensureLocationCategoriesSeeded() {
     for (const cat of defaultCats) {
       await db.locationCategory.upsert({
         where: { key: cat.key },
-        update: { name: cat.name, sortOrder: cat.sortOrder },
+        update: {},
         create: cat,
       });
     }

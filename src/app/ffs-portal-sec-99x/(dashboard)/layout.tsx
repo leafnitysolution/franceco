@@ -1,6 +1,7 @@
 import { getAdminSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { AdminNavbar } from '@/components/admin/AdminNavbar';
+import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
 export const revalidate = 0;
 
@@ -14,6 +15,8 @@ export default async function AdminDashboardLayout({
   if (!isAuthenticated) {
     redirect('/ffs-portal-sec-99x/login');
   }
+
+  await ensureLocationsSeeded();
 
   return (
     <div className="min-h-screen bg-[#FBF9F5] text-navy-900 flex flex-col font-sans">
