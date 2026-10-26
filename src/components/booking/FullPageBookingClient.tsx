@@ -37,6 +37,7 @@ import {
   Mail,
   Info,
   Navigation,
+  Compass,
 } from 'lucide-react';
 
 interface FullPageBookingClientProps {
@@ -411,6 +412,74 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
                       All prices include VAT, taxes & tolls
                     </p>
                   </div>
+
+                  {/* SERVICE MODE TABS: POINT-TO-POINT TRANSFER vs HOURLY CHAUFFEUR TOUR */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200 text-xs font-bold gap-1">
+                    <button
+                      type="button"
+                      onClick={() => store.setServiceMode('TRANSFER')}
+                      className={`py-2.5 px-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                        store.serviceMode === 'TRANSFER'
+                          ? 'bg-white text-navy-900 font-black shadow-sm border border-slate-200/80'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <Car className="w-4 h-4 text-gold-600 shrink-0" />
+                      <span>Point-to-Point Direct Transfer</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => store.setServiceMode('HOURLY_TOUR')}
+                      className={`py-2.5 px-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                        store.serviceMode === 'HOURLY_TOUR'
+                          ? 'bg-white text-navy-900 font-black shadow-sm ring-1 ring-gold-400 border border-gold-200'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      <Compass className="w-4 h-4 text-gold-600 shrink-0" />
+                      <span>Hourly Tour (Driver Guide Included)</span>
+                    </button>
+                  </div>
+
+                  {store.serviceMode === 'HOURLY_TOUR' && (
+                    <div className="bg-gradient-to-r from-gold-50 via-white to-gold-50 border border-gold-300 rounded-2xl p-4 space-y-3 animate-in fade-in">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-0.5">
+                          <div className="text-xs font-black text-navy-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <Compass className="w-4 h-4 text-gold-600" />
+                            <span>Tour Service Duration (Driver Guide Included)</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 font-medium">
+                            Rates: <strong>65€/h Car (1-3p)</strong> • <strong>80€/h Van (1-6p)</strong>. All tolls & guide service included.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-700">Hours:</span>
+                          <div className="flex items-center gap-1.5 bg-white border border-slate-300 rounded-xl px-2 py-1 shadow-xs">
+                            <button
+                              type="button"
+                              onClick={() => store.setRentalHours(Math.max(2, store.rentalHours - 1))}
+                              className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold flex items-center justify-center text-xs cursor-pointer"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-black text-navy-900 px-2 min-w-[24px] text-center">
+                              {store.rentalHours}h
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => store.setRentalHours(Math.min(16, store.rentalHours + 1))}
+                              className="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center justify-center text-xs cursor-pointer"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Top Counter Bar: Passengers / Checked Luggage / Hand Luggage */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
