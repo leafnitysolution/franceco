@@ -1,10 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
-import { ArrowRight, ArrowRightLeft, Car, Users, Sparkles, CheckCircle2, ShieldCheck, Clock, Award } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import {
+  ArrowRight,
+  ArrowRightLeft,
+  Navigation,
+  Loader2,
+  CheckCircle2,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
 interface OurRatesClientProps {
@@ -16,7 +23,22 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
   const router = useRouter();
   const [selectedFromId, setSelectedFromId] = useState<string>('');
   const [selectedToId, setSelectedToId] = useState<string>('');
-  const { setOrigin, setDestination } = useBookingStore();
+
+  const [customRouteData, setCustomRouteData] = useState<{
+    distanceKm: number;
+    durationMinutes: number;
+    pricing: { sedan: number; economyVan: number; businessVan: number; minibus: number };
+  } | null>(null);
+  const [isCalculatingCustom, setIsCalculatingCustom] = useState(false);
+
+  const {
+    setOrigin,
+    setDestination,
+    setRoutePricing,
+    setEstimatedKm,
+    setEstimatedDurationMinutes,
+    setDistanceRouteCalculated,
+  } = useBookingStore();
   const { t } = useLanguage();
 
   // Smart Filter: exact match first, or partial match if no exact match
@@ -34,6 +56,78 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
 
   const displayRoutes = exactRoutes.length > 0 ? exactRoutes : partialRoutes;
   const isFiltered = Boolean(selectedFromId || selectedToId);
+
+  // If user picked both FROM and TO, check if it's not in the database routes, and calculate dynamically
+  useEffect(() => {
+    let isCancelled = false;
+    if (selectedFromId && selectedToId && selectedFromId !== selectedToId) {
+      const dbMatch = initialRoutes.find(
+        (r) =>
+          (r.originId === selectedFromId && r.destinationId === selectedToId) ||
+          (r.originId === selectedToId && r.destinationId === selectedFromId)
+      );
+
+      if (!dbMatch) {
+        const fromLoc = locations.find((l) => l.id === selectedFromId);
+        const toLoc = locations.find((l) => l.id === selectedToId);
+        if (fromLoc && toLoc) {
+          setIsCalculatingCustom(true);
+          fetch('/api/maps/distance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              origin: fromLoc.name,
+              destination: toLoc.name,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (!isCancelled && data.success && data.pricing) {
+                setCustomRouteData({
+                  distanceKm: data.distanceKm,
+                  durationMinutes: data.durationMinutes,
+                  pricing: data.pricing,
+                });
+              }
+            })
+            .catch((err) => {
+              console.warn('Failed to calculate custom route:', err);
+            })
+            .finally(() => {
+              if (!isCancelled) setIsCalculatingCustom(false);
+            });
+        }
+      } else {
+        setCustomRouteData(null);
+      }
+    } else {
+      setCustomRouteData(null);
+    }
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedFromId, selectedToId, initialRoutes, locations]);
+
+  const handleBookRoute = (
+    originLoc: any,
+    destLoc: any,
+    pricing: { sedan: number; economyVan: number; businessVan: number; minibus: number },
+    distanceKm: number,
+    durationMinutes: number,
+    isDynamic: boolean = false
+  ) => {
+    if (originLoc) setOrigin(originLoc);
+    if (destLoc) setDestination(destLoc);
+    setRoutePricing(pricing);
+    setEstimatedKm(distanceKm);
+    setEstimatedDurationMinutes(durationMinutes);
+    setDistanceRouteCalculated(isDynamic);
+    router.push('/book');
+  };
+
+  const selectedFromLoc = locations.find((l) => l.id === selectedFromId);
+  const selectedToLoc = locations.find((l) => l.id === selectedToId);
 
   return (
     <div className="space-y-10">
@@ -103,6 +197,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
               onClick={() => {
                 setSelectedFromId('');
                 setSelectedToId('');
+                setCustomRouteData(null);
               }}
               className="text-xs font-bold text-gold-700 hover:text-gold-800 underline flex items-center gap-1 cursor-pointer"
             >
@@ -111,6 +206,84 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
           </div>
         )}
       </div>
+
+      {/* DYNAMIC CALCULATED ROUTE CARD (When user selects two locations without a fixed DB route) */}
+      {selectedFromLoc && selectedToLoc && selectedFromId !== selectedToId && (
+        <>
+          {isCalculatingCustom ? (
+            <div className="bg-white border border-gold-200 rounded-3xl p-6 text-center max-w-xl mx-auto shadow-md space-y-2 animate-in fade-in">
+              <Loader2 className="w-6 h-6 animate-spin text-gold-600 mx-auto" />
+              <p className="text-xs font-bold text-slate-700">
+                Calculating exact road distance and guaranteed fare...
+              </p>
+            </div>
+          ) : customRouteData ? (
+            <div className="bg-gradient-to-r from-gold-50 via-white to-gold-50 border-2 border-gold-300 rounded-3xl p-6 sm:p-7 shadow-xl max-w-2xl mx-auto space-y-5 animate-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b border-gold-200/80 pb-3">
+                <div className="flex items-center gap-2 text-xs font-black text-gold-900 uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-gold-600" />
+                  <span>Custom Route Distance Fare</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-black text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full border border-emerald-300">
+                  <Navigation className="w-3.5 h-3.5" />
+                  <span>
+                    {customRouteData.distanceKm} km • ~{customRouteData.durationMinutes} mins
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">FROM</div>
+                  <div className="font-serif text-lg font-bold text-navy-900">{selectedFromLoc.name}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TO</div>
+                  <div className="font-serif text-lg font-bold text-gold-700">{selectedToLoc.name}</div>
+                </div>
+              </div>
+
+              {/* Fares Table */}
+              <div className="grid grid-cols-4 gap-2 text-center text-xs font-bold pt-2">
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                  <div className="text-[10px] text-slate-400 uppercase">Sedan (3p)</div>
+                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.sedan}€</div>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border-2 border-gold-400 shadow-sm">
+                  <div className="text-[10px] text-gold-700 uppercase">Van (6p)</div>
+                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.economyVan}€</div>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                  <div className="text-[10px] text-slate-400 uppercase">VIP Van (7p)</div>
+                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.businessVan}€</div>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                  <div className="text-[10px] text-slate-400 uppercase">Minibus (8p)</div>
+                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.minibus}€</div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleBookRoute(
+                    selectedFromLoc,
+                    selectedToLoc,
+                    customRouteData.pricing,
+                    customRouteData.distanceKm,
+                    customRouteData.durationMinutes,
+                    true
+                  )
+                }
+                className="w-full py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                <span>Book This Custom Route Now</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          ) : null}
+        </>
+      )}
 
       {/* Rates Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -135,9 +308,17 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
               {/* Header Info */}
               <div className="space-y-4">
                 <div className="space-y-2 border-b border-slate-100 pb-4">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    {t('from')}
+                  <div className="flex items-center justify-between">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      {t('from')}
+                    </div>
+                    {/* Route Distance & Time Badge */}
+                    <div className="flex items-center gap-1.5 text-[11px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      <Navigation className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <span>{route.distanceKm || 45} km (~{route.estDurationMinutes || 40}m)</span>
+                    </div>
                   </div>
+
                   <div className="font-serif text-lg font-bold text-navy-900 line-clamp-1">
                     {route.origin?.name || 'Pickup Location'}
                   </div>
@@ -165,7 +346,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
                   </div>
 
                   <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F7F2E7] rounded-xl border border-[#E5D7BC]">
-                    <span>1 – 8 Pax (Van)</span>
+                    <span>1 – 6 Pax (Van)</span>
                     <span className="text-center text-navy-900 font-bold">{vanOneWay}€</span>
                     <span className="text-right text-gold-700 font-extrabold">{vanRoundTrip}€</span>
                   </div>
@@ -177,7 +358,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
                   </div>
 
                   <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
-                    <span>1 – 16 Pax (Minibus)</span>
+                    <span>1 – 8 Pax (Minibus)</span>
                     <span className="text-center text-navy-900 font-bold">{minibusOneWay}€</span>
                     <span className="text-right text-gold-700 font-extrabold">{minibusRoundTrip}€</span>
                   </div>
@@ -187,11 +368,21 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
               {/* Action Button */}
               <button
                 type="button"
-                onClick={() => {
-                  if (route.origin) setOrigin(route.origin);
-                  if (route.destination) setDestination(route.destination);
-                  router.push('/book');
-                }}
+                onClick={() =>
+                  handleBookRoute(
+                    route.origin,
+                    route.destination,
+                    {
+                      sedan: route.sedanPriceEur,
+                      economyVan: route.economyVanPriceEur,
+                      businessVan: route.businessVanPriceEur,
+                      minibus: route.minibusPriceEur,
+                    },
+                    route.distanceKm || 45,
+                    route.estDurationMinutes || 40,
+                    false
+                  )
+                }
                 className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <span>Reserve Transfer Now</span>
@@ -261,4 +452,3 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
     </div>
   );
 }
-
