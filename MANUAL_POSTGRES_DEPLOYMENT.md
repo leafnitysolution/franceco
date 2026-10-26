@@ -129,7 +129,7 @@ SMTP_USER="projet15df@outlook.fr"
 SMTP_PASS="your-email-app-password"
 ADMIN_DISPATCH_EMAIL="projet15df@outlook.fr"
 
-# Optional: Google Maps & TripAdvisor APIs (Can also be set in Admin Panel at /ffs-portal-sec-99x/settings)
+# Optional: Google Maps & TripAdvisor External Review APIs (Configured in .env)
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 GOOGLE_PLACES_API_KEY=""
 GOOGLE_PLACE_ID=""
