@@ -1,8 +1,7 @@
-import { db } from '@/lib/db';
 import { Header } from '@/components/UI/Header';
 import { Footer } from '@/components/UI/Footer';
 import { CheckoutModal } from '@/components/booking/CheckoutModal';
-import { ensureLocationsSeeded } from '@/lib/seedHelper';
+import { getPublicRoutes } from '@/lib/publicData';
 
 export const revalidate = 0; // Revalidate dynamically on every request
 
@@ -11,16 +10,7 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await ensureLocationsSeeded();
-
-  const activeRoutes = await db.route.findMany({
-    where: { isActive: true },
-    include: {
-      origin: true,
-      destination: true,
-    },
-    orderBy: { slug: 'asc' },
-  });
+  const activeRoutes = await getPublicRoutes();
 
   return (
     <>
@@ -31,4 +21,3 @@ export default async function PublicLayout({
     </>
   );
 }
-

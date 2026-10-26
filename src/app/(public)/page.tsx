@@ -1,32 +1,16 @@
-import { db } from '@/lib/db';
 import { HomePageClient } from '@/components/home/HomePageClient';
-import { ensureLocationsSeeded } from '@/lib/seedHelper';
+import { getPublicLocations, getPublicCategories, getPublicRoutes } from '@/lib/publicData';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  await ensureLocationsSeeded();
+  const [locations, categories, allRoutes] = await Promise.all([
+    getPublicLocations(),
+    getPublicCategories(),
+    getPublicRoutes(),
+  ]);
 
-  const locations = await db.location.findMany({
-    orderBy: { name: 'asc' },
-  });
-
-  const categories = await db.locationCategory.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-  });
-
-  const featuredRoutes = await db.route.findMany({
-    where: {
-      isActive: true,
-    },
-    include: {
-      origin: true,
-      destination: true,
-    },
-    orderBy: {
-      isFeatured: 'desc',
-    },
-  });
+  const featuredRoutes = allRoutes.filter((r) => r.isActive !== false);
 
   const defaultFaqs = [
     {

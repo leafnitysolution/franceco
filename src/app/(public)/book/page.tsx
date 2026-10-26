@@ -1,6 +1,5 @@
-import { db } from '@/lib/db';
 import { FullPageBookingClient } from '@/components/booking/FullPageBookingClient';
-import { ensureLocationsSeeded } from '@/lib/seedHelper';
+import { getPublicLocations, getPublicCategories, getPublicRoutes } from '@/lib/publicData';
 
 export const revalidate = 0;
 
@@ -11,18 +10,10 @@ export const metadata = {
 };
 
 export default async function BookPage() {
-  await ensureLocationsSeeded();
-
   const [locations, categories, routes] = await Promise.all([
-    db.location.findMany({
-      orderBy: { name: 'asc' },
-    }),
-    db.locationCategory.findMany({
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-    }),
-    db.route.findMany({
-      where: { isActive: true },
-    }),
+    getPublicLocations(),
+    getPublicCategories(),
+    getPublicRoutes(),
   ]);
 
   return (

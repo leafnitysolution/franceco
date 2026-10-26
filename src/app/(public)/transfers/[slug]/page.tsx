@@ -9,6 +9,8 @@ import { ShieldCheck, Clock, MapPin, CheckCircle2, Sparkles, HelpCircle, AlertCi
 import { formatCurrency } from '@/lib/utils';
 import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
+import { getPublicRoutes, getPublicLocations, getPublicCategories, DEFAULT_ROUTES } from '@/lib/publicData';
+
 export const revalidate = 60;
 
 interface RoutePageProps {
@@ -26,11 +28,16 @@ function formatSlugToTitle(slug: string): string {
 
 export async function generateMetadata({ params }: RoutePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const route = await db.route.findUnique({
-    where: { slug },
-  });
+  let route: any = null;
+  try {
+    route = await db.route.findUnique({
+      where: { slug },
+    });
+  } catch (err) {
+    route = DEFAULT_ROUTES.find((r) => r.slug === slug) || null;
+  }
 
-  const title = route?.metaTitle || `${formatSlugToTitle(slug)} | FastForward Shuttle`;
+  const title = route?.metaTitle || `${formatSlugToTitle(slug)} | FranceGo Transfers`;
   const description =
     route?.metaDescription ||
     `Book door-to-door private transfers for ${formatSlugToTitle(
@@ -45,23 +52,29 @@ export async function generateMetadata({ params }: RoutePageProps): Promise<Meta
 
 export default async function RoutePage({ params }: RoutePageProps) {
   const { slug } = await params;
-  await ensureLocationsSeeded();
 
-  let route = await db.route.findUnique({
-    where: { slug },
-    include: {
-      origin: true,
-      destination: true,
-    },
-  });
+  let route: any = null;
+  try {
+    await ensureLocationsSeeded();
+    route = await db.route.findUnique({
+      where: { slug },
+      include: {
+        origin: true,
+        destination: true,
+      },
+    });
+  } catch (err) {
+    console.warn('Database lookup failed in RoutePage, using fallback:', err);
+  }
 
-  const locations = await db.location.findMany({
-    orderBy: { name: 'asc' },
-  });
+  if (!route) {
+    route = DEFAULT_ROUTES.find((r) => r.slug === slug) || null;
+  }
 
-  const categories = await db.locationCategory.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-  });
+  const [locations, categories] = await Promise.all([
+    getPublicLocations(),
+    getPublicCategories(),
+  ]);
 
   // Customized details per hub location category
   let distanceKm = 45;

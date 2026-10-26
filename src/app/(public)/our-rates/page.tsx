@@ -1,7 +1,6 @@
-import { db } from '@/lib/db';
 import { OurRatesClient } from '@/components/rates/OurRatesClient';
 import { Sparkles } from 'lucide-react';
-import { ensureLocationsSeeded } from '@/lib/seedHelper';
+import { getPublicLocations, getPublicRoutes } from '@/lib/publicData';
 
 export const revalidate = 60;
 
@@ -12,18 +11,10 @@ export const metadata = {
 };
 
 export default async function OurRatesPage() {
-  await ensureLocationsSeeded();
-
-  const locations = await db.location.findMany({
-    orderBy: { name: 'asc' },
-  });
-
-  const routes = await db.route.findMany({
-    include: {
-      origin: true,
-      destination: true,
-    },
-  });
+  const [locations, routes] = await Promise.all([
+    getPublicLocations(),
+    getPublicRoutes(),
+  ]);
 
   return (
     <div className="min-h-screen bg-[#FBF9F5] text-navy-900 py-12 px-4 sm:px-6 lg:px-8 space-y-10">
@@ -49,4 +40,3 @@ export default async function OurRatesPage() {
     </div>
   );
 }
-
