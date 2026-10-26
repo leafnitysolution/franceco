@@ -1,21 +1,89 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { submitReviewAction } from '@/lib/actions/reviews';
 import { Star, ShieldCheck, CheckCircle2, MessageSquare, X, ExternalLink, Loader2 } from 'lucide-react';
+
+interface ReviewItem {
+  id: string | number;
+  authorName: string;
+  location: string;
+  routeText: string;
+  rating: number;
+  dateText: string;
+  comment: string;
+  verified?: boolean;
+}
 
 interface ReviewsPageClientProps {
   initialReviews: any[];
 }
 
 export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
-  const [reviews, setReviews] = useState(initialReviews);
+  const [reviews, setReviews] = useState<ReviewItem[]>(() =>
+    initialReviews.map((r) => ({
+      id: r.id,
+      authorName: r.authorName || 'Guest',
+      location: r.location || 'Verified Traveler',
+      routeText: r.routeText || 'Private Chauffeur Transfer',
+      rating: r.rating || 5,
+      dateText: r.createdAt
+        ? new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        : 'Recent',
+      comment: r.comment || '',
+      verified: true,
+    }))
+  );
+
+  const [score, setScore] = useState<number>(5.0);
+  const [totalCount, setTotalCount] = useState<number>(384);
+  const [tripAdvisorUrl, setTripAdvisorUrl] = useState<string>('https://www.tripadvisor.com');
+  const [googleUrl, setGoogleUrl] = useState<string>('https://maps.google.com');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-
   const [rating, setRating] = useState(5);
+
+  useEffect(() => {
+    async function loadExternalReviews() {
+      try {
+        const res = await fetch('/api/reviews/external');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ratingScore) setScore(data.ratingScore);
+          if (data.totalReviews) setTotalCount(data.totalReviews);
+          if (data.tripAdvisorUrl) setTripAdvisorUrl(data.tripAdvisorUrl);
+          if (data.googleReviewsUrl) setGoogleUrl(data.googleReviewsUrl);
+
+          if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+            const externalNormalized: ReviewItem[] = data.reviews.map((ext: any) => ({
+              id: ext.id,
+              authorName: ext.name || 'Verified Guest',
+              location: ext.originCountry || 'TripAdvisor Verified 🦉',
+              routeText: ext.route || 'Private Transfer',
+              rating: ext.rating || 5,
+              dateText: ext.date || 'Recent',
+              comment: ext.review || '',
+              verified: ext.verified ?? true,
+            }));
+
+            // Merge TripAdvisor reviews with local reviews (avoid duplicates)
+            setReviews((prev) => {
+              const existingIds = new Set(prev.map((p) => String(p.id)));
+              const uniqueExternal = externalNormalized.filter((e) => !existingIds.has(String(e.id)));
+              return [...uniqueExternal, ...prev];
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch external review sync:', err);
+      }
+    }
+
+    loadExternalReviews();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,11 +111,11 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
 
   return (
     <div className="space-y-12">
-      {/* SCORE CARD & WRITE A REVIEW ACTION BAR (MATCHING SCREENSHOT 1) */}
+      {/* SCORE CARD & WRITE A REVIEW ACTION BAR */}
       <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-5 text-left">
           <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-col items-center justify-center shrink-0">
-            <span className="text-2xl font-black text-emerald-800 leading-none">5.0</span>
+            <span className="text-2xl font-black text-emerald-800 leading-none">{score.toFixed(1)}</span>
           </div>
 
           <div className="space-y-1">
@@ -57,21 +125,34 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
               ))}
             </div>
             <p className="text-xs font-bold text-slate-700">
-              Average rating on Tripadvisor & Google Reviews
+              Average rating across Tripadvisor & Google Reviews ({totalCount}+ ratings)
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <a
-            href="https://www.tripadvisor.com"
+            href={tripAdvisorUrl}
             target="_blank"
             rel="noreferrer"
-            className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-300 transition-all flex items-center gap-1.5"
+            className="px-5 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-800 transition-all flex items-center gap-1.5 shadow-sm"
           >
-            <span>Open Tripadvisor</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <span>🦉 Open Tripadvisor</span>
+            <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </a>
+
+          {googleUrl && (
+            <a
+              href={googleUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-300 transition-all flex items-center gap-1.5"
+            >
+              <span className="text-amber-500">★</span>
+              <span>Google Reviews</span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+            </a>
+          )}
 
           <button
             onClick={() => setIsModalOpen(true)}
@@ -118,7 +199,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
               <div className="text-right">
                 <div className="text-brand-600 font-bold text-[11px]">{r.routeText}</div>
                 <div className="text-[10px] text-slate-400 font-medium">
-                  {new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                  {r.dateText}
                 </div>
               </div>
             </div>
