@@ -117,8 +117,7 @@ export async function POST(req: NextRequest) {
               'Content-Type': 'application/json',
               'X-Goog-Api-Key': apiKey,
               'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters',
-              'Referer': 'https://francegotransfers.io/',
-            },
+                },
             body: JSON.stringify(routesPayload),
             next: { revalidate: 86400 },
           }

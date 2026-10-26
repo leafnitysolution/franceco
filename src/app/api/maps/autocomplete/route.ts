@@ -90,7 +90,6 @@ export async function GET(req: NextRequest) {
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': apiKey,
-          'Referer': 'https://francegotransfers.io/',
         },
         body: JSON.stringify(payload),
       }
