@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/lib/store';
+import { LocationDropdown } from '@/components/booking/LocationDropdown';
 import {
   ArrowRight,
   ArrowRightLeft,
@@ -11,6 +12,8 @@ import {
   CheckCircle2,
   ShieldCheck,
   Sparkles,
+  MapPin,
+  ChevronDown,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -21,6 +24,10 @@ interface OurRatesClientProps {
 
 export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps) {
   const router = useRouter();
+  const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
+  const [selectedFromLoc, setSelectedFromLoc] = useState<any>(null);
+  const [selectedToLoc, setSelectedToLoc] = useState<any>(null);
+
   const [selectedFromId, setSelectedFromId] = useState<string>('');
   const [selectedToId, setSelectedToId] = useState<string>('');
 
@@ -43,60 +50,72 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
 
   // Smart Filter: exact match first, or partial match if no exact match
   const exactRoutes = initialRoutes.filter((r) => {
-    const matchFrom = !selectedFromId || r.originId === selectedFromId;
-    const matchTo = !selectedToId || r.destinationId === selectedToId;
+    const matchFrom =
+      !selectedFromId ||
+      r.originId === selectedFromId ||
+      r.origin?.shortCode === selectedFromLoc?.shortCode ||
+      r.origin?.name === selectedFromLoc?.name;
+    const matchTo =
+      !selectedToId ||
+      r.destinationId === selectedToId ||
+      r.destination?.shortCode === selectedToLoc?.shortCode ||
+      r.destination?.name === selectedToLoc?.name;
     return matchFrom && matchTo;
   });
 
   // If user selected both From and To, but no exact route exists, find routes with either location
   const partialRoutes =
     exactRoutes.length === 0 && (selectedFromId || selectedToId)
-      ? initialRoutes.filter((r) => r.originId === selectedFromId || r.destinationId === selectedToId)
+      ? initialRoutes.filter(
+          (r) =>
+            r.originId === selectedFromId ||
+            r.destinationId === selectedToId ||
+            r.origin?.name === selectedFromLoc?.name ||
+            r.destination?.name === selectedToLoc?.name
+        )
       : [];
 
   const displayRoutes = exactRoutes.length > 0 ? exactRoutes : partialRoutes;
-  const isFiltered = Boolean(selectedFromId || selectedToId);
+  const isFiltered = Boolean(selectedFromLoc || selectedToLoc);
 
   // If user picked both FROM and TO, check if it's not in the database routes, and calculate dynamically
   useEffect(() => {
     let isCancelled = false;
-    if (selectedFromId && selectedToId && selectedFromId !== selectedToId) {
+    if (selectedFromLoc && selectedToLoc && selectedFromLoc.id !== selectedToLoc.id) {
       const dbMatch = initialRoutes.find(
         (r) =>
-          (r.originId === selectedFromId && r.destinationId === selectedToId) ||
-          (r.originId === selectedToId && r.destinationId === selectedFromId)
+          (r.originId === selectedFromLoc.id && r.destinationId === selectedToLoc.id) ||
+          (r.originId === selectedToLoc.id && r.destinationId === selectedFromLoc.id) ||
+          (r.origin?.name === selectedFromLoc.name && r.destination?.name === selectedToLoc.name) ||
+          (r.origin?.name === selectedToLoc.name && r.destination?.name === selectedFromLoc.name)
       );
 
       if (!dbMatch) {
-        const fromLoc = locations.find((l) => l.id === selectedFromId);
-        const toLoc = locations.find((l) => l.id === selectedToId);
-        if (fromLoc && toLoc) {
-          setIsCalculatingCustom(true);
-          fetch('/api/maps/distance', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              origin: fromLoc.name,
-              destination: toLoc.name,
-            }),
+        setIsCalculatingCustom(true);
+        fetch('/api/maps/distance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            origin: selectedFromLoc.name,
+            destination: selectedToLoc.name,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (!isCancelled && data.success && data.pricing) {
+              setCustomRouteData({
+                distanceKm: data.distanceKm,
+                durationMinutes: data.durationMinutes,
+                pricing: data.pricing,
+              });
+            }
           })
-            .then((res) => res.json())
-            .then((data) => {
-              if (!isCancelled && data.success && data.pricing) {
-                setCustomRouteData({
-                  distanceKm: data.distanceKm,
-                  durationMinutes: data.durationMinutes,
-                  pricing: data.pricing,
-                });
-              }
-            })
-            .catch((err) => {
-              console.warn('Failed to calculate custom route:', err);
-            })
-            .finally(() => {
-              if (!isCancelled) setIsCalculatingCustom(false);
-            });
-        }
+          .catch((err) => {
+            console.warn('Failed to calculate custom route:', err);
+          })
+          .finally(() => {
+            if (!isCancelled) setIsCalculatingCustom(false);
+          });
       } else {
         setCustomRouteData(null);
       }
@@ -107,7 +126,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
     return () => {
       isCancelled = true;
     };
-  }, [selectedFromId, selectedToId, initialRoutes, locations]);
+  }, [selectedFromLoc, selectedToLoc, initialRoutes]);
 
   const handleBookRoute = (
     originLoc: any,
@@ -126,31 +145,52 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
     router.push('/book');
   };
 
-  const selectedFromLoc = locations.find((l) => l.id === selectedFromId);
-  const selectedToLoc = locations.find((l) => l.id === selectedToId);
-
   return (
     <div className="space-y-10">
-      {/* Separate FROM and TO Filter Toolbar Card */}
+      {/* Searchable FROM and TO Filter Toolbar Card */}
       <div className="bg-white border border-[#E5D7BC] rounded-3xl p-6 sm:p-7 shadow-xl max-w-4xl mx-auto space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          {/* FROM SELECTOR */}
-          <div className="md:col-span-5 space-y-1">
+          {/* FROM SELECTOR (Searchable & Typable Input Dropdown) */}
+          <div className="md:col-span-5 relative space-y-1">
             <label className="text-[10px] font-bold uppercase text-slate-500 block tracking-wider">
               FROM (Pickup Location)
             </label>
-            <select
-              value={selectedFromId}
-              onChange={(e) => setSelectedFromId(e.target.value)}
-              className="w-full bg-[#F5F3ED] border border-[#E5D7BC] rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-navy-900 focus:outline-none focus:border-gold-500 cursor-pointer"
+            <div
+              onClick={() => setActiveDropdown(activeDropdown === 'ORIGIN' ? null : 'ORIGIN')}
+              className={`w-full bg-[#F5F3ED] hover:bg-[#eae6db] border rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-navy-900 cursor-pointer flex items-center justify-between transition-colors shadow-sm ${
+                activeDropdown === 'ORIGIN' ? 'ring-2 ring-gold-600 border-gold-600' : 'border-[#E5D7BC]'
+              }`}
             >
-              <option value="">All Pickup Locations</option>
-              {locations.map((loc) => (
-                <option key={loc.id} value={loc.id}>
-                  {loc.name}
-                </option>
-              ))}
-            </select>
+              <div className="flex items-center gap-2 truncate">
+                <MapPin className="w-4 h-4 text-gold-600 shrink-0" />
+                <span
+                  className={
+                    selectedFromLoc ? 'text-navy-900 font-extrabold truncate' : 'text-slate-400 font-medium'
+                  }
+                >
+                  {selectedFromLoc ? selectedFromLoc.name : 'Type or select pickup location...'}
+                </span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                  activeDropdown === 'ORIGIN' ? 'rotate-180 text-gold-600' : ''
+                }`}
+              />
+            </div>
+
+            {/* Typable Search Dropdown with Google Maps Autocomplete */}
+            <LocationDropdown
+              isOpen={activeDropdown === 'ORIGIN'}
+              onClose={() => setActiveDropdown(null)}
+              title="Select Pickup Location or Type Address"
+              placeholder="Type airport, hotel, station, or street address..."
+              locations={locations}
+              selectedLocationId={selectedFromLoc?.id}
+              onSelectLocation={(loc) => {
+                setSelectedFromLoc(loc);
+                setSelectedFromId(loc.id);
+              }}
+            />
           </div>
 
           {/* SWAP BUTTON */}
@@ -158,34 +198,61 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
             <button
               type="button"
               onClick={() => {
-                const temp = selectedFromId;
+                const tempLoc = selectedFromLoc;
+                const tempId = selectedFromId;
+                setSelectedFromLoc(selectedToLoc);
+                setSelectedToLoc(tempLoc);
                 setSelectedFromId(selectedToId);
-                setSelectedToId(temp);
+                setSelectedToId(tempId);
               }}
               title="Swap From & To"
-              className="w-10 h-10 rounded-xl bg-[#F7F2E7] border border-[#E5D7BC] text-gold-600 hover:bg-gold-600 hover:text-white transition-all flex items-center justify-center shadow-sm"
+              className="w-10 h-10 rounded-xl bg-[#F7F2E7] border border-[#E5D7BC] text-gold-600 hover:bg-gold-600 hover:text-white transition-all flex items-center justify-center shadow-sm active:scale-95"
             >
               <ArrowRightLeft className="w-4 h-4" />
             </button>
           </div>
 
-          {/* TO SELECTOR */}
-          <div className="md:col-span-5 space-y-1">
+          {/* TO SELECTOR (Searchable & Typable Input Dropdown) */}
+          <div className="md:col-span-5 relative space-y-1">
             <label className="text-[10px] font-bold uppercase text-slate-500 block tracking-wider">
               TO (Dropoff Location)
             </label>
-            <select
-              value={selectedToId}
-              onChange={(e) => setSelectedToId(e.target.value)}
-              className="w-full bg-[#F5F3ED] border border-[#E5D7BC] rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-navy-900 focus:outline-none focus:border-gold-500 cursor-pointer"
+            <div
+              onClick={() => setActiveDropdown(activeDropdown === 'DESTINATION' ? null : 'DESTINATION')}
+              className={`w-full bg-[#F5F3ED] hover:bg-[#eae6db] border rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-navy-900 cursor-pointer flex items-center justify-between transition-colors shadow-sm ${
+                activeDropdown === 'DESTINATION' ? 'ring-2 ring-gold-600 border-gold-600' : 'border-[#E5D7BC]'
+              }`}
             >
-              <option value="">All Dropoff Locations</option>
-              {locations.map((loc) => (
-                <option key={loc.id} value={loc.id}>
-                  {loc.name}
-                </option>
-              ))}
-            </select>
+              <div className="flex items-center gap-2 truncate">
+                <MapPin className="w-4 h-4 text-gold-600 shrink-0" />
+                <span
+                  className={
+                    selectedToLoc ? 'text-navy-900 font-extrabold truncate' : 'text-slate-400 font-medium'
+                  }
+                >
+                  {selectedToLoc ? selectedToLoc.name : 'Type or select dropoff destination...'}
+                </span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                  activeDropdown === 'DESTINATION' ? 'rotate-180 text-gold-600' : ''
+                }`}
+              />
+            </div>
+
+            {/* Typable Search Dropdown with Google Maps Autocomplete */}
+            <LocationDropdown
+              isOpen={activeDropdown === 'DESTINATION'}
+              onClose={() => setActiveDropdown(null)}
+              title="Select Dropoff Destination or Type Address"
+              placeholder="Type hotel, Disneyland, Paris street address..."
+              locations={locations}
+              selectedLocationId={selectedToLoc?.id}
+              onSelectLocation={(loc) => {
+                setSelectedToLoc(loc);
+                setSelectedToId(loc.id);
+              }}
+            />
           </div>
         </div>
 
@@ -195,6 +262,8 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
             <button
               type="button"
               onClick={() => {
+                setSelectedFromLoc(null);
+                setSelectedToLoc(null);
                 setSelectedFromId('');
                 setSelectedToId('');
                 setCustomRouteData(null);
@@ -207,8 +276,8 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
         )}
       </div>
 
-      {/* DYNAMIC CALCULATED ROUTE CARD (When user selects two locations without a fixed DB route) */}
-      {selectedFromLoc && selectedToLoc && selectedFromId !== selectedToId && (
+      {/* DYNAMIC CALCULATED ROUTE CARD (When user types or selects custom locations without a fixed DB route) */}
+      {selectedFromLoc && selectedToLoc && selectedFromLoc.id !== selectedToLoc.id && (
         <>
           {isCalculatingCustom ? (
             <div className="bg-white border border-gold-200 rounded-3xl p-6 text-center max-w-xl mx-auto shadow-md space-y-2 animate-in fade-in">
