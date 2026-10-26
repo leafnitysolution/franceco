@@ -99,44 +99,93 @@ export async function GET() {
   // =========================================================
   if (googleApiKey && googlePlaceId) {
     try {
-      const gRes = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
-          googlePlaceId
-        )}&fields=name,rating,user_ratings_total,reviews,url&key=${encodeURIComponent(googleApiKey)}`,
-        { next: { revalidate: 3600 } }
-      );
+      let googleFetched = false;
 
-      if (gRes.ok) {
-        const gData = await gRes.json();
-        if (gData.result) {
-          if (!liveRatingScore && gData.result.rating) {
-            liveRatingScore = gData.result.rating;
+      // 2A. Try Modern Places API (New) v1 endpoint
+      try {
+        const newRes = await fetch(
+          `https://places.googleapis.com/v1/places/${encodeURIComponent(googlePlaceId)}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': googleApiKey,
+              'X-Goog-FieldMask': 'rating,userRatingCount,reviews,googleMapsUri',
+            },
+            next: { revalidate: 3600 },
           }
-          if (!liveTotalReviews && gData.result.user_ratings_total) {
-            liveTotalReviews = gData.result.user_ratings_total;
-          }
-          if (gData.result.url) {
-            liveGoogleUrl = gData.result.url;
-          }
-          liveSource = liveSource
-            ? 'TripAdvisor & Google Live API'
-            : 'Google Places Official API';
+        );
 
-          if (Array.isArray(gData.result.reviews)) {
-            gData.result.reviews.forEach((gRev: any, idx: number) => {
-              if (gRev.text) {
+        if (newRes.ok) {
+          const newData = await newRes.json();
+          if (!liveRatingScore && newData.rating) liveRatingScore = newData.rating;
+          if (!liveTotalReviews && newData.userRatingCount) liveTotalReviews = newData.userRatingCount;
+          if (newData.googleMapsUri) liveGoogleUrl = newData.googleMapsUri;
+          liveSource = liveSource ? 'TripAdvisor & Google Live API' : 'Google Places Official API';
+
+          if (Array.isArray(newData.reviews)) {
+            newData.reviews.forEach((nRev: any, idx: number) => {
+              const text = nRev.text?.text || nRev.originalText?.text;
+              if (text) {
                 liveReviewsList.push({
-                  id: `google-${idx}-${gRev.time || Date.now()}`,
-                  name: gRev.author_name || 'Google Guest',
+                  id: `google-v1-${idx}-${Date.now()}`,
+                  name: nRev.authorAttribution?.displayName || 'Google Guest',
                   originCountry: 'Google Review ★',
                   route: 'Private Chauffeur Transfer',
-                  rating: Number(gRev.rating) || 5,
-                  date: gRev.relative_time_description || 'Recent',
+                  rating: Number(nRev.rating) || 5,
+                  date: nRev.relativePublishTimeDescription || 'Recent',
                   verified: true,
-                  review: gRev.text,
+                  review: text,
                 });
               }
             });
+          }
+          googleFetched = true;
+        }
+      } catch (newErr) {
+        console.warn('Places API (New) fetch error, falling back to legacy endpoint:', newErr);
+      }
+
+      // 2B. Fallback to Legacy Google Place Details endpoint if v1 wasn't used
+      if (!googleFetched) {
+        const gRes = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
+            googlePlaceId
+          )}&fields=name,rating,user_ratings_total,reviews,url&key=${encodeURIComponent(googleApiKey)}`,
+          { next: { revalidate: 3600 } }
+        );
+
+        if (gRes.ok) {
+          const gData = await gRes.json();
+          if (gData.result) {
+            if (!liveRatingScore && gData.result.rating) {
+              liveRatingScore = gData.result.rating;
+            }
+            if (!liveTotalReviews && gData.result.user_ratings_total) {
+              liveTotalReviews = gData.result.user_ratings_total;
+            }
+            if (gData.result.url) {
+              liveGoogleUrl = gData.result.url;
+            }
+            liveSource = liveSource
+              ? 'TripAdvisor & Google Live API'
+              : 'Google Places Official API';
+
+            if (Array.isArray(gData.result.reviews)) {
+              gData.result.reviews.forEach((gRev: any, idx: number) => {
+                if (gRev.text) {
+                  liveReviewsList.push({
+                    id: `google-${idx}-${gRev.time || Date.now()}`,
+                    name: gRev.author_name || 'Google Guest',
+                    originCountry: 'Google Review ★',
+                    route: 'Private Chauffeur Transfer',
+                    rating: Number(gRev.rating) || 5,
+                    date: gRev.relative_time_description || 'Recent',
+                    verified: true,
+                    review: gRev.text,
+                  });
+                }
+              });
+            }
           }
         }
       }
