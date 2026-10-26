@@ -129,9 +129,12 @@ SMTP_USER="projet15df@outlook.fr"
 SMTP_PASS="your-email-app-password"
 ADMIN_DISPATCH_EMAIL="projet15df@outlook.fr"
 
-# Optional: Google Maps & TripAdvisor External Review APIs (Configured in .env)
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
-GOOGLE_PLACES_API_KEY=""
+# Optional: Google Maps Platform (Uber-style Dynamic Distance Pricing & Live Autocomplete)
+GOOGLE_MAPS_API_KEY="AIzaSyDNgoZLJXN1yNrPkUWzdZ3DCjKGbZPZ18g"
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="AIzaSyDNgoZLJXN1yNrPkUWzdZ3DCjKGbZPZ18g"
+GOOGLE_PLACES_API_KEY="AIzaSyDNgoZLJXN1yNrPkUWzdZ3DCjKGbZPZ18g"
+
+# Optional: Google Place Reviews & TripAdvisor Review Sync
 GOOGLE_PLACE_ID=""
 GOOGLE_REVIEWS_URL="https://maps.google.com"
 TRIPADVISOR_API_KEY=""

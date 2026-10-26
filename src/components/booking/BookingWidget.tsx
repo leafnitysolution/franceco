@@ -33,6 +33,7 @@ import {
   Minus,
   Search,
   ChevronDown,
+  Loader2,
 } from 'lucide-react';
 
 interface BookingWidgetProps {
@@ -94,26 +95,79 @@ export function BookingWidget({
     });
   }, [defaultOriginId, defaultDestinationId, defaultSedanPrice, defaultEconomyVanPrice, defaultBusinessVanPrice, defaultMinibusPrice, locations]);
 
-  // Dynamically sync route pricing from Admin Panel database routes whenever origin/destination changes
+  // Dynamically sync route pricing: Predefined DB routes take precedence;
+  // custom locations/addresses trigger automated Google road distance & per-km rate calculation.
   useEffect(() => {
-    if (routes && routes.length > 0 && store.origin && store.destination) {
-      const matched = routes.find(
-        (r) =>
-          (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
-          (r.originId === store.destination?.id && r.destinationId === store.origin?.id) ||
-          (r.origin?.shortCode === store.origin?.shortCode && r.destination?.shortCode === store.destination?.shortCode) ||
-          (r.origin?.shortCode === store.destination?.shortCode && r.destination?.shortCode === store.origin?.shortCode)
-      );
-      if (matched) {
-        store.setRoutePricing({
-          sedan: matched.sedanPriceEur ?? defaultSedanPrice,
-          economyVan: matched.economyVanPriceEur ?? defaultEconomyVanPrice,
-          businessVan: matched.businessVanPriceEur ?? defaultBusinessVanPrice,
-          minibus: matched.minibusPriceEur ?? defaultMinibusPrice,
-        });
-      }
+    let isCancelled = false;
+
+    if (!store.origin || !store.destination || store.origin.id === store.destination.id) {
+      return;
     }
-  }, [store.origin, store.destination, routes, defaultSedanPrice, defaultEconomyVanPrice, defaultBusinessVanPrice, defaultMinibusPrice]);
+
+    const matched = routes?.find(
+      (r) =>
+        (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
+        (r.originId === store.destination?.id && r.destinationId === store.origin?.id) ||
+        (r.origin?.shortCode === store.origin?.shortCode && r.destination?.shortCode === store.destination?.shortCode) ||
+        (r.origin?.shortCode === store.destination?.shortCode && r.destination?.shortCode === store.origin?.shortCode)
+    );
+
+    if (matched) {
+      store.setRoutePricing({
+        sedan: matched.sedanPriceEur ?? defaultSedanPrice,
+        economyVan: matched.economyVanPriceEur ?? defaultEconomyVanPrice,
+        businessVan: matched.businessVanPriceEur ?? defaultBusinessVanPrice,
+        minibus: matched.minibusPriceEur ?? defaultMinibusPrice,
+      });
+      store.setEstimatedKm(matched.distanceKm || 35);
+      store.setEstimatedDurationMinutes(matched.estDurationMinutes || 40);
+      store.setDistanceRouteCalculated(false);
+      store.setIsCalculatingDistance(false);
+      return;
+    }
+
+    // Dynamic distance calculation via Routes API
+    store.setIsCalculatingDistance(true);
+    fetch('/api/maps/distance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origin: store.origin.name,
+        destination: store.destination.name,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isCancelled && data.success && data.pricing) {
+          store.setRoutePricing(data.pricing);
+          store.setEstimatedKm(data.distanceKm);
+          store.setEstimatedDurationMinutes(data.durationMinutes);
+          store.setDistanceRouteCalculated(true);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to calculate dynamic distance:', err);
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          store.setIsCalculatingDistance(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    store.origin?.id,
+    store.origin?.name,
+    store.destination?.id,
+    store.destination?.name,
+    routes,
+    defaultSedanPrice,
+    defaultEconomyVanPrice,
+    defaultBusinessVanPrice,
+    defaultMinibusPrice,
+  ]);
 
   // Calculate prices dynamically based on Service Mode
   const getVehiclePrice = (tier: string): number => {
@@ -427,6 +481,36 @@ export function BookingWidget({
                       onSelectLocation={(loc) => store.setDestination(loc)}
                     />
                   </div>
+
+                  {/* DYNAMIC ROAD DISTANCE & DURATION BADGE */}
+                  {store.origin && store.destination && store.origin.id !== store.destination.id && (
+                    <div className="py-2 px-3 bg-slate-50 border border-slate-200/90 rounded-xl flex items-center justify-between text-xs font-bold text-slate-700 animate-in fade-in">
+                      <div className="flex items-center gap-2">
+                        {store.isCalculatingDistance ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-gold-600 shrink-0" />
+                            <span className="text-slate-500 font-medium">Calculating road distance...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Navigation className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span>
+                              {store.estimatedKm} km • ~{store.estimatedDurationMinutes} mins driving time
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <span
+                        className={`text-[10px] uppercase font-black px-2 py-0.5 rounded ${
+                          store.distanceRouteCalculated
+                            ? 'text-emerald-700 bg-emerald-100/80 border border-emerald-200'
+                            : 'text-slate-700 bg-slate-200/80'
+                        }`}
+                      >
+                        {store.distanceRouteCalculated ? 'Live Distance Rate' : 'Fixed Hub Rate'}
+                      </span>
+                    </div>
+                  )}
                 </>
               )}
 

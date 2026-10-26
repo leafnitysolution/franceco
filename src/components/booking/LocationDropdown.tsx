@@ -11,7 +11,16 @@ import {
   Building,
   Train,
   Landmark,
+  Loader2,
+  Compass,
 } from 'lucide-react';
+
+interface GooglePlacePrediction {
+  placeId: string;
+  title: string;
+  subtitle: string;
+  fullText: string;
+}
 
 interface LocationDropdownProps {
   isOpen: boolean;
@@ -28,23 +37,38 @@ interface LocationDropdownProps {
 const FALLBACK_CATEGORY_NAMES: Record<string, string> = {
   AIRPORT: 'Paris Airports',
   AMUSEMENT_PARK: 'Euro Disney Paris',
-  CITY_CENTER: 'Paris',
+  CITY_CENTER: 'Paris City Center',
   TRAIN_STATION: 'Paris Train Stations',
-  PALACE: 'Other',
+  PALACE: 'Other Attractions',
 };
 
 export function LocationDropdown({
   isOpen,
   onClose,
   title = 'Please select pickup location',
-  placeholder = 'Type location name or code...',
+  placeholder = 'Type airport, hotel, or address...',
   locations,
   categories,
   selectedLocationId,
   onSelectLocation,
 }: LocationDropdownProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [googlePredictions, setGooglePredictions] = useState<GooglePlacePrediction[]>([]);
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
+  const sessionTokenRef = useRef<string>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Initialize or reset session token when dropdown opens
+  useEffect(() => {
+    if (isOpen) {
+      sessionTokenRef.current =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `session-${Date.now()}`;
+      setSearchQuery('');
+      setGooglePredictions([]);
+    }
+  }, [isOpen]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -62,9 +86,40 @@ export function LocationDropdown({
     };
   }, [isOpen, onClose]);
 
+  // Debounced Google Places Autocomplete search (350ms delay, min 3 chars)
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!isOpen || q.length < 3) {
+      setGooglePredictions([]);
+      setIsLoadingGoogle(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsLoadingGoogle(true);
+      try {
+        const res = await fetch(
+          `/api/maps/autocomplete?input=${encodeURIComponent(q)}&sessionToken=${encodeURIComponent(
+            sessionTokenRef.current
+          )}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setGooglePredictions(data.predictions || []);
+        }
+      } catch (err) {
+        console.warn('Autocomplete fetch failed:', err);
+      } finally {
+        setIsLoadingGoogle(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, isOpen]);
+
   if (!isOpen) return null;
 
-  // Filter locations by search query
+  // Filter local predefined locations by search query
   const filteredLocations = locations.filter((loc) => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
@@ -82,10 +137,9 @@ export function LocationDropdown({
     return acc;
   }, {});
 
-  // Pre-defined category order
   const categoryOrder = ['AIRPORT', 'AMUSEMENT_PARK', 'CITY_CENTER', 'TRAIN_STATION', 'PALACE'];
   const presentCategories = Object.keys(groupedLocations);
-  
+
   const sortedCategories = presentCategories.sort((a, b) => {
     const idxA = categoryOrder.indexOf(a);
     const idxB = categoryOrder.indexOf(b);
@@ -95,7 +149,6 @@ export function LocationDropdown({
     return a.localeCompare(b);
   });
 
-  // Helper to pick a subtle clean grey icon for each item
   const getItemIcon = (category: string) => {
     switch (category) {
       case 'AIRPORT':
@@ -111,15 +164,27 @@ export function LocationDropdown({
     }
   };
 
+  const handleSelectGooglePrediction = (pred: GooglePlacePrediction) => {
+    const fullLocName = pred.fullText || (pred.subtitle ? `${pred.title}, ${pred.subtitle}` : pred.title);
+    onSelectLocation({
+      id: pred.placeId || `custom-place-${Date.now()}`,
+      name: fullLocName,
+      shortCode: 'MAPS',
+      category: 'CUSTOM_ADDRESS',
+    });
+    onClose();
+  };
+
   return (
     <div
       ref={dropdownRef}
-      className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[360px] animate-in fade-in duration-150"
+      className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[380px] animate-in fade-in duration-150"
     >
       {/* Top Header Bar */}
-      <div className="bg-black text-white px-3.5 py-2.5 flex items-center justify-between shrink-0">
-        <span className="text-xs sm:text-sm font-bold tracking-tight">
-          {title}
+      <div className="bg-slate-900 text-white px-3.5 py-2.5 flex items-center justify-between shrink-0">
+        <span className="text-xs sm:text-sm font-bold tracking-tight flex items-center gap-1.5">
+          <Compass className="w-4 h-4 text-gold-400" />
+          <span>{title}</span>
         </span>
         <button
           type="button"
@@ -139,17 +204,57 @@ export function LocationDropdown({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={placeholder}
-            className="w-full pl-8 pr-3 py-1.5 bg-white text-xs text-slate-800 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 placeholder-slate-400 font-medium"
+            className="w-full pl-8 pr-8 py-1.5 bg-white text-xs text-slate-800 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 placeholder-slate-400 font-medium"
             autoFocus
           />
+          {isLoadingGoogle && (
+            <Loader2 className="w-3.5 h-3.5 text-gold-600 animate-spin absolute right-3 pointer-events-none" />
+          )}
         </div>
       </div>
 
-      {/* Clean Light Categorized List */}
-      <div className="overflow-y-auto flex-1">
-        {sortedCategories.length === 0 ? (
-          <div className="p-6 text-center text-slate-400 text-xs font-medium">
-            No matching locations found
+      {/* Scrollable Results */}
+      <div className="overflow-y-auto flex-1 divide-y divide-slate-100">
+        {/* 1. Live Google Places Suggestions (Addresses, Hotels, Streets) */}
+        {googlePredictions.length > 0 && (
+          <div className="bg-gold-50/20">
+            <div className="px-4 py-2 bg-gold-100/60 text-gold-950 text-xs font-black tracking-tight border-b border-gold-200/60 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-gold-700" />
+                <span>Live Address & Hotel Search (France)</span>
+              </span>
+              <span className="text-[10px] text-gold-800 font-semibold">Google Maps</span>
+            </div>
+            {googlePredictions.map((pred) => (
+              <button
+                key={pred.placeId || pred.title}
+                type="button"
+                onClick={() => handleSelectGooglePrediction(pred)}
+                className="w-full px-4 py-2.5 text-left flex items-start gap-2.5 transition-colors bg-white hover:bg-gold-50/50 border-b border-slate-100/60 last:border-0"
+              >
+                <MapPin className="w-4 h-4 text-gold-600 shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                    {pred.title}
+                  </div>
+                  {pred.subtitle && (
+                    <div className="text-[11px] text-slate-500 truncate">
+                      {pred.subtitle}
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* 2. Categorized Predefined Hubs (Airports, Disney, Stations, etc.) */}
+        {sortedCategories.length === 0 && googlePredictions.length === 0 && !isLoadingGoogle ? (
+          <div className="p-6 text-center text-slate-400 text-xs font-medium space-y-1">
+            <p>No matching locations found.</p>
+            <p className="text-[11px] text-slate-400">
+              Type at least 3 letters to search any address or hotel across France.
+            </p>
           </div>
         ) : (
           sortedCategories.map((catKey) => {
@@ -161,12 +266,10 @@ export function LocationDropdown({
 
             return (
               <div key={catKey}>
-                {/* Simple Light Grey Category Header */}
                 <div className="px-4 py-2 bg-[#f3f4f6] text-slate-800 text-xs font-bold tracking-tight border-b border-slate-100">
                   {categoryTitle}
                 </div>
 
-                {/* Clean Location Items */}
                 <div>
                   {items.map((loc) => {
                     const isSelected = selectedLocationId === loc.id;

@@ -36,6 +36,7 @@ import {
   Tag,
   Mail,
   Info,
+  Navigation,
 } from 'lucide-react';
 
 interface FullPageBookingClientProps {
@@ -71,24 +72,67 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
   const [activeDropdown, setActiveDropdown] = useState<'ORIGIN' | 'DESTINATION' | null>(null);
   const [isEditJourneyModalOpen, setIsEditJourneyModalOpen] = useState(false);
 
-  // Dynamically sync route pricing from Admin Panel database routes whenever origin/destination changes
+  // Dynamically sync route pricing: Predefined DB routes take precedence;
+  // custom locations/addresses trigger automated Google road distance & per-km rate calculation.
   useEffect(() => {
-    if (routes && routes.length > 0 && store.origin && store.destination) {
-      const matched = routes.find(
-        (r) =>
-          (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
-          (r.originId === store.destination?.id && r.destinationId === store.origin?.id)
-      );
-      if (matched) {
-        store.setRoutePricing({
-          sedan: matched.sedanPriceEur ?? 70,
-          economyVan: matched.economyVanPriceEur ?? 90,
-          businessVan: matched.businessVanPriceEur ?? 120,
-          minibus: matched.minibusPriceEur ?? 180,
-        });
-      }
+    let isCancelled = false;
+
+    if (!store.origin || !store.destination || store.origin.id === store.destination.id) {
+      return;
     }
-  }, [store.origin, store.destination, routes]);
+
+    const matched = routes?.find(
+      (r) =>
+        (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
+        (r.originId === store.destination?.id && r.destinationId === store.origin?.id)
+    );
+
+    if (matched) {
+      store.setRoutePricing({
+        sedan: matched.sedanPriceEur ?? 70,
+        economyVan: matched.economyVanPriceEur ?? 90,
+        businessVan: matched.businessVanPriceEur ?? 120,
+        minibus: matched.minibusPriceEur ?? 180,
+      });
+      store.setEstimatedKm(matched.distanceKm || 35);
+      store.setEstimatedDurationMinutes(matched.estDurationMinutes || 40);
+      store.setDistanceRouteCalculated(false);
+      store.setIsCalculatingDistance(false);
+      return;
+    }
+
+    // Dynamic distance calculation via Routes API
+    store.setIsCalculatingDistance(true);
+    fetch('/api/maps/distance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origin: store.origin.name,
+        destination: store.destination.name,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isCancelled && data.success && data.pricing) {
+          store.setRoutePricing(data.pricing);
+          store.setEstimatedKm(data.distanceKm);
+          store.setEstimatedDurationMinutes(data.durationMinutes);
+          store.setDistanceRouteCalculated(true);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to calculate dynamic distance:', err);
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          store.setIsCalculatingDistance(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [store.origin?.id, store.origin?.name, store.destination?.id, store.destination?.name, routes]);
 
   // Group locations for native select dropdowns
   const groupedLocations = useMemo(() => {
@@ -958,6 +1002,27 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
                             <span>{store.destination?.name}</span>
                           </div>
                         </div>
+
+                        {store.origin && store.destination && store.origin.id !== store.destination.id && (
+                          <div className="flex items-center justify-between border-t border-slate-200/60 pt-2 text-xs font-bold text-slate-700">
+                            <div className="flex items-center gap-1.5">
+                              {store.isCalculatingDistance ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin text-gold-600" />
+                                  <span className="text-slate-400">Calculating...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Navigation className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>{store.estimatedKm} km • ~{store.estimatedDurationMinutes} mins</span>
+                                </>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-extrabold border border-emerald-200">
+                              {store.distanceRouteCalculated ? 'Distance Rate' : 'Fixed Route'}
+                            </span>
+                          </div>
+                        )}
 
                         <div className="flex items-center justify-between border-t border-slate-200/60 pt-2 text-xs font-bold text-slate-700">
                           <div className="flex items-center gap-1.5">

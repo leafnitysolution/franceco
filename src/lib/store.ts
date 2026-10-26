@@ -32,6 +32,9 @@ interface BookingStoreState {
   // Tour & Distance Mode fields
   rentalHours: number;
   estimatedKm: number;
+  estimatedDurationMinutes: number;
+  isCalculatingDistance: boolean;
+  distanceRouteCalculated: boolean;
 
   // Custom price overrides per vehicle tier from active route
   sedanPriceEur: number;
@@ -61,6 +64,9 @@ interface BookingStoreState {
   setBoosterSeats: (seats: number) => void;
   setRentalHours: (hours: number) => void;
   setEstimatedKm: (km: number) => void;
+  setEstimatedDurationMinutes: (minutes: number) => void;
+  setIsCalculatingDistance: (loading: boolean) => void;
+  setDistanceRouteCalculated: (calculated: boolean) => void;
   setCustomerDetails: (details: { name: string; email: string; phone: string; notes?: string }) => void;
   setRoutePricing: (prices: { sedan: number; economyVan: number; businessVan: number; minibus?: number }) => void;
   openModal: () => void;
@@ -97,6 +103,9 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
 
   rentalHours: 4,
   estimatedKm: 30,
+  estimatedDurationMinutes: 40,
+  isCalculatingDistance: false,
+  distanceRouteCalculated: false,
 
   sedanPriceEur: 70,
   economyVanPriceEur: 90,
@@ -132,6 +141,9 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   setBoosterSeats: (seats) => set({ boosterSeats: Math.max(0, seats) }),
   setRentalHours: (hours) => set({ rentalHours: Math.max(1, hours) }),
   setEstimatedKm: (km) => set({ estimatedKm: Math.max(1, km) }),
+  setEstimatedDurationMinutes: (minutes) => set({ estimatedDurationMinutes: Math.max(1, minutes) }),
+  setIsCalculatingDistance: (loading) => set({ isCalculatingDistance: loading }),
+  setDistanceRouteCalculated: (calculated) => set({ distanceRouteCalculated: calculated }),
   setCustomerDetails: (details) =>
     set({
       customerName: details.name,
@@ -174,6 +186,9 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       notes: '',
       rentalHours: 4,
       estimatedKm: 30,
+      estimatedDurationMinutes: 40,
+      isCalculatingDistance: false,
+      distanceRouteCalculated: false,
       isModalOpen: false,
       currentStep: 1,
     }),
