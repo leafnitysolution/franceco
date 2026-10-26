@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, LogOut, LayoutDashboard, Route as RouteIcon, CalendarCheck, Home, Star, Clock, AlertTriangle, RefreshCw, MapPin, Mail } from 'lucide-react';
+import { ShieldCheck, LogOut, LayoutDashboard, Route as RouteIcon, CalendarCheck, Home, Star, Clock, AlertTriangle, RefreshCw, MapPin, Mail, Key } from 'lucide-react';
 import { adminLogoutAction } from '@/lib/actions/auth';
 
 const IDLE_TIMEOUT_MS = 20 * 60 * 1000; // 20 minutes (1,200,000 ms)
@@ -90,6 +90,12 @@ export function AdminNavbar() {
       href: '/ffs-portal-sec-99x/reviews',
       exact: false,
       icon: Star,
+    },
+    {
+      label: 'API & Settings',
+      href: '/ffs-portal-sec-99x/settings',
+      exact: false,
+      icon: Key,
     },
   ];
 
