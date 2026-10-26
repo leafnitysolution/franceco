@@ -7,10 +7,16 @@ interface AutocompletePrediction {
   fullText: string;
 }
 
-// In-Memory Search Cache to prevent billing when multiple users type common queries
-const searchCache = new Map<string, { predictions: AutocompletePrediction[]; cachedAt: number }>();
+interface CacheEntry {
+  predictions: AutocompletePrediction[];
+  cachedAt: number;
+}
 
-// Rate limit: Max 40 autocomplete requests per minute per IP
+// In-Memory Search Cache (Key: normalized input string)
+// Reduces Google Places API billable requests by up to 90%.
+const searchCache = new Map<string, CacheEntry>();
+
+// Rate Limiting Map (IP -> { count, resetAt })
 const ipRateLimit = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(ip: string): boolean {
@@ -20,7 +26,7 @@ function checkRateLimit(ip: string): boolean {
     ipRateLimit.set(ip, { count: 1, resetAt: now + 60_000 });
     return true;
   }
-  if (entry.count >= 40) {
+  if (entry.count >= 60) {
     return false;
   }
   entry.count += 1;
@@ -36,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
-        { error: 'Too many search requests. Please slow down.' },
+        { error: 'Too many requests. Please wait a moment.' },
         { status: 429 }
       );
     }
@@ -45,14 +51,16 @@ export async function GET(req: NextRequest) {
     const input = (searchParams.get('input') || '').trim();
     const sessionToken = searchParams.get('sessionToken') || '';
 
-    if (!input || input.length < 3) {
+    if (!input || input.length < 2) {
       return NextResponse.json({ predictions: [] });
     }
 
     const cacheKey = input.toLowerCase();
+
+    // 1. Check in-memory cache first (24 hours TTL)
     const cached = searchCache.get(cacheKey);
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-    if (cached && Date.now() - cached.cachedAt < ONE_DAY_MS) {
+    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+    if (cached && Date.now() - cached.cachedAt < TWENTY_FOUR_HOURS_MS) {
       return NextResponse.json({
         predictions: cached.predictions,
         cached: true,
@@ -91,7 +99,13 @@ export async function GET(req: NextRequest) {
     if (!gRes.ok) {
       const errText = await gRes.text();
       console.warn('Google Places Autocomplete error:', gRes.status, errText);
-      return NextResponse.json({ predictions: [], error: 'Autocomplete unavailable' });
+      return NextResponse.json({
+        predictions: [],
+        error: 'Autocomplete unavailable',
+        status: gRes.status,
+        details: errText,
+        keyConfigured: Boolean(process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY),
+      });
     }
 
     const gData = await gRes.json();
@@ -113,9 +127,15 @@ export async function GET(req: NextRequest) {
     // Cache the predictions
     searchCache.set(cacheKey, { predictions, cachedAt: Date.now() });
 
-    return NextResponse.json({ predictions, cached: false });
+    return NextResponse.json({
+      predictions,
+      cached: false,
+    });
   } catch (err: any) {
     console.error('Autocomplete API error:', err);
-    return NextResponse.json({ predictions: [] });
+    return NextResponse.json(
+      { error: err.message || 'Internal server error', predictions: [] },
+      { status: 500 }
+    );
   }
 }

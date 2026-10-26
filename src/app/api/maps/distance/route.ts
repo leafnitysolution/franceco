@@ -98,6 +98,7 @@ export async function POST(req: NextRequest) {
     let originAddress = origin;
     let destinationAddress = destination;
     let usedGoogleApi = false;
+    let apiError: string | null = null;
 
     if (apiKey) {
       try {
@@ -136,9 +137,11 @@ export async function POST(req: NextRequest) {
         } else {
           const errText = await gRes.text();
           console.warn('Google Routes API returned non-200:', gRes.status, errText);
+          apiError = `${gRes.status}: ${errText}`;
         }
-      } catch (apiErr) {
+      } catch (apiErr: any) {
         console.warn('Google Routes API fetch failed, using smart distance fallback:', apiErr);
+        apiError = apiErr?.message || 'Network error';
       }
     }
 
@@ -165,6 +168,8 @@ export async function POST(req: NextRequest) {
       destinationAddress,
       cached: false,
       liveApiUsed: usedGoogleApi,
+      apiDiagnostics: usedGoogleApi ? 'CONNECTED_AND_ACTIVE' : apiError,
+      keyConfigured: Boolean(process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY),
     });
   } catch (err: any) {
     console.error('Distance calculation error:', err);
