@@ -14,6 +14,7 @@ import {
   Sparkles,
   MapPin,
   ChevronDown,
+  Search,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -128,6 +129,21 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
     };
   }, [selectedFromLoc, selectedToLoc, initialRoutes]);
 
+  const handleSearchClick = () => {
+    if (!selectedFromLoc) {
+      setActiveDropdown('ORIGIN');
+      return;
+    }
+    if (!selectedToLoc) {
+      setActiveDropdown('DESTINATION');
+      return;
+    }
+    const el = document.getElementById('rates-results');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleBookRoute = (
     originLoc: any,
     destLoc: any,
@@ -147,17 +163,17 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
 
   return (
     <div className="space-y-10">
-      {/* Searchable FROM and TO Filter Toolbar Card */}
-      <div className="bg-white border border-[#E5D7BC] rounded-3xl p-6 sm:p-7 shadow-xl max-w-4xl mx-auto space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+      {/* Searchable FROM and TO Filter Toolbar Card with SEARCH BUTTON */}
+      <div className="bg-white border border-[#E5D7BC] rounded-3xl p-6 sm:p-7 shadow-xl max-w-5xl mx-auto space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
           {/* FROM SELECTOR (Searchable & Typable Input Dropdown) */}
-          <div className="md:col-span-5 relative space-y-1">
+          <div className="lg:col-span-4 relative space-y-1">
             <label className="text-[10px] font-bold uppercase text-slate-500 block tracking-wider">
               FROM (Pickup Location)
             </label>
             <div
               onClick={() => setActiveDropdown(activeDropdown === 'ORIGIN' ? null : 'ORIGIN')}
-              className={`w-full bg-[#F5F3ED] hover:bg-[#eae6db] border rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-navy-900 cursor-pointer flex items-center justify-between transition-colors shadow-sm ${
+              className={`w-full bg-[#F5F3ED] hover:bg-[#eae6db] border rounded-xl px-3.5 py-3 text-xs sm:text-sm font-bold text-navy-900 cursor-pointer flex items-center justify-between transition-colors shadow-sm ${
                 activeDropdown === 'ORIGIN' ? 'ring-2 ring-gold-600 border-gold-600' : 'border-[#E5D7BC]'
               }`}
             >
@@ -168,7 +184,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
                     selectedFromLoc ? 'text-navy-900 font-extrabold truncate' : 'text-slate-400 font-medium'
                   }
                 >
-                  {selectedFromLoc ? selectedFromLoc.name : 'Type or select pickup location...'}
+                  {selectedFromLoc ? selectedFromLoc.name : 'Type pickup location...'}
                 </span>
               </div>
               <ChevronDown
@@ -194,7 +210,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
           </div>
 
           {/* SWAP BUTTON */}
-          <div className="md:col-span-2 flex justify-center pb-1">
+          <div className="lg:col-span-1 flex justify-center pb-1">
             <button
               type="button"
               onClick={() => {
@@ -213,13 +229,13 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
           </div>
 
           {/* TO SELECTOR (Searchable & Typable Input Dropdown) */}
-          <div className="md:col-span-5 relative space-y-1">
+          <div className="lg:col-span-4 relative space-y-1">
             <label className="text-[10px] font-bold uppercase text-slate-500 block tracking-wider">
               TO (Dropoff Location)
             </label>
             <div
               onClick={() => setActiveDropdown(activeDropdown === 'DESTINATION' ? null : 'DESTINATION')}
-              className={`w-full bg-[#F5F3ED] hover:bg-[#eae6db] border rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-navy-900 cursor-pointer flex items-center justify-between transition-colors shadow-sm ${
+              className={`w-full bg-[#F5F3ED] hover:bg-[#eae6db] border rounded-xl px-3.5 py-3 text-xs sm:text-sm font-bold text-navy-900 cursor-pointer flex items-center justify-between transition-colors shadow-sm ${
                 activeDropdown === 'DESTINATION' ? 'ring-2 ring-gold-600 border-gold-600' : 'border-[#E5D7BC]'
               }`}
             >
@@ -230,7 +246,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
                     selectedToLoc ? 'text-navy-900 font-extrabold truncate' : 'text-slate-400 font-medium'
                   }
                 >
-                  {selectedToLoc ? selectedToLoc.name : 'Type or select dropoff destination...'}
+                  {selectedToLoc ? selectedToLoc.name : 'Type dropoff location...'}
                 </span>
               </div>
               <ChevronDown
@@ -254,11 +270,36 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
               }}
             />
           </div>
+
+          {/* PROMINENT SEARCH BUTTON */}
+          <div className="lg:col-span-3 pb-0.5">
+            <button
+              type="button"
+              onClick={handleSearchClick}
+              className="w-full py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+            >
+              <Search className="w-4 h-4 stroke-[2.5]" />
+              <span>Search Fares</span>
+            </button>
+          </div>
         </div>
 
-        {/* Clear Filter Button */}
-        {isFiltered && (
-          <div className="flex justify-end pt-1">
+        {/* Status / Clear Filter Bar */}
+        <div className="flex flex-wrap items-center justify-between pt-1 gap-2 border-t border-slate-100">
+          <div className="text-[11px] text-slate-500 font-medium">
+            {isFiltered ? (
+              <span>
+                Showing results for{' '}
+                <strong className="text-slate-900">
+                  {selectedFromLoc?.name || 'Any'} ➔ {selectedToLoc?.name || 'Any'}
+                </strong>
+              </span>
+            ) : (
+              <span>Type or pick any pickup and dropoff to calculate road distance and guaranteed fares.</span>
+            )}
+          </div>
+
+          {isFiltered && (
             <button
               type="button"
               onClick={() => {
@@ -268,198 +309,201 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
                 setSelectedToId('');
                 setCustomRouteData(null);
               }}
-              className="text-xs font-bold text-gold-700 hover:text-gold-800 underline flex items-center gap-1 cursor-pointer"
+              className="text-xs font-bold text-gold-700 hover:text-gold-800 underline flex items-center gap-1 cursor-pointer ml-auto"
             >
-              <span>Reset Search / View All Fares</span>
+              <span>Reset / View All Routes</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* DYNAMIC CALCULATED ROUTE CARD (When user types or selects custom locations without a fixed DB route) */}
-      {selectedFromLoc && selectedToLoc && selectedFromLoc.id !== selectedToLoc.id && (
-        <>
-          {isCalculatingCustom ? (
-            <div className="bg-white border border-gold-200 rounded-3xl p-6 text-center max-w-xl mx-auto shadow-md space-y-2 animate-in fade-in">
-              <Loader2 className="w-6 h-6 animate-spin text-gold-600 mx-auto" />
-              <p className="text-xs font-bold text-slate-700">
-                Calculating exact road distance and guaranteed fare...
-              </p>
-            </div>
-          ) : customRouteData ? (
-            <div className="bg-gradient-to-r from-gold-50 via-white to-gold-50 border-2 border-gold-300 rounded-3xl p-6 sm:p-7 shadow-xl max-w-2xl mx-auto space-y-5 animate-in zoom-in-95 duration-200">
-              <div className="flex items-center justify-between border-b border-gold-200/80 pb-3">
-                <div className="flex items-center gap-2 text-xs font-black text-gold-900 uppercase tracking-wider">
-                  <Sparkles className="w-4 h-4 text-gold-600" />
-                  <span>Custom Route Distance Fare</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs font-black text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full border border-emerald-300">
-                  <Navigation className="w-3.5 h-3.5" />
-                  <span>
-                    {customRouteData.distanceKm} km • ~{customRouteData.durationMinutes} mins
-                  </span>
-                </div>
+      {/* RESULTS SECTION ANCHOR */}
+      <div id="rates-results" className="space-y-8 scroll-mt-24">
+        {/* DYNAMIC CALCULATED ROUTE CARD (When user types or selects custom locations without a fixed DB route) */}
+        {selectedFromLoc && selectedToLoc && selectedFromLoc.id !== selectedToLoc.id && (
+          <>
+            {isCalculatingCustom ? (
+              <div className="bg-white border border-gold-200 rounded-3xl p-6 text-center max-w-xl mx-auto shadow-md space-y-2 animate-in fade-in">
+                <Loader2 className="w-6 h-6 animate-spin text-gold-600 mx-auto" />
+                <p className="text-xs font-bold text-slate-700">
+                  Calculating exact road distance and guaranteed fare...
+                </p>
               </div>
+            ) : customRouteData ? (
+              <div className="bg-gradient-to-r from-gold-50 via-white to-gold-50 border-2 border-gold-300 rounded-3xl p-6 sm:p-7 shadow-xl max-w-2xl mx-auto space-y-5 animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between border-b border-gold-200/80 pb-3">
+                  <div className="flex items-center gap-2 text-xs font-black text-gold-900 uppercase tracking-wider">
+                    <Sparkles className="w-4 h-4 text-gold-600" />
+                    <span>Custom Route Distance Fare</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-black text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full border border-emerald-300">
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>
+                      {customRouteData.distanceKm} km • ~{customRouteData.durationMinutes} mins
+                    </span>
+                  </div>
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">FROM</div>
-                  <div className="font-serif text-lg font-bold text-navy-900">{selectedFromLoc.name}</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">FROM</div>
+                    <div className="font-serif text-lg font-bold text-navy-900">{selectedFromLoc.name}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TO</div>
+                    <div className="font-serif text-lg font-bold text-gold-700">{selectedToLoc.name}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TO</div>
-                  <div className="font-serif text-lg font-bold text-gold-700">{selectedToLoc.name}</div>
+
+                {/* Fares Table */}
+                <div className="grid grid-cols-4 gap-2 text-center text-xs font-bold pt-2">
+                  <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="text-[10px] text-slate-400 uppercase">Sedan (3p)</div>
+                    <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.sedan}€</div>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border-2 border-gold-400 shadow-sm">
+                    <div className="text-[10px] text-gold-700 uppercase">Van (6p)</div>
+                    <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.economyVan}€</div>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="text-[10px] text-slate-400 uppercase">VIP Van (7p)</div>
+                    <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.businessVan}€</div>
+                  </div>
+                  <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="text-[10px] text-slate-400 uppercase">Minibus (8p)</div>
+                    <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.minibus}€</div>
+                  </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleBookRoute(
+                      selectedFromLoc,
+                      selectedToLoc,
+                      customRouteData.pricing,
+                      customRouteData.distanceKm,
+                      customRouteData.durationMinutes,
+                      true
+                    )
+                  }
+                  className="w-full py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <span>Book This Custom Route Now</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
+            ) : null}
+          </>
+        )}
 
-              {/* Fares Table */}
-              <div className="grid grid-cols-4 gap-2 text-center text-xs font-bold pt-2">
-                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-                  <div className="text-[10px] text-slate-400 uppercase">Sedan (3p)</div>
-                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.sedan}€</div>
-                </div>
-                <div className="bg-white p-2.5 rounded-xl border-2 border-gold-400 shadow-sm">
-                  <div className="text-[10px] text-gold-700 uppercase">Van (6p)</div>
-                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.economyVan}€</div>
-                </div>
-                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-                  <div className="text-[10px] text-slate-400 uppercase">VIP Van (7p)</div>
-                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.businessVan}€</div>
-                </div>
-                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-                  <div className="text-[10px] text-slate-400 uppercase">Minibus (8p)</div>
-                  <div className="text-sm font-black text-navy-900 mt-0.5">{customRouteData.pricing.minibus}€</div>
-                </div>
-              </div>
+        {/* Rates Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {displayRoutes.map((route) => {
+            const sedanOneWay = route.sedanPriceEur;
+            const sedanRoundTrip = route.sedanPriceEur * 2;
 
-              <button
-                type="button"
-                onClick={() =>
-                  handleBookRoute(
-                    selectedFromLoc,
-                    selectedToLoc,
-                    customRouteData.pricing,
-                    customRouteData.distanceKm,
-                    customRouteData.durationMinutes,
-                    true
-                  )
-                }
-                className="w-full py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
+            const vanOneWay = route.economyVanPriceEur;
+            const vanRoundTrip = route.economyVanPriceEur * 2;
+
+            const vipOneWay = route.businessVanPriceEur;
+            const vipRoundTrip = route.businessVanPriceEur * 2;
+
+            const minibusOneWay = route.minibusPriceEur;
+            const minibusRoundTrip = route.minibusPriceEur * 2;
+
+            return (
+              <div
+                key={route.id}
+                className="bg-white border border-[#E5D7BC]/90 rounded-3xl p-6 shadow-md hover:shadow-xl transition-all flex flex-col justify-between space-y-6"
               >
-                <span>Book This Custom Route Now</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          ) : null}
-        </>
-      )}
-
-      {/* Rates Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {displayRoutes.map((route) => {
-          const sedanOneWay = route.sedanPriceEur;
-          const sedanRoundTrip = route.sedanPriceEur * 2;
-
-          const vanOneWay = route.economyVanPriceEur;
-          const vanRoundTrip = route.economyVanPriceEur * 2;
-
-          const vipOneWay = route.businessVanPriceEur;
-          const vipRoundTrip = route.businessVanPriceEur * 2;
-
-          const minibusOneWay = route.minibusPriceEur;
-          const minibusRoundTrip = route.minibusPriceEur * 2;
-
-          return (
-            <div
-              key={route.id}
-              className="bg-white border border-[#E5D7BC]/90 rounded-3xl p-6 shadow-md hover:shadow-xl transition-all flex flex-col justify-between space-y-6"
-            >
-              {/* Header Info */}
-              <div className="space-y-4">
-                <div className="space-y-2 border-b border-slate-100 pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      {t('from')}
+                {/* Header Info */}
+                <div className="space-y-4">
+                  <div className="space-y-2 border-b border-slate-100 pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        {t('from')}
+                      </div>
+                      {/* Route Distance & Time Badge */}
+                      <div className="flex items-center gap-1.5 text-[11px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                        <Navigation className="w-3 h-3 text-emerald-600 shrink-0" />
+                        <span>{route.distanceKm || 45} km (~{route.estDurationMinutes || 40}m)</span>
+                      </div>
                     </div>
-                    {/* Route Distance & Time Badge */}
-                    <div className="flex items-center gap-1.5 text-[11px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                      <Navigation className="w-3 h-3 text-emerald-600 shrink-0" />
-                      <span>{route.distanceKm || 45} km (~{route.estDurationMinutes || 40}m)</span>
+
+                    <div className="font-serif text-lg font-bold text-navy-900 line-clamp-1">
+                      {route.origin?.name || 'Pickup Location'}
+                    </div>
+
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-1">
+                      TO
+                    </div>
+                    <div className="font-serif text-lg font-bold text-gold-700 line-clamp-1">
+                      {route.destination?.name || 'Dropoff Location'}
                     </div>
                   </div>
 
-                  <div className="font-serif text-lg font-bold text-navy-900 line-clamp-1">
-                    {route.origin?.name || 'Pickup Location'}
-                  </div>
+                  {/* PAX Price Breakdown Table */}
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1 px-1">
+                      <span>PAX</span>
+                      <span className="text-center">ONE WAY</span>
+                      <span className="text-right">ROUND TRIP</span>
+                    </div>
 
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-1">
-                    TO
-                  </div>
-                  <div className="font-serif text-lg font-bold text-gold-700 line-clamp-1">
-                    {route.destination?.name || 'Dropoff Location'}
+                    <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
+                      <span>1 – 3 Pax (Sedan)</span>
+                      <span className="text-center text-navy-900 font-bold">{sedanOneWay}€</span>
+                      <span className="text-right text-gold-700 font-extrabold">{sedanRoundTrip}€</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F7F2E7] rounded-xl border border-[#E5D7BC]">
+                      <span>1 – 6 Pax (Van)</span>
+                      <span className="text-center text-navy-900 font-bold">{vanOneWay}€</span>
+                      <span className="text-right text-gold-700 font-extrabold">{vanRoundTrip}€</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
+                      <span>1 – 7 Pax (VIP Van)</span>
+                      <span className="text-center text-navy-900 font-bold">{vipOneWay}€</span>
+                      <span className="text-right text-gold-700 font-extrabold">{vipRoundTrip}€</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
+                      <span>1 – 8 Pax (Minibus)</span>
+                      <span className="text-center text-navy-900 font-bold">{minibusOneWay}€</span>
+                      <span className="text-right text-gold-700 font-extrabold">{minibusRoundTrip}€</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* PAX Price Breakdown Table */}
-                <div className="space-y-2">
-                  <div className="grid grid-cols-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1 px-1">
-                    <span>PAX</span>
-                    <span className="text-center">ONE WAY</span>
-                    <span className="text-right">ROUND TRIP</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
-                    <span>1 – 3 Pax (Sedan)</span>
-                    <span className="text-center text-navy-900 font-bold">{sedanOneWay}€</span>
-                    <span className="text-right text-gold-700 font-extrabold">{sedanRoundTrip}€</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F7F2E7] rounded-xl border border-[#E5D7BC]">
-                    <span>1 – 6 Pax (Van)</span>
-                    <span className="text-center text-navy-900 font-bold">{vanOneWay}€</span>
-                    <span className="text-right text-gold-700 font-extrabold">{vanRoundTrip}€</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
-                    <span>1 – 7 Pax (VIP Van)</span>
-                    <span className="text-center text-navy-900 font-bold">{vipOneWay}€</span>
-                    <span className="text-right text-gold-700 font-extrabold">{vipRoundTrip}€</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 text-xs font-semibold text-slate-800 px-2 py-2 bg-[#F5F3ED] rounded-xl border border-[#E5D7BC]/40">
-                    <span>1 – 8 Pax (Minibus)</span>
-                    <span className="text-center text-navy-900 font-bold">{minibusOneWay}€</span>
-                    <span className="text-right text-gold-700 font-extrabold">{minibusRoundTrip}€</span>
-                  </div>
-                </div>
+                {/* Action Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleBookRoute(
+                      route.origin,
+                      route.destination,
+                      {
+                        sedan: route.sedanPriceEur,
+                        economyVan: route.economyVanPriceEur,
+                        businessVan: route.businessVanPriceEur,
+                        minibus: route.minibusPriceEur,
+                      },
+                      route.distanceKm || 45,
+                      route.estDurationMinutes || 40,
+                      false
+                    )
+                  }
+                  className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <span>Reserve Transfer Now</span>
+                  <ArrowRight className="w-4 h-4 text-gold-400" />
+                </button>
               </div>
-
-              {/* Action Button */}
-              <button
-                type="button"
-                onClick={() =>
-                  handleBookRoute(
-                    route.origin,
-                    route.destination,
-                    {
-                      sedan: route.sedanPriceEur,
-                      economyVan: route.economyVanPriceEur,
-                      businessVan: route.businessVanPriceEur,
-                      minibus: route.minibusPriceEur,
-                    },
-                    route.distanceKm || 45,
-                    route.estDurationMinutes || 40,
-                    false
-                  )
-                }
-                className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
-              >
-                <span>Reserve Transfer Now</span>
-                <ArrowRight className="w-4 h-4 text-gold-400" />
-              </button>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Transparent Rate Guarantee Banner */}
