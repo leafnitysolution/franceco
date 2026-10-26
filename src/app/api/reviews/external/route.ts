@@ -19,6 +19,7 @@ export async function GET() {
   const tripAdvisorUrl = process.env.TRIPADVISOR_URL || 'https://www.tripadvisor.com';
 
   const googleApiKey =
+    process.env.GOOGLE_MAPS_API_KEY ||
     process.env.GOOGLE_PLACES_API_KEY ||
     process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const googlePlaceId = process.env.GOOGLE_PLACE_ID;
