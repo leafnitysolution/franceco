@@ -23,8 +23,10 @@ export async function ensureSettingsTable(): Promise<void> {
         "isSecret" BOOLEAN NOT NULL DEFAULT false,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE UNIQUE INDEX IF NOT EXISTS "SystemSetting_key_key" ON "SystemSetting"("key");
+      )
+    `);
+    await db.$executeRawUnsafe(`
+      CREATE UNIQUE INDEX IF NOT EXISTS "SystemSetting_key_key" ON "SystemSetting"("key")
     `);
     isTableInitialized = true;
   } catch (err) {

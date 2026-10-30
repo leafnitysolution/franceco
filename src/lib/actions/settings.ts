@@ -292,7 +292,9 @@ export async function adminSearchTripAdvisorAction(query: string, customKey?: st
 
   try {
     const res = await fetch(
-      https://api.content.tripadvisor.com/api/v1/location/search?searchQuery=&key=&language=en,
+      `https://api.content.tripadvisor.com/api/v1/location/search?searchQuery=${encodeURIComponent(
+        query
+      )}&key=${encodeURIComponent(apiKey)}&language=en`,
       { headers: { accept: 'application/json' } }
     );
 
@@ -306,19 +308,19 @@ export async function adminSearchTripAdvisorAction(query: string, customKey?: st
       return {
         success: true,
         locations,
-        message: Found  matching TripAdvisor listing(s),
+        message: `Found ${locations.length} matching TripAdvisor listing(s)`,
       };
     } else {
       const errText = await res.text();
       return {
         success: false,
-        error: HTTP : ,
+        error: `HTTP ${res.status}: ${errText.slice(0, 200)}`,
       };
     }
   } catch (err: any) {
     return {
       success: false,
-      error: Network error: ,
+      error: `Network error: ${err.message}`,
     };
   }
 }
