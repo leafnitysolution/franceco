@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSetting } from '@/lib/settings';
 
 interface RouteCacheEntry {
   distanceKm: number;
@@ -86,11 +87,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Dynamic API key resolution: Admin Panel DB -> .env -> Verified Default
     const apiKey =
+      (await getSetting('GOOGLE_MAPS_API_KEY')) ||
       process.env.GOOGLE_MAPS_API_KEY ||
       process.env.GOOGLE_PLACES_API_KEY ||
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      'AIzaSyDNgoZLJXN1yNrPkUWzdZ3DCjKGbZPZ18g';
+      'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564';
 
     // 2. Call Google Routes API (Modern v2 endpoint)
     let distanceKm = 35;
@@ -117,7 +120,7 @@ export async function POST(req: NextRequest) {
               'Content-Type': 'application/json',
               'X-Goog-Api-Key': apiKey,
               'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters',
-                },
+            },
             body: JSON.stringify(routesPayload),
             next: { revalidate: 86400 },
           }
@@ -128,7 +131,6 @@ export async function POST(req: NextRequest) {
           const route = gData.routes?.[0];
           if (route?.distanceMeters) {
             distanceKm = Math.round((route.distanceMeters / 1000) * 10) / 10;
-            // Parse duration string e.g. "2450s"
             const durSeconds = parseInt(route.duration?.replace('s', '') || '2400', 10);
             durationMinutes = Math.ceil(durSeconds / 60);
             usedGoogleApi = true;
@@ -168,7 +170,7 @@ export async function POST(req: NextRequest) {
       cached: false,
       liveApiUsed: usedGoogleApi,
       apiDiagnostics: usedGoogleApi ? 'CONNECTED_AND_ACTIVE' : apiError,
-      keyConfigured: Boolean(process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY),
+      keyConfigured: Boolean(apiKey),
     });
   } catch (err: any) {
     console.error('Distance calculation error:', err);

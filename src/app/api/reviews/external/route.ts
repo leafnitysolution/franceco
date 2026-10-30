@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { ensureLocationsSeeded } from '@/lib/seedHelper';
+import { getSetting } from '@/lib/settings';
 
 interface NormalizedReview {
   id: string | number;
@@ -14,16 +15,18 @@ interface NormalizedReview {
 }
 
 export async function GET() {
-  const tripAdvisorApiKey = process.env.TRIPADVISOR_API_KEY;
-  const tripAdvisorLocationId = process.env.TRIPADVISOR_LOCATION_ID;
-  const tripAdvisorUrl = process.env.TRIPADVISOR_URL || 'https://www.tripadvisor.com';
+  const tripAdvisorApiKey = (await getSetting('TRIPADVISOR_API_KEY')) || process.env.TRIPADVISOR_API_KEY;
+  const tripAdvisorLocationId = (await getSetting('TRIPADVISOR_LOCATION_ID')) || process.env.TRIPADVISOR_LOCATION_ID;
+  const tripAdvisorUrl = (await getSetting('TRIPADVISOR_URL')) || process.env.TRIPADVISOR_URL || 'https://www.tripadvisor.com';
 
   const googleApiKey =
+    (await getSetting('GOOGLE_MAPS_API_KEY')) ||
     process.env.GOOGLE_MAPS_API_KEY ||
     process.env.GOOGLE_PLACES_API_KEY ||
-    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  const googlePlaceId = process.env.GOOGLE_PLACE_ID;
-  const googleReviewsUrl = process.env.GOOGLE_REVIEWS_URL || 'https://maps.google.com';
+    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
+    'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564';
+  const googlePlaceId = (await getSetting('GOOGLE_PLACE_ID')) || process.env.GOOGLE_PLACE_ID || 'ChIJK_W2Fipt5kcRCOpTeqfLY6g';
+  const googleReviewsUrl = (await getSetting('GOOGLE_REVIEWS_URL')) || process.env.GOOGLE_REVIEWS_URL || 'https://maps.app.goo.gl/DwYGzJ9yDqszXAPW7';
 
   let liveRatingScore: number | null = null;
   let liveTotalReviews: number | null = null;
@@ -67,15 +70,15 @@ export async function GET() {
 
       if (reviewsRes.ok) {
         const reviewsData = await reviewsRes.json();
-        if (Array.isArray(reviewsData?.data)) {
+        if (Array.isArray(reviewsData.data)) {
           for (const item of reviewsData.data) {
             if (item.text) {
               liveReviewsList.push({
-                id: `ta-${item.id}`,
-                name: item.user?.username || 'Verified Guest',
-                originCountry: 'TripAdvisor Verified 🦉',
-                route: item.title || 'Private Chauffeur Service',
-                rating: Number(item.rating) || 5,
+                id: item.id || Math.random(),
+                name: item.user?.username || 'TripAdvisor Guest',
+                originCountry: item.user?.user_location?.name || 'Verified Traveler',
+                route: 'VIP Airport Transfer',
+                rating: item.rating || 5,
                 date: item.published_date
                   ? new Date(item.published_date).toLocaleDateString('en-US', {
                       month: 'long',
@@ -166,25 +169,23 @@ export async function GET() {
             if (gData.result.url) {
               liveGoogleUrl = gData.result.url;
             }
-            liveSource = liveSource
-              ? 'TripAdvisor & Google Live API'
-              : 'Google Places Official API';
+            liveSource = liveSource ? 'TripAdvisor & Google Live API' : 'Google Places Official API';
 
             if (Array.isArray(gData.result.reviews)) {
-              gData.result.reviews.forEach((gRev: any, idx: number) => {
-                if (gRev.text) {
+              for (const rev of gData.result.reviews) {
+                if (rev.text) {
                   liveReviewsList.push({
-                    id: `google-${idx}-${gRev.time || Date.now()}`,
-                    name: gRev.author_name || 'Google Guest',
-                    originCountry: 'Google Review ★',
-                    route: 'Private Chauffeur Transfer',
-                    rating: Number(gRev.rating) || 5,
-                    date: gRev.relative_time_description || 'Recent',
+                    id: rev.time || Math.random(),
+                    name: rev.author_name || 'Google Reviewer',
+                    originCountry: 'Google Verified Guest',
+                    route: 'Paris Private Chauffeur',
+                    rating: rev.rating || 5,
+                    date: rev.relative_time_description || 'Recent',
                     verified: true,
-                    review: gRev.text,
+                    review: rev.text,
                   });
                 }
-              });
+              }
             }
           }
         }

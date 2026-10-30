@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSetting } from '@/lib/settings';
 
 interface AutocompletePrediction {
   placeId: string;
@@ -67,11 +68,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Dynamic API key resolution: Admin Panel DB -> .env -> Verified Default
     const apiKey =
+      (await getSetting('GOOGLE_MAPS_API_KEY')) ||
       process.env.GOOGLE_MAPS_API_KEY ||
       process.env.GOOGLE_PLACES_API_KEY ||
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      'AIzaSyDNgoZLJXN1yNrPkUWzdZ3DCjKGbZPZ18g';
+      'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564';
 
     const payload: Record<string, any> = {
       input,
@@ -103,7 +106,7 @@ export async function GET(req: NextRequest) {
         error: 'Autocomplete unavailable',
         status: gRes.status,
         details: errText,
-        keyConfigured: Boolean(process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY),
+        keyConfigured: Boolean(apiKey),
       });
     }
 

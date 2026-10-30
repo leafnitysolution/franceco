@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { formatCurrency } from './utils';
+import { getSetting } from './settings';
 
 interface EmailPayload {
   bookingRef: string;
@@ -36,8 +37,13 @@ function escapeHtml(unsafe?: string): string {
 }
 
 export async function sendBookingConfirmationEmails(data: EmailPayload) {
-  const adminEmail = process.env.ADMIN_DISPATCH_EMAIL || 'projet15df@outlook.fr';
-  const smtpSender = process.env.SMTP_USER || 'noreply@francego.com';
+  const adminEmail = (await getSetting('ADMIN_DISPATCH_EMAIL')) || process.env.ADMIN_DISPATCH_EMAIL || 'projet15df@outlook.fr';
+  const smtpUser = (await getSetting('SMTP_USER')) || process.env.SMTP_USER || 'projet15df@outlook.fr';
+  const smtpPass = (await getSetting('SMTP_PASS')) || process.env.SMTP_PASS || '';
+  const smtpHost = (await getSetting('SMTP_HOST')) || process.env.SMTP_HOST || 'smtp-mail.outlook.com';
+  const smtpPort = Number((await getSetting('SMTP_PORT')) || process.env.SMTP_PORT || '587');
+  const smtpSecure = ((await getSetting('SMTP_SECURE')) || process.env.SMTP_SECURE) === 'true';
+  const smtpSender = smtpUser || 'noreply@francego.com';
 
   const vehicleName =
     data.vehicleTier === 'SEDAN'
@@ -182,12 +188,12 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
 
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
       auth: {
-        user: process.env.SMTP_USER || 'contact@francego.com',
-        pass: process.env.SMTP_PASS || 'demopass',
+        user: smtpUser,
+        pass: smtpPass,
       },
     });
 

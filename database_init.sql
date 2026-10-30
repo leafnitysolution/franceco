@@ -151,6 +151,26 @@ CREATE TABLE IF NOT EXISTS "ContactSubmission" (
 );
 
 -- =============================================================================
+
+
+-- -----------------------------------------------------------------------------
+-- 7. Table: SystemSetting (Dynamic API Keys & Integrations)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS "SystemSetting" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "group" TEXT NOT NULL DEFAULT 'GENERAL',
+    "label" TEXT,
+    "isSecret" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "SystemSetting_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "SystemSetting_key_key" ON "SystemSetting"("key");
+
 -- DATA SEEDING (COMPLETE PRODUCTION DATA FOR ALL PAGES & DROPDOWNS)
 -- =============================================================================
 
