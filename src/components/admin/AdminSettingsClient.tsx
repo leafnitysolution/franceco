@@ -428,12 +428,7 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
               <MapPin className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black text-slate-900">TripAdvisor Content API</h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  5,000 Free Calls / Mo
-                </span>
-              </div>
+              <h2 className="text-lg font-black text-slate-900">TripAdvisor Content API</h2>
               <p className="text-xs text-slate-500 font-medium">
                 Syncs live TripAdvisor location rating score, total review count, and official rating badge.
               </p>
