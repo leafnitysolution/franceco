@@ -5,6 +5,7 @@ import {
   adminSaveSettingsAction,
   adminTestGoogleApiAction,
   adminTestTripAdvisorAction,
+  adminSearchTripAdvisorAction,
   adminTestEmailAction,
 } from '@/lib/actions/settings';
 import {
@@ -25,6 +26,11 @@ import {
   Sparkles,
   Send,
   Sliders,
+  Search,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  Info,
 } from 'lucide-react';
 
 interface AdminSettingsClientProps {
@@ -52,9 +58,15 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
   const [testingGoogle, setTestingGoogle] = useState(false);
   const [googleTestResult, setGoogleTestResult] = useState<any | null>(null);
 
-  // TripAdvisor Test State
+  // TripAdvisor Test & Search State
   const [testingTrip, setTestingTrip] = useState(false);
   const [tripTestResult, setTripTestResult] = useState<any | null>(null);
+  const [showTripGuide, setShowTripGuide] = useState(false);
+  const [tripSearchQuery, setTripSearchQuery] = useState('');
+  const [searchingTrip, setSearchingTrip] = useState(false);
+  const [tripSearchResults, setTripSearchResults] = useState<Array<{ locationId: string; name: string; address: string }> | null>(null);
+  const [tripSearchError, setTripSearchError] = useState<string | null>(null);
+  const [extractedNotice, setExtractedNotice] = useState<string | null>(null);
 
   // SMTP Test State
   const [testingSmtp, setTestingSmtp] = useState(false);
@@ -64,6 +76,17 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
     setSettings((prev) => ({ ...prev, [key]: value }));
     setSaveSuccess(null);
     setSaveError(null);
+
+    // Auto-detect TripAdvisor Location ID from URL
+    if (key === 'TRIPADVISOR_URL' && value) {
+      const match = value.match(/-d(\d+)[-_.]/) || value.match(/[?&]locationId=(\d+)/) || value.match(/-d(\d+)$/);
+      if (match && match[1]) {
+        const detectedId = match[1];
+        setSettings((prev) => ({ ...prev, TRIPADVISOR_LOCATION_ID: detectedId }));
+        setExtractedNotice(`Location ID ${detectedId} automatically extracted from your TripAdvisor URL!`);
+        setTimeout(() => setExtractedNotice(null), 4000);
+      }
+    }
   };
 
   const copyToClipboard = (text: string, identifier: string) => {
@@ -123,6 +146,33 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
     } finally {
       setTestingTrip(false);
     }
+  };
+
+  const handleSearchTripAdvisor = async () => {
+    if (!tripSearchQuery.trim()) return;
+    setSearchingTrip(true);
+    setTripSearchError(null);
+    setTripSearchResults(null);
+
+    try {
+      const res = await adminSearchTripAdvisorAction(tripSearchQuery, settings.TRIPADVISOR_API_KEY);
+      if (res.success && res.locations) {
+        setTripSearchResults(res.locations);
+      } else {
+        setTripSearchError(res.error || 'No matching locations found.');
+      }
+    } catch (err: any) {
+      setTripSearchError(err?.message || 'Search failed');
+    } finally {
+      setSearchingTrip(false);
+    }
+  };
+
+  const handleSelectTripLocation = (loc: { locationId: string; name: string }) => {
+    handleInputChange('TRIPADVISOR_LOCATION_ID', loc.locationId);
+    setTripSearchResults(null);
+    setExtractedNotice(`Selected: "${loc.name}" (ID: ${loc.locationId})`);
+    setTimeout(() => setExtractedNotice(null), 4000);
   };
 
   const handleTestEmail = async () => {
@@ -378,24 +428,91 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
               <MapPin className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-slate-900">TripAdvisor Content API</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-black text-slate-900">TripAdvisor Content API</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  5,000 Free Calls / Mo
+                </span>
+              </div>
               <p className="text-xs text-slate-500 font-medium">
                 Syncs live TripAdvisor location rating score, total review count, and official rating badge.
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleTestTripAdvisor}
-            disabled={testingTrip || !settings.TRIPADVISOR_API_KEY}
-            className="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-2 transition-all self-start sm:self-auto cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${testingTrip ? 'animate-spin text-emerald-600' : ''}`} />
-            <span>{testingTrip ? 'Testing...' : 'Test TripAdvisor API'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowTripGuide(!showTripGuide)}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
+              <span>{showTripGuide ? 'Hide Setup Guide' : 'Setup Guide'}</span>
+              {showTripGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTestTripAdvisor}
+              disabled={testingTrip || !settings.TRIPADVISOR_API_KEY}
+              className="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-2 transition-all self-start sm:self-auto cursor-pointer disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${testingTrip ? 'animate-spin text-emerald-600' : ''}`} />
+              <span>{testingTrip ? 'Testing...' : 'Test TripAdvisor API'}</span>
+            </button>
+          </div>
         </div>
 
+        {/* Collapsible Quick Setup Guide */}
+        {showTripGuide && (
+          <div className="p-5 rounded-2xl bg-[#FBF9F5] border border-[#C5A059]/30 text-xs space-y-3 animate-in fade-in duration-200">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-[#0B192C] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <Info className="w-4 h-4 text-[#C5A059]" />
+                How to get your TripAdvisor API Key & Location ID
+              </span>
+              <a
+                href="https://developer-tripadvisor.com/content-api/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1"
+              >
+                <span>TripAdvisor Developer Portal</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            <ol className="list-decimal pl-5 space-y-1.5 text-slate-700 leading-relaxed font-medium">
+              <li>
+                Visit <strong>developer-tripadvisor.com/content-api</strong> and register for a free account.
+              </li>
+              <li>
+                Create an Application with use case <em>&quot;Website review badge & guest testimonials&quot;</em> to receive your <strong>API Key</strong> (5,000 monthly calls free).
+              </li>
+              <li>
+                Find your <strong>Location ID</strong> by looking at your TripAdvisor URL: <br />
+                <code className="text-[10px] text-emerald-900 bg-emerald-100/70 px-1 py-0.5 rounded">
+                  tripadvisor.com/Attraction_Review-g187147-<strong>d12345678</strong>-Reviews-...
+                </code>
+                <br />
+                The digits after <strong>-d</strong> (e.g. <code>12345678</code>) is your Location ID!
+              </li>
+              <li>
+                <em>Tip:</em> Simply paste your full TripAdvisor URL into the <strong>TripAdvisor URL</strong> field below — our system will automatically extract and fill the Location ID for you!
+              </li>
+            </ol>
+          </div>
+        )}
+
+        {/* Extracted Notice */}
+        {extractedNotice && (
+          <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <span>{extractedNotice}</span>
+          </div>
+        )}
+
+        {/* Live Test Diagnostic Output */}
         {tripTestResult && (
           <div
             className={`p-4 rounded-2xl text-xs space-y-1 border ${
@@ -412,10 +529,16 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
               )}
               <span>{tripTestResult.message || tripTestResult.error}</span>
             </div>
+            {tripTestResult.rankingString && (
+              <div className="text-[11px] text-slate-600 font-semibold pl-6">
+                Official Ranking: {tripTestResult.rankingString}
+              </div>
+            )}
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* API Key */}
           <div className="space-y-1.5">
             <label className="text-xs font-black text-slate-700">TripAdvisor API Key</label>
             <div className="relative">
@@ -434,10 +557,15 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
                 {showTripKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
             </div>
+            <p className="text-[11px] text-slate-400">Available from TripAdvisor Developer Portal.</p>
           </div>
 
+          {/* Location ID */}
           <div className="space-y-1.5">
-            <label className="text-xs font-black text-slate-700">Location ID</label>
+            <label className="text-xs font-black text-slate-700 flex items-center justify-between">
+              <span>Location ID</span>
+              <span className="text-[10px] text-slate-400">e.g. 12345678</span>
+            </label>
             <input
               type="text"
               value={settings.TRIPADVISOR_LOCATION_ID || ''}
@@ -445,10 +573,12 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
               placeholder="e.g. 12345678"
               className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
             />
+            <p className="text-[11px] text-slate-400">Digits after &quot;-d&quot; in your TripAdvisor URL.</p>
           </div>
 
+          {/* Public TripAdvisor URL */}
           <div className="space-y-1.5">
-            <label className="text-xs font-black text-slate-700">TripAdvisor URL</label>
+            <label className="text-xs font-black text-slate-700">TripAdvisor Profile URL</label>
             <input
               type="text"
               value={settings.TRIPADVISOR_URL || ''}
@@ -456,7 +586,61 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
               placeholder="https://www.tripadvisor.com/..."
               className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
             />
+            <p className="text-[11px] text-slate-400">Pasting your URL auto-detects the Location ID above.</p>
           </div>
+        </div>
+
+        {/* In-App TripAdvisor Search Tool */}
+        <div className="pt-2 border-t border-slate-100 space-y-3">
+          <label className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+            <Search className="w-3.5 h-3.5 text-slate-500" />
+            <span>Search TripAdvisor For Your Business (Auto-Find Location ID)</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={tripSearchQuery}
+              onChange={(e) => setTripSearchQuery(e.target.value)}
+              placeholder="Type business name e.g. FranceGo Transfers or Paris Airport Shuttle"
+              className="flex-1 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+            />
+            <button
+              type="button"
+              onClick={handleSearchTripAdvisor}
+              disabled={searchingTrip || !tripSearchQuery.trim() || !settings.TRIPADVISOR_API_KEY}
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
+            >
+              <Search className={`w-3.5 h-3.5 ${searchingTrip ? 'animate-spin' : ''}`} />
+              <span>{searchingTrip ? 'Searching...' : 'Find ID'}</span>
+            </button>
+          </div>
+
+          {tripSearchError && (
+            <div className="text-[11px] text-red-600 font-semibold">{tripSearchError}</div>
+          )}
+
+          {tripSearchResults && tripSearchResults.length > 0 && (
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+              <div className="text-[11px] font-bold text-slate-500">Matching Listings Found:</div>
+              <div className="divide-y divide-slate-200 max-h-48 overflow-y-auto">
+                {tripSearchResults.map((loc) => (
+                  <div key={loc.locationId} className="py-2 flex items-center justify-between gap-3 text-xs">
+                    <div>
+                      <div className="font-bold text-slate-900">{loc.name}</div>
+                      <div className="text-[10px] text-slate-500">{loc.address || 'Location ID: ' + loc.locationId}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTripLocation(loc)}
+                      className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold cursor-pointer transition-all shrink-0"
+                    >
+                      Select ID: {loc.locationId}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

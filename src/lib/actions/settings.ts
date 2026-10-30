@@ -267,6 +267,62 @@ export async function adminTestTripAdvisorAction(customKey?: string, customLocat
   }
 }
 
+
+export async function adminSearchTripAdvisorAction(query: string, customKey?: string) {
+  const auth = await getAdminSession();
+  if (!auth) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
+  const apiKey = (customKey || (await getSetting('TRIPADVISOR_API_KEY')) || '').trim();
+
+  if (!apiKey) {
+    return {
+      success: false,
+      error: 'TripAdvisor API Key is required to search for locations.',
+    };
+  }
+
+  if (!query || query.trim().length < 2) {
+    return {
+      success: false,
+      error: 'Search query must be at least 2 characters.',
+    };
+  }
+
+  try {
+    const res = await fetch(
+      https://api.content.tripadvisor.com/api/v1/location/search?searchQuery=&key=&language=en,
+      { headers: { accept: 'application/json' } }
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      const locations = (data.data || []).map((loc: any) => ({
+        locationId: loc.location_id,
+        name: loc.name,
+        address: loc.address_obj?.address_string || '',
+      }));
+      return {
+        success: true,
+        locations,
+        message: Found  matching TripAdvisor listing(s),
+      };
+    } else {
+      const errText = await res.text();
+      return {
+        success: false,
+        error: HTTP : ,
+      };
+    }
+  } catch (err: any) {
+    return {
+      success: false,
+      error: Network error: ,
+    };
+  }
+}
+
 export async function adminTestEmailAction(recipientEmail?: string) {
   const auth = await getAdminSession();
   if (!auth) {
