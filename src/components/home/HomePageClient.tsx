@@ -10,7 +10,7 @@ import { FaqAccordion } from '@/components/UI/FaqAccordion';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useBookingStore } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
-import { TripAdvisorLogo, RepubliqueFrancaiseBadge } from '@/components/UI/TrustBadges';
+import { TripAdvisorLogo, RepubliqueFrancaiseBadge, TripAdvisorTravellersChoiceCard } from '@/components/UI/TrustBadges';
 import {
   ShieldCheck,
   Clock,
@@ -39,6 +39,7 @@ interface RouteData {
   economyVanPriceEur?: number;
   businessVanPriceEur?: number;
   minibusPriceEur?: number;
+  imageUrl?: string | null;
   h1Heading?: string;
   origin: { shortCode: string; name: string };
   destination: { shortCode: string; name: string };
@@ -156,11 +157,17 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
                   <span>{t('bilingualDrivers')}</span>
                 </div>
               </div>
+
+              {/* TRIPADVISOR TRAVELLERS' CHOICE 2025 AWARD CARD (DESKTOP) */}
+              <TripAdvisorTravellersChoiceCard theme="dark" className="mt-4" />
             </div>
 
             {/* RIGHT COLUMN: BOOKING ENGINE WIDGET */}
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-6 space-y-4">
               <BookingWidget locations={locations} categories={categories} routes={featuredRoutes as any} />
+              
+              {/* TRIPADVISOR TRAVELLERS' CHOICE 2025 AWARD CARD (MOBILE / TABLET) */}
+              <TripAdvisorTravellersChoiceCard theme="light" className="lg:hidden" />
             </div>
           </div>
         </div>
@@ -224,7 +231,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredRoutes.map((route) => {
-            const imgPath = getRouteImage(route.slug, route.origin.shortCode, route.destination.shortCode);
+            const imgPath = route.imageUrl || getRouteImage(route.slug, route.origin.shortCode, route.destination.shortCode);
             return (
               <div
                 key={route.id}

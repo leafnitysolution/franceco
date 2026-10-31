@@ -102,3 +102,67 @@ export function RepubliqueFrancaiseBadge({
     </div>
   );
 }
+
+/**
+ * TripAdvisor Travellers' Choice 2025 Award Card
+ * Matches official Travellers' Choice 2025 badge with laurel wreath and verified text
+ */
+export function TripAdvisorTravellersChoiceCard({
+  className = '',
+  theme = 'dark',
+}: {
+  className?: string;
+  theme?: 'dark' | 'light';
+}) {
+  const isDark = theme === 'dark';
+  return (
+    <div
+      className={`rounded-2xl p-4 sm:p-5 flex items-center gap-4 sm:gap-5 border backdrop-blur-md transition-all ${
+        isDark
+          ? 'bg-slate-900/80 border-white/15 text-white shadow-xl'
+          : 'bg-white/95 border-slate-200 text-slate-900 shadow-md'
+      } ${className}`}
+    >
+      {/* Travellers Choice Green Shield Badge */}
+      <div className="shrink-0 w-16 h-20 sm:w-18 sm:h-22 rounded-2xl bg-[#00AF87] text-black flex flex-col items-center justify-between py-2 px-1 shadow-md select-none">
+        {/* Owl + Laurel Wreath */}
+        <div className="relative flex items-center justify-center pt-0.5">
+          {/* Laurel Wreath */}
+          <svg viewBox="0 0 48 32" className="w-12 h-8 text-black fill-current">
+            <path d="M12 24c-2.5-2.2-4.2-5.4-4.8-8.8 1.4.6 3 .9 4.8.8-1.8-1.5-3.1-3.6-3.8-5.8 1.5.4 3.1.5 4.7.2C11 8.8 9.9 7 9.4 5c1.4.3 2.9.4 4.3.2C13 3.6 12.3 2 12 0c2 .8 3.8 2 5.2 3.6 1.4-1.6 3.2-2.8 5.2-3.6-.3 2-1 3.6-1.7 5.2 1.4.2 2.9.1 4.3-.2-.5 2-1.6 3.8-3.5 5.4 1.6.3 3.2.2 4.7-.2-.7 2.2-2 4.3-3.8 5.8 1.8.1 3.4-.2 4.8-.8-.6 3.4-2.3 6.6-4.8 8.8-1.5-1.5-2.6-3.4-3.2-5.5-1.2 2.2-3 4-5.2 5.2-.6-2.1-1.7-4-3.2-5.5-.6 2.1-1.7 4-3.2 5.5z" />
+          </svg>
+          {/* Owl inside wreath */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <TripAdvisorLogo className="w-5 h-5 text-black" />
+          </div>
+        </div>
+        {/* Year */}
+        <span className="text-base sm:text-lg font-black tracking-tighter text-black leading-none">
+          2025
+        </span>
+      </div>
+
+      {/* Text Info */}
+      <div className="space-y-1 text-left min-w-0">
+        <div
+          className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
+            isDark ? 'text-slate-300' : 'text-slate-500'
+          }`}
+        >
+          TRIPADVISOR TRAVELLERS&apos; CHOICE
+        </div>
+        <div className="text-sm sm:text-base font-bold leading-snug">
+          Awarded for consistent great reviews from global travellers.
+        </div>
+        <div
+          className={`text-xs sm:text-[13px] leading-relaxed line-clamp-2 ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}
+        >
+          FranceGo is trusted by thousands of families, executives, and travel advisors every year.
+        </div>
+      </div>
+    </div>
+  );
+}
+

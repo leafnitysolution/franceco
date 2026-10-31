@@ -18,7 +18,18 @@ import {
   Building2,
   CheckCircle2,
   X,
+  Image as ImageIcon,
 } from 'lucide-react';
+
+const ROUTE_IMAGE_PRESETS = [
+  { label: '🏰 Disneyland Paris', url: '/images/routes/cdg-to-disneyland-paris.jpg' },
+  { label: '🗼 Paris Eiffel Tower', url: '/images/routes/cdg-to-paris-city.jpg' },
+  { label: '🏛️ Arc de Triomphe', url: '/images/routes/orly-to-paris-city.jpg' },
+  { label: '👑 Palace of Versailles', url: '/images/routes/paris-to-versailles.jpg' },
+  { label: '🎢 Parc Astérix', url: '/images/routes/cdg-to-parc-asterix.jpg' },
+  { label: '🛫 Orly Airport', url: '/images/routes/orly-to-disneyland-paris.jpg' },
+  { label: '✈️ Beauvais Airport', url: '/images/routes/beauvais-to-disneyland-paris.jpg' },
+];
 
 interface RouteFormProps {
   initialData?: RouteWithLocations | null;
@@ -57,6 +68,7 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
   const [overviewText, setOverviewText] = useState(initialData?.overviewText || 'Enjoy a stress-free private transfer directly from Charles de Gaulle Airport (CDG) to your Disneyland Paris hotel.');
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured ?? false);
+  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '');
 
   // Dynamic FAQs State
   let parsedFaqs = [];
@@ -133,6 +145,7 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
       economyVanPriceEur: Number(economyVanPriceEur),
       businessVanPriceEur: Number(businessVanPriceEur),
       minibusPriceEur: Number(minibusPriceEur),
+      imageUrl: imageUrl.trim() || null,
       h1Heading,
       metaTitle,
       metaDescription,
@@ -493,8 +506,92 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: SEO CONTENT & LIVE GOOGLE SERP PREVIEW (5 COLS) */}
+        {/* RIGHT COLUMN: SEO CONTENT, ROUTE IMAGE & PREVIEWS (5 COLS) */}
         <div className="lg:col-span-5 space-y-6">
+          {/* Card: Route Illustration Image & Landmark Presets */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-brand-600" />
+                <span>Route Illustration Image</span>
+              </h3>
+              {imageUrl && (
+                <button
+                  type="button"
+                  onClick={() => setImageUrl('')}
+                  className="text-[11px] font-bold text-red-600 hover:underline"
+                >
+                  Reset to Auto
+                </button>
+              )}
+            </div>
+
+            {/* Live Image Preview */}
+            <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center">
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt="Route Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-center p-4 text-slate-400 space-y-1">
+                  <ImageIcon className="w-8 h-8 mx-auto opacity-40 text-slate-500" />
+                  <div className="text-xs font-bold text-slate-600">Auto-Matched Route Image</div>
+                  <div className="text-[10px] text-slate-400">Select a preset below or enter a custom image URL</div>
+                </div>
+              )}
+              {imageUrl && (
+                <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-xs text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>Custom Image Active</span>
+                </div>
+              )}
+            </div>
+
+            {/* Custom URL Input */}
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Image URL or Local Path</label>
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="/images/routes/cdg-to-disneyland-paris.jpg or https://..."
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold font-mono focus:outline-none focus:border-brand-500"
+              />
+              <p className="text-[10px] text-slate-500">
+                Select from the popular presets below or paste any custom web image link.
+              </p>
+            </div>
+
+            {/* Quick Presets */}
+            <div className="space-y-2 pt-1">
+              <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
+                Popular Landmark Presets:
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {ROUTE_IMAGE_PRESETS.map((preset) => {
+                  const isSelected = imageUrl === preset.url;
+                  return (
+                    <button
+                      key={preset.url}
+                      type="button"
+                      onClick={() => setImageUrl(preset.url)}
+                      className={`text-[11px] font-bold px-2.5 py-1.5 rounded-xl border transition-all ${
+                        isSelected
+                          ? 'bg-gold-700 text-white border-gold-700 shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
           {/* Card 4: Live Google SERP Preview */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-3">
             <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-3">

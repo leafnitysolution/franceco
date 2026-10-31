@@ -45,9 +45,14 @@ export default async function AdminRoutesPage() {
           >
             <div className="space-y-3">
               <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-[#F7F2E7] border border-[#E5D7BC] flex items-center justify-center text-gold-600 font-bold">
-                    <MapPin className="w-4 h-4" />
+                <div className="flex items-center gap-3">
+                  <div className="relative w-12 h-12 rounded-xl bg-[#F7F2E7] border border-[#E5D7BC] overflow-hidden flex items-center justify-center text-gold-600 font-bold shrink-0 shadow-xs">
+                    {(r as any).imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={(r as any).imageUrl} alt={r.slug} className="w-full h-full object-cover" />
+                    ) : (
+                      <MapPin className="w-5 h-5" />
+                    )}
                   </div>
                   <div>
                     <h3 className="font-serif text-base font-bold text-navy-900">

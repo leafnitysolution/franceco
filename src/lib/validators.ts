@@ -20,6 +20,7 @@ export const routeSchema = z
     economyVanPriceEur: z.coerce.number().positive('Economy Van fare required').max(5000),
     businessVanPriceEur: z.coerce.number().positive('Business Van fare required').max(5000),
     minibusPriceEur: z.coerce.number().positive('Minibus fare required').max(10000).default(180),
+    imageUrl: z.string().trim().optional().nullable(),
     h1Heading: z.string().trim().min(5, 'H1 Heading required').max(200),
     metaTitle: z.string().trim().min(5, 'SEO Meta Title required').max(150),
     metaDescription: z.string().trim().min(10, 'SEO Meta Description required').max(350),

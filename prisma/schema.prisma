@@ -41,7 +41,7 @@ model Route {
   economyVanPriceEur  Float
   businessVanPriceEur Float
   minibusPriceEur     Float    @default(180)
-  
+  imageUrl            String?
   h1Heading           String
   metaTitle           String
   metaDescription     String

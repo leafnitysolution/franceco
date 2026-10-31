@@ -28,6 +28,10 @@ export async function ensureSettingsTable(): Promise<void> {
     await db.$executeRawUnsafe(`
       CREATE UNIQUE INDEX IF NOT EXISTS "SystemSetting_key_key" ON "SystemSetting"("key")
     `);
+    // Ensure Route table has imageUrl column
+    await db.$executeRawUnsafe(`
+      ALTER TABLE "Route" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT
+    `);
     isTableInitialized = true;
   } catch (err) {
     console.warn('[SETTINGS NOTICE] SystemSetting table auto-ensure warning:', err);

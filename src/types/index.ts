@@ -38,6 +38,7 @@ export interface RouteWithLocations {
   economyVanPriceEur: number;
   businessVanPriceEur: number;
   minibusPriceEur: number;
+  imageUrl?: string | null;
   h1Heading: string;
   metaTitle: string;
   metaDescription: string;

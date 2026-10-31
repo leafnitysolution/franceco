@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS "Route" (
     "economyVanPriceEur" DOUBLE PRECISION NOT NULL,
     "businessVanPriceEur" DOUBLE PRECISION NOT NULL,
     "minibusPriceEur" DOUBLE PRECISION NOT NULL DEFAULT 180,
+    "imageUrl" TEXT,
     "h1Heading" TEXT NOT NULL,
     "metaTitle" TEXT NOT NULL,
     "metaDescription" TEXT NOT NULL,
