@@ -25,10 +25,18 @@ const ROUTE_IMAGE_PRESETS = [
   { label: '🏰 Disneyland Paris', url: '/images/routes/cdg-to-disneyland-paris.jpg' },
   { label: '🗼 Paris Eiffel Tower', url: '/images/routes/cdg-to-paris-city.jpg' },
   { label: '🏛️ Arc de Triomphe', url: '/images/routes/orly-to-paris-city.jpg' },
+  { label: '🖼️ Musée du Louvre', url: '/images/routes/paris-louvre.jpg' },
   { label: '👑 Palace of Versailles', url: '/images/routes/paris-to-versailles.jpg' },
+  { label: '🍾 Champagne & Reims', url: '/images/routes/paris-to-champagne.jpg' },
+  { label: '🏰 Fontainebleau Castle', url: '/images/routes/paris-to-fontainebleau.jpg' },
+  { label: '🌸 Monet Gardens Giverny', url: '/images/routes/paris-to-giverny.jpg' },
+  { label: '🏰 Loire Valley Châteaux', url: '/images/routes/paris-to-loire-valley.jpg' },
+  { label: '⛪ Mont Saint-Michel', url: '/images/routes/paris-to-mont-saint-michel.jpg' },
+  { label: '🌊 Normandy D-Day Beaches', url: '/images/routes/paris-to-normandy.jpg' },
   { label: '🎢 Parc Astérix', url: '/images/routes/cdg-to-parc-asterix.jpg' },
-  { label: '🛫 Orly Airport', url: '/images/routes/orly-to-disneyland-paris.jpg' },
-  { label: '✈️ Beauvais Airport', url: '/images/routes/beauvais-to-disneyland-paris.jpg' },
+  { label: '🚆 Eurostar Train Station', url: '/images/routes/paris-train-stations.jpg' },
+  { label: '🛫 Orly Airport', url: '/images/routes/orly-to-paris-city.jpg' },
+  { label: '✈️ Beauvais Airport', url: '/images/routes/beauvais-to-paris-city.jpg' },
 ];
 
 interface RouteFormProps {

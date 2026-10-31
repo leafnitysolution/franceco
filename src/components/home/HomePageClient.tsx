@@ -47,6 +47,37 @@ interface RouteData {
 
 function getRouteImage(slug: string, originCode: string, destCode: string): string {
   const normalized = slug.toLowerCase();
+
+  // 1. Specific Destination Tours & Excursions
+  if (normalized.includes('champagne') || normalized.includes('reims')) {
+    return '/images/routes/paris-to-champagne.jpg';
+  }
+  if (normalized.includes('fontainebleau') || normalized.includes('barbizon')) {
+    return '/images/routes/paris-to-fontainebleau.jpg';
+  }
+  if (normalized.includes('giverny') || normalized.includes('monet')) {
+    return '/images/routes/paris-to-giverny.jpg';
+  }
+  if (normalized.includes('loire') || normalized.includes('chambord') || normalized.includes('amboise')) {
+    return '/images/routes/paris-to-loire-valley.jpg';
+  }
+  if (normalized.includes('mont-saint-michel') || normalized.includes('michel')) {
+    return '/images/routes/paris-to-mont-saint-michel.jpg';
+  }
+  if (normalized.includes('normandy') || normalized.includes('omaha')) {
+    return '/images/routes/paris-to-normandy.jpg';
+  }
+  if (normalized.includes('versailles')) {
+    return '/images/routes/paris-to-versailles.jpg';
+  }
+  if (normalized.includes('asterix')) {
+    return '/images/routes/cdg-to-parc-asterix.jpg';
+  }
+  if (normalized.includes('train') || normalized.includes('gare-du-nord') || normalized.includes('eurostar')) {
+    return '/images/routes/paris-train-stations.jpg';
+  }
+
+  // 2. Specific Airport & Disneyland Route Pairings
   if (normalized.includes('cdg') && normalized.includes('disney')) return '/images/routes/cdg-to-disneyland-paris.jpg';
   if (normalized.includes('orly') && normalized.includes('disney')) return '/images/routes/orly-to-disneyland-paris.jpg';
   if (normalized.includes('beauvais') && normalized.includes('disney')) return '/images/routes/beauvais-to-disneyland-paris.jpg';
@@ -54,11 +85,15 @@ function getRouteImage(slug: string, originCode: string, destCode: string): stri
   if (normalized.includes('orly') && normalized.includes('paris')) return '/images/routes/orly-to-paris-city.jpg';
   if (normalized.includes('beauvais') && normalized.includes('paris')) return '/images/routes/beauvais-to-paris-city.jpg';
   if (normalized.includes('paris') && normalized.includes('disney')) return '/images/routes/paris-to-disneyland.jpg';
-  if (normalized.includes('versailles')) return '/images/routes/paris-to-versailles.jpg';
-  if (normalized.includes('asterix')) return '/images/routes/cdg-to-parc-asterix.jpg';
+
+  // 3. Fallbacks by short code
   if (originCode === 'DLP' || destCode === 'DLP') return '/images/routes/cdg-to-disneyland-paris.jpg';
-  if (originCode === 'PAR' || destCode === 'PAR') return '/images/routes/cdg-to-paris-city.jpg';
-  return '/images/france_transfer_hero.jpg';
+  if (originCode === 'BVA' || destCode === 'BVA') return '/images/routes/beauvais-to-paris-city.jpg';
+  if (originCode === 'ORY' || destCode === 'ORY') return '/images/routes/orly-to-paris-city.jpg';
+  if (originCode === 'CDG' || destCode === 'CDG') return '/images/routes/cdg-to-paris-city.jpg';
+  if (originCode === 'PAR' || destCode === 'PAR') return '/images/routes/paris-louvre.jpg';
+
+  return '/images/routes/cdg-to-paris-city.jpg';
 }
 
 interface HomePageClientProps {
