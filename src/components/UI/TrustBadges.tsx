@@ -64,17 +64,16 @@ export function RepubliqueFrancaiseBadge({
 }) {
   if (variant === 'compact') {
     return (
-      <div className={`inline-flex items-center gap-2 ${className}`}>
-        {/* French Tricolor Flag Block with Marianne silhouette */}
-        <div className="relative w-7 h-5 rounded-[3px] overflow-hidden shadow-xs border border-slate-300 shrink-0 flex">
-          <div className="w-1/3 h-full bg-[#002395]" />
-          <div className="w-1/3 h-full bg-[#FFFFFF] flex items-center justify-center">
-            {/* Minimal Marianne Profile Silhouette */}
-            <svg viewBox="0 0 10 10" className="w-2.5 h-2.5 text-[#002395] fill-current">
-              <path d="M5 1C3.5 1 2.8 2.2 2.8 3.5C2.8 4.2 3.1 4.8 3.5 5.2C3.2 5.8 2.5 6.5 1.5 7C2.5 7.2 3.8 6.8 4.5 6.2C5 6.8 5.8 7 6.8 6.8C8 6.5 8.5 5.2 8.5 4C8.5 2.5 7 1 5 1Z" />
-            </svg>
-          </div>
-          <div className="w-1/3 h-full bg-[#ED2939]" />
+      <div className={`inline-flex items-center gap-2.5 ${className}`}>
+        {/* Official French Marianne & Tricolor Emblem */}
+        <div className="relative h-7 w-12 sm:h-8 sm:w-14 shrink-0 flex items-center justify-center">
+          <Image
+            src="/images/republique_francaise.png"
+            alt="République Française"
+            fill
+            className="object-contain"
+            priority
+          />
         </div>
 
         <div className="text-left leading-tight">
@@ -91,17 +90,17 @@ export function RepubliqueFrancaiseBadge({
 
   return (
     <div
-      className={`p-3 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center gap-3 ${className}`}
+      className={`p-3 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center gap-3.5 ${className}`}
     >
-      {/* Official Government Tricolor Block */}
-      <div className="relative w-12 h-9 rounded-md overflow-hidden shadow-xs border border-slate-300 shrink-0 flex">
-        <div className="w-1/3 h-full bg-[#002395]" />
-        <div className="w-1/3 h-full bg-[#FFFFFF] flex items-center justify-center">
-          <svg viewBox="0 0 12 12" className="w-4 h-4 text-[#002395] fill-current">
-            <path d="M6 1C4 1 3.2 2.5 3.2 4C3.2 4.9 3.6 5.6 4.1 6.1C3.8 6.8 3 7.6 1.8 8.2C3 8.4 4.5 8 5.4 7.2C6 7.9 7 8.2 8.2 7.9C9.6 7.6 10.2 6.1 10.2 4.6C10.2 2.9 8.4 1 6 1Z" />
-          </svg>
-        </div>
-        <div className="w-1/3 h-full bg-[#ED2939]" />
+      {/* Official French Marianne & Tricolor Emblem */}
+      <div className="relative h-10 w-16 shrink-0 flex items-center justify-center">
+        <Image
+          src="/images/republique_francaise.png"
+          alt="République Française"
+          fill
+          className="object-contain"
+          priority
+        />
       </div>
 
       <div className="text-left leading-tight">
@@ -121,7 +120,7 @@ export function RepubliqueFrancaiseBadge({
 
 /**
  * TripAdvisor Travellers' Choice 2025 Award Card
- * Matches official Travellers' Choice 2025 badge with laurel wreath and verified text
+ * Matches official Travellers' Choice 2025 badge with TripAdvisor green logo
  */
 export function TripAdvisorTravellersChoiceCard({
   className = '',
@@ -139,33 +138,26 @@ export function TripAdvisorTravellersChoiceCard({
           : 'bg-white/95 border-slate-200 text-slate-900 shadow-md'
       } ${className}`}
     >
-      {/* Travellers Choice Green Shield Badge */}
-      <div className="shrink-0 w-16 h-20 sm:w-18 sm:h-22 rounded-2xl bg-[#00AF87] text-black flex flex-col items-center justify-between py-2 px-1 shadow-md select-none">
-        {/* Owl + Laurel Wreath */}
-        <div className="relative flex items-center justify-center pt-0.5">
-          {/* Laurel Wreath */}
-          <svg viewBox="0 0 48 32" className="w-12 h-8 text-black fill-current">
-            <path d="M12 24c-2.5-2.2-4.2-5.4-4.8-8.8 1.4.6 3 .9 4.8.8-1.8-1.5-3.1-3.6-3.8-5.8 1.5.4 3.1.5 4.7.2C11 8.8 9.9 7 9.4 5c1.4.3 2.9.4 4.3.2C13 3.6 12.3 2 12 0c2 .8 3.8 2 5.2 3.6 1.4-1.6 3.2-2.8 5.2-3.6-.3 2-1 3.6-1.7 5.2 1.4.2 2.9.1 4.3-.2-.5 2-1.6 3.8-3.5 5.4 1.6.3 3.2.2 4.7-.2-.7 2.2-2 4.3-3.8 5.8 1.8.1 3.4-.2 4.8-.8-.6 3.4-2.3 6.6-4.8 8.8-1.5-1.5-2.6-3.4-3.2-5.5-1.2 2.2-3 4-5.2 5.2-.6-2.1-1.7-4-3.2-5.5-.6 2.1-1.7 4-3.2 5.5z" />
-          </svg>
-          {/* Owl inside wreath */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <TripAdvisorLogo className="w-5 h-5 text-black" />
-          </div>
-        </div>
-        {/* Year */}
-        <span className="text-base sm:text-lg font-black tracking-tighter text-black leading-none">
-          2025
-        </span>
+      {/* TripAdvisor Official Logo Icon Badge */}
+      <div className="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-md border border-[#00AA6C]/30 bg-[#00AA6C] flex items-center justify-center">
+        <Image
+          src="/images/tripadvisor_icon.jpg"
+          alt="TripAdvisor Official Award"
+          fill
+          className="object-cover"
+          priority
+        />
       </div>
 
       {/* Text Info */}
       <div className="space-y-1 text-left min-w-0">
         <div
-          className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
+          className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
             isDark ? 'text-slate-300' : 'text-slate-500'
           }`}
         >
-          TRIPADVISOR TRAVELLERS&apos; CHOICE
+          <span>TRIPADVISOR TRAVELLERS&apos; CHOICE</span>
+          <span className="text-[9px] font-black bg-[#00AA6C] text-black px-1.5 py-0.5 rounded font-mono">2025</span>
         </div>
         <div className="text-sm sm:text-base font-bold leading-snug">
           Awarded for consistent great reviews from global travellers.
