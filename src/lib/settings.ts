@@ -28,9 +28,13 @@ export async function ensureSettingsTable(): Promise<void> {
     await db.$executeRawUnsafe(`
       CREATE UNIQUE INDEX IF NOT EXISTS "SystemSetting_key_key" ON "SystemSetting"("key")
     `);
-    // Ensure Route table has imageUrl column
+    // Ensure Route and Review tables have all required columns
     await db.$executeRawUnsafe(`
-      ALTER TABLE "Route" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT
+      ALTER TABLE "Route" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "title" TEXT;
+      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "authorAvatar" TEXT;
+      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "source" TEXT DEFAULT 'TripAdvisor';
     `);
     isTableInitialized = true;
   } catch (err) {

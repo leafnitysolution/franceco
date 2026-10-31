@@ -83,6 +83,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS "Route_slug_key" ON "Route"("slug");
 CREATE INDEX IF NOT EXISTS "Route_originId_idx" ON "Route"("originId");
 CREATE INDEX IF NOT EXISTS "Route_destinationId_idx" ON "Route"("destinationId");
 
+-- Backwards-compatibility for existing Route tables
+ALTER TABLE "Route" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+
 -- -----------------------------------------------------------------------------
 -- 4. Table: Booking
 -- -----------------------------------------------------------------------------
