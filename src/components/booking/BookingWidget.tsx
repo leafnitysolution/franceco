@@ -8,6 +8,7 @@ import { LocationItem, CategoryItem } from '@/types';
 import { VehicleCard } from './VehicleCard';
 import { LocationDropdown } from './LocationDropdown';
 import { findZoneRoute } from '@/lib/zoneResolver';
+import { TripAdvisorLogo } from '@/components/UI/TrustBadges';
 import { useLanguage } from '@/lib/LanguageContext';
 import { CountryCodePhoneInput } from '@/components/UI/CountryCodePhoneInput';
 import {
@@ -1122,10 +1123,15 @@ export function BookingWidget({
           href="https://www.tripadvisor.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="border border-[#E5D7BC] bg-[#F7F2E7] hover:bg-[#EAE0CA] transition-colors rounded-lg px-2.5 py-1 text-center group"
+          className="border border-[#E5D7BC] bg-[#F7F2E7] hover:bg-[#EAE0CA] transition-colors rounded-lg px-3 py-1 flex items-center gap-2 group shadow-2xs"
         >
-          <div className="text-[8px] font-bold text-gold-800 uppercase tracking-wider group-hover:underline">Tripadvisor</div>
-          <div className="text-[9px] font-bold text-navy-900 leading-none">Ranked #6 Travellers' Choice</div>
+          <TripAdvisorLogo className="w-5 h-5 shrink-0" />
+          <div className="text-left">
+            <div className="text-[9px] font-black text-slate-800 leading-tight group-hover:underline flex items-center gap-1">
+              <span>Tripadvisor</span>
+            </div>
+            <div className="text-[9px] font-bold text-navy-900 leading-none">Ranked #6 Travellers' Choice</div>
+          </div>
         </a>
       </div>
     </div>

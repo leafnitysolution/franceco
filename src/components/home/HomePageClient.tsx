@@ -2,18 +2,22 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { BookingWidget } from '@/components/booking/BookingWidget';
 import { FleetShowcase } from '@/components/UI/FleetShowcase';
 import { CustomerReviews } from '@/components/UI/CustomerReviews';
 import { FaqAccordion } from '@/components/UI/FaqAccordion';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useBookingStore } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
+import { TripAdvisorLogo, RepubliqueFrancaiseBadge } from '@/components/UI/TrustBadges';
 import {
   ShieldCheck,
   Clock,
   Award,
   Sparkles,
   ArrowRight,
+  ChevronRight,
   MapPin,
   CheckCircle2,
   Users,
@@ -27,12 +31,33 @@ import { formatCurrency } from '@/lib/utils';
 interface RouteData {
   id: string;
   slug: string;
+  originId?: string;
+  destinationId?: string;
   distanceKm: number;
   estDurationMinutes: number;
   sedanPriceEur: number;
-  h1Heading: string;
+  economyVanPriceEur?: number;
+  businessVanPriceEur?: number;
+  minibusPriceEur?: number;
+  h1Heading?: string;
   origin: { shortCode: string; name: string };
   destination: { shortCode: string; name: string };
+}
+
+function getRouteImage(slug: string, originCode: string, destCode: string): string {
+  const normalized = slug.toLowerCase();
+  if (normalized.includes('cdg') && normalized.includes('disney')) return '/images/routes/cdg-to-disneyland-paris.jpg';
+  if (normalized.includes('orly') && normalized.includes('disney')) return '/images/routes/orly-to-disneyland-paris.jpg';
+  if (normalized.includes('beauvais') && normalized.includes('disney')) return '/images/routes/beauvais-to-disneyland-paris.jpg';
+  if (normalized.includes('cdg') && normalized.includes('paris')) return '/images/routes/cdg-to-paris-city.jpg';
+  if (normalized.includes('orly') && normalized.includes('paris')) return '/images/routes/orly-to-paris-city.jpg';
+  if (normalized.includes('beauvais') && normalized.includes('paris')) return '/images/routes/beauvais-to-paris-city.jpg';
+  if (normalized.includes('paris') && normalized.includes('disney')) return '/images/routes/paris-to-disneyland.jpg';
+  if (normalized.includes('versailles')) return '/images/routes/paris-to-versailles.jpg';
+  if (normalized.includes('asterix')) return '/images/routes/cdg-to-parc-asterix.jpg';
+  if (originCode === 'DLP' || destCode === 'DLP') return '/images/routes/cdg-to-disneyland-paris.jpg';
+  if (originCode === 'PAR' || destCode === 'PAR') return '/images/routes/cdg-to-paris-city.jpg';
+  return '/images/france_transfer_hero.jpg';
 }
 
 interface HomePageClientProps {
@@ -44,6 +69,36 @@ interface HomePageClientProps {
 
 export function HomePageClient({ locations, categories, featuredRoutes, defaultFaqs }: HomePageClientProps) {
   const { t } = useLanguage();
+  const router = useRouter();
+  const store = useBookingStore();
+
+  const handleBookRoute = (route: RouteData) => {
+    store.setServiceMode('TRANSFER');
+    const orig = locations.find((l) => l.id === route.originId || l.shortCode === route.origin.shortCode) || {
+      id: route.originId || `loc-${route.origin.shortCode.toLowerCase()}`,
+      name: route.origin.name,
+      shortCode: route.origin.shortCode,
+      category: 'AIRPORT',
+    };
+    const dest = locations.find((l) => l.id === route.destinationId || l.shortCode === route.destination.shortCode) || {
+      id: route.destinationId || `loc-${route.destination.shortCode.toLowerCase()}`,
+      name: route.destination.name,
+      shortCode: route.destination.shortCode,
+      category: 'CITY_CENTER',
+    };
+    store.setOrigin(orig as any);
+    store.setDestination(dest as any);
+    store.setRoutePricing({
+      sedan: route.sedanPriceEur,
+      economyVan: route.economyVanPriceEur || Math.round(route.sedanPriceEur * 1.3),
+      businessVan: route.businessVanPriceEur || Math.round(route.sedanPriceEur * 1.7),
+      minibus: route.minibusPriceEur || Math.round(route.sedanPriceEur * 2.5),
+    });
+    store.setEstimatedKm(route.distanceKm);
+    store.setEstimatedDurationMinutes(route.estDurationMinutes);
+    store.setIsFixedZoneRate(true, `${route.origin.name} ↔ ${route.destination.name}`);
+    router.push('/book');
+  };
 
   return (
     <div className="space-y-16 pb-20 bg-[#FBF9F5] text-navy-900">
@@ -113,7 +168,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
 
       {/* TRUST SPECS & STATS BAR */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5D7BC]/70 shadow-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 text-center">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5D7BC]/70 shadow-md grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 text-center items-center">
           <div className="p-2 space-y-0.5">
             <div className="flex items-center justify-center gap-1 text-amber-500 text-xs">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
@@ -127,19 +182,23 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
             <div className="text-[10px] text-slate-500 font-medium">{t('verifiedReviewsCount')}</div>
           </div>
 
-          <div className="p-2 space-y-0.5">
-            <div className="font-bold text-gold-700 text-xs uppercase tracking-wider">Tripadvisor</div>
-            <div className="text-[10px] text-slate-500 font-medium">{t('travelersChoice')}</div>
+          {/* OFFICIAL TRIPADVISOR BADGE WITH VECTOR LOGO */}
+          <div className="p-2 flex flex-col items-center justify-center space-y-0.5">
+            <div className="flex items-center justify-center gap-1.5">
+              <TripAdvisorLogo className="w-5 h-5 shrink-0" />
+              <span className="font-black text-navy-900 text-xs tracking-tight">Tripadvisor</span>
+            </div>
+            <div className="text-[10px] text-slate-500 font-medium">Ranked #6 Travellers' Choice</div>
+          </div>
+
+          {/* OFFICIAL LICENSED COMPANY - RÉPUBLIQUE FRANÇAISE BADGE */}
+          <div className="p-2 flex items-center justify-center">
+            <RepubliqueFrancaiseBadge variant="compact" />
           </div>
 
           <div className="p-2 space-y-0.5">
             <div className="font-bold text-navy-900 text-xs">{t('fixedPricingBadge')}</div>
             <div className="text-[10px] text-slate-500 font-medium">{t('noHiddenFees')}</div>
-          </div>
-
-          <div className="p-2 space-y-0.5">
-            <div className="font-bold text-navy-900 text-xs">{t('zeroDeposit')}</div>
-            <div className="text-[10px] text-slate-500 font-medium">{t('payOnArrivalBadge')}</div>
           </div>
 
           <div className="p-2 space-y-0.5">
@@ -164,47 +223,74 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredRoutes.map((route) => (
-            <Link
-              key={route.id}
-              href={`/transfers/${route.slug}`}
-              className="bg-white border border-[#E5D7BC]/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all space-y-4 group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-xl bg-[#F7F2E7] border border-[#E5D7BC] flex items-center justify-center text-gold-600 group-hover:scale-105 transition-transform">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <span className="text-xs font-bold text-gold-800 bg-[#F7F2E7] px-2.5 py-1 rounded-md border border-[#E5D7BC]">
-                  {t('from')} {formatCurrency(route.sedanPriceEur)}
-                </span>
-              </div>
+          {featuredRoutes.map((route) => {
+            const imgPath = getRouteImage(route.slug, route.origin.shortCode, route.destination.shortCode);
+            return (
+              <div
+                key={route.id}
+                className="bg-white border border-[#E5D7BC]/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group"
+              >
+                <div className="flex gap-4">
+                  {/* Left: Illustrative Route Picture */}
+                  <div className="relative w-28 sm:w-32 h-28 sm:h-32 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-100">
+                    <Image
+                      src={imgPath}
+                      alt={`Transfer from ${route.origin.name} to ${route.destination.name}`}
+                      fill
+                      sizes="(max-width: 640px) 120px, 140px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/65 backdrop-blur-xs text-[9px] font-bold text-white flex items-center gap-1">
+                      <Compass className="w-2.5 h-2.5 text-gold-400" />
+                      <span>{route.distanceKm} km</span>
+                    </div>
+                  </div>
 
-              <div className="space-y-1">
-                <h3 className="font-serif text-xl font-bold text-navy-900 group-hover:text-gold-600 transition-colors">
-                  {route.origin.shortCode} → {route.destination.shortCode}
-                </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  {route.origin.name} → {route.destination.name}
-                </p>
-              </div>
+                  {/* Right: Route Details & Price */}
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-start justify-between gap-1">
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-navy-900 group-hover:text-gold-700 transition-colors leading-snug line-clamp-2">
+                        Transfers from {route.origin.name} to {route.destination.name}
+                      </h3>
+                      <div className="text-right shrink-0">
+                        <span className="text-base sm:text-lg font-black text-rose-600 block leading-tight">
+                          {formatCurrency(route.sedanPriceEur)}
+                        </span>
+                      </div>
+                    </div>
 
-              <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 pt-2 border-t border-slate-100">
-                <div className="flex items-center gap-1">
-                  <Compass className="w-3.5 h-3.5 text-gold-600" />
-                  <span>{route.distanceKm} km</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-gold-600" />
-                  <span>~{route.estDurationMinutes} {t('mins')}</span>
-                </div>
-              </div>
+                    <div className="text-[11px] font-semibold text-slate-500">
+                      Private transfer
+                    </div>
 
-              <div className="pt-2 text-xs font-bold text-gold-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                <span>{t('viewRoute')}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                    <p className="text-[11px] text-slate-400 line-clamp-2 leading-tight">
+                      Door-to-door transfer with free flight delay tracking and child seats.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bottom Action Buttons */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleBookRoute(route)}
+                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <span>Book Now</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+
+                  <Link
+                    href={`/transfers/${route.slug}`}
+                    className="text-xs font-bold text-slate-500 hover:text-gold-700 flex items-center gap-0.5 transition-colors"
+                  >
+                    <span>View Details</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
 
