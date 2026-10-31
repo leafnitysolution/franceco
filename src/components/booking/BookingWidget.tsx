@@ -7,6 +7,7 @@ import { useBookingStore, ServiceMode } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
 import { VehicleCard } from './VehicleCard';
 import { LocationDropdown } from './LocationDropdown';
+import { findZoneRoute } from '@/lib/zoneResolver';
 import { useLanguage } from '@/lib/LanguageContext';
 import { CountryCodePhoneInput } from '@/components/UI/CountryCodePhoneInput';
 import {
@@ -104,29 +105,47 @@ export function BookingWidget({
       return;
     }
 
-    const matched = routes?.find(
-      (r) =>
-        (r.originId === store.origin?.id && r.destinationId === store.destination?.id) ||
-        (r.originId === store.destination?.id && r.destinationId === store.origin?.id) ||
-        (r.origin?.shortCode === store.origin?.shortCode && r.destination?.shortCode === store.destination?.shortCode) ||
-        (r.origin?.shortCode === store.destination?.shortCode && r.destination?.shortCode === store.origin?.shortCode)
-    );
+    // 1. Zone-Based Fixed Route Check:
+    // If either side is a custom address matching a configured zone (e.g. Eiffel Tower ➔ CDG Airport),
+    // lock in the fixed database route rate instead of variable per-km pricing.
+    const zoneMatch = routes ? findZoneRoute(store.origin, store.destination, routes) : null;
 
-    if (matched) {
-      store.setRoutePricing({
-        sedan: matched.sedanPriceEur ?? defaultSedanPrice,
-        economyVan: matched.economyVanPriceEur ?? defaultEconomyVanPrice,
-        businessVan: matched.businessVanPriceEur ?? defaultBusinessVanPrice,
-        minibus: matched.minibusPriceEur ?? defaultMinibusPrice,
-      });
-      store.setEstimatedKm(matched.distanceKm || 35);
-      store.setEstimatedDurationMinutes(matched.estDurationMinutes || 40);
+    if (zoneMatch) {
+      store.setRoutePricing(zoneMatch.pricing);
+      store.setIsFixedZoneRate(true, zoneMatch.zoneLabel);
       store.setDistanceRouteCalculated(false);
-      store.setIsCalculatingDistance(false);
+
+      // Background distance fetch to show exact travel time & km
+      store.setIsCalculatingDistance(true);
+      fetch('/api/maps/distance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: store.origin.name,
+          destination: store.destination.name,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (!isCancelled && data.success) {
+            store.setEstimatedKm(data.distanceKm || zoneMatch.distanceKm);
+            store.setEstimatedDurationMinutes(data.durationMinutes || zoneMatch.estDurationMinutes);
+          }
+        })
+        .catch(() => {
+          if (!isCancelled) {
+            store.setEstimatedKm(zoneMatch.distanceKm);
+            store.setEstimatedDurationMinutes(zoneMatch.estDurationMinutes);
+          }
+        })
+        .finally(() => {
+          if (!isCancelled) store.setIsCalculatingDistance(false);
+        });
       return;
     }
 
-    // Dynamic distance calculation via Routes API
+    // 2. Dynamic distance calculation via Routes API (for unconfigured routes outside fixed zones)
+    store.setIsFixedZoneRate(false, null);
     store.setIsCalculatingDistance(true);
     fetch('/api/maps/distance', {
       method: 'POST',
@@ -142,7 +161,10 @@ export function BookingWidget({
           store.setRoutePricing(data.pricing);
           store.setEstimatedKm(data.distanceKm);
           store.setEstimatedDurationMinutes(data.durationMinutes);
-          store.setDistanceRouteCalculated(true);
+          store.setDistanceRouteCalculated(!data.isFixedZoneRate);
+          if (data.isFixedZoneRate) {
+            store.setIsFixedZoneRate(true, data.matchedZoneLabel);
+          }
         }
       })
       .catch((err) => {
@@ -536,7 +558,7 @@ export function BookingWidget({
                             : 'text-slate-700 bg-slate-200/80'
                         }`}
                       >
-                        {store.distanceRouteCalculated ? 'Live Distance Rate' : 'Fixed Hub Rate'}
+                        {store.isFixedZoneRate ? 'Fixed Zone Rate' : store.distanceRouteCalculated ? 'Live Distance Rate' : 'Fixed Hub Rate'}
                       </span>
                     </div>
                   )}

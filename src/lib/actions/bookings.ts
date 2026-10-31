@@ -6,6 +6,7 @@ import { generateBookingRef } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
 import { sendBookingConfirmationEmails } from '@/lib/email';
 import { getAdminSession } from '@/lib/auth';
+import { findZoneRoute } from '@/lib/zoneResolver';
 import { headers } from 'next/headers';
 
 // Simple In-Memory Sliding Window Rate Limiter (5 bookings per hour per IP)
@@ -90,8 +91,9 @@ export async function createBookingAction(formData: BookingFormValues) {
     // 5. SERVER-SIDE PRICE RECALCULATION (Eliminate Client Price Tampering Risk)
     let calculatedOneWayFare = 70; // Fallback standard fare
 
+    let dbRoute = null;
     if (validated.originId && validated.destinationId) {
-      const dbRoute = await db.route.findFirst({
+      dbRoute = await db.route.findFirst({
         where: {
           OR: [
             { originId: validated.originId, destinationId: validated.destinationId },
@@ -100,12 +102,33 @@ export async function createBookingAction(formData: BookingFormValues) {
           isActive: true,
         },
       });
+    }
 
-      if (dbRoute) {
-        if (validated.vehicleTier === 'SEDAN') calculatedOneWayFare = dbRoute.sedanPriceEur;
-        else if (validated.vehicleTier === 'ECONOMY_VAN') calculatedOneWayFare = dbRoute.economyVanPriceEur;
-        else if (validated.vehicleTier === 'BUSINESS_VAN') calculatedOneWayFare = dbRoute.businessVanPriceEur;
-        else if (validated.vehicleTier === 'MINIBUS') calculatedOneWayFare = dbRoute.minibusPriceEur;
+    if (dbRoute) {
+      if (validated.vehicleTier === 'SEDAN') calculatedOneWayFare = dbRoute.sedanPriceEur;
+      else if (validated.vehicleTier === 'ECONOMY_VAN') calculatedOneWayFare = dbRoute.economyVanPriceEur;
+      else if (validated.vehicleTier === 'BUSINESS_VAN') calculatedOneWayFare = dbRoute.businessVanPriceEur;
+      else if (validated.vehicleTier === 'MINIBUS') calculatedOneWayFare = dbRoute.minibusPriceEur;
+    } else {
+      // Zone Resolution Check for Custom Addresses (e.g. Eiffel Tower ➔ CDG Airport)
+      try {
+        const allRoutes = await db.route.findMany({
+          where: { isActive: true },
+          include: { origin: true, destination: true },
+        });
+        const zoneMatch = findZoneRoute(
+          { id: validated.originId, name: validated.pickupAddress },
+          { id: validated.destinationId, name: validated.dropoffAddress },
+          allRoutes
+        );
+        if (zoneMatch) {
+          if (validated.vehicleTier === 'SEDAN') calculatedOneWayFare = zoneMatch.pricing.sedan;
+          else if (validated.vehicleTier === 'ECONOMY_VAN') calculatedOneWayFare = zoneMatch.pricing.economyVan;
+          else if (validated.vehicleTier === 'BUSINESS_VAN') calculatedOneWayFare = zoneMatch.pricing.businessVan;
+          else if (validated.vehicleTier === 'MINIBUS') calculatedOneWayFare = zoneMatch.pricing.minibus;
+        }
+      } catch (err) {
+        console.warn('Server-side zone matching check skipped:', err);
       }
     }
 

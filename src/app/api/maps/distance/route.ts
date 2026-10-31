@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSetting } from '@/lib/settings';
+import { db } from '@/lib/db';
+import { findZoneRoute } from '@/lib/zoneResolver';
 
 interface RouteCacheEntry {
   distanceKm: number;
   durationMinutes: number;
   originAddress: string;
   destinationAddress: string;
+  isFixedZoneRate: boolean;
+  matchedZoneLabel?: string;
   pricing: {
     sedan: number;
     economyVan: number;
@@ -81,6 +85,8 @@ export async function POST(req: NextRequest) {
         distanceKm: cached.distanceKm,
         durationMinutes: cached.durationMinutes,
         pricing: cached.pricing,
+        isFixedZoneRate: cached.isFixedZoneRate || false,
+        matchedZoneLabel: cached.matchedZoneLabel,
         originAddress: cached.originAddress,
         destinationAddress: cached.destinationAddress,
         cached: true,
@@ -146,13 +152,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const pricing = calculateTierPrices(distanceKm);
+    // 3. Zone-Based Fixed Pricing Check
+    // If endpoints belong to a predefined fixed route (e.g. CDG ↔ Paris City Center),
+    // apply the database route rate regardless of individual street distance.
+    let matchedZone = null;
+    try {
+      const dbRoutes = await db.route.findMany({
+        where: { isActive: true },
+        include: { origin: true, destination: true },
+      });
+      matchedZone = findZoneRoute(body.originLocation || origin, body.destinationLocation || destination, dbRoutes);
+    } catch (dbErr) {
+      console.warn('Zone route resolution DB check skipped:', dbErr);
+    }
+
+    const isFixedZoneRate = Boolean(matchedZone);
+    const matchedZoneLabel = matchedZone?.zoneLabel;
+    const pricing = matchedZone ? matchedZone.pricing : calculateTierPrices(distanceKm);
 
     const resultEntry: RouteCacheEntry = {
       distanceKm,
       durationMinutes,
       originAddress,
       destinationAddress,
+      isFixedZoneRate,
+      matchedZoneLabel,
       pricing,
       cachedAt: Date.now(),
     };
@@ -165,6 +189,8 @@ export async function POST(req: NextRequest) {
       distanceKm,
       durationMinutes,
       pricing,
+      isFixedZoneRate,
+      matchedZoneLabel,
       originAddress,
       destinationAddress,
       cached: false,

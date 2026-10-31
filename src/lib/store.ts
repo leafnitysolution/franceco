@@ -35,6 +35,8 @@ interface BookingStoreState {
   estimatedDurationMinutes: number;
   isCalculatingDistance: boolean;
   distanceRouteCalculated: boolean;
+  isFixedZoneRate: boolean;
+  matchedZoneName: string | null;
 
   // Custom price overrides per vehicle tier from active route
   sedanPriceEur: number;
@@ -67,6 +69,7 @@ interface BookingStoreState {
   setEstimatedDurationMinutes: (minutes: number) => void;
   setIsCalculatingDistance: (loading: boolean) => void;
   setDistanceRouteCalculated: (calculated: boolean) => void;
+  setIsFixedZoneRate: (isFixed: boolean, zoneName?: string | null) => void;
   setCustomerDetails: (details: { name: string; email: string; phone: string; notes?: string }) => void;
   setRoutePricing: (prices: { sedan: number; economyVan: number; businessVan: number; minibus?: number }) => void;
   openModal: () => void;
@@ -144,6 +147,8 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   setEstimatedDurationMinutes: (minutes) => set({ estimatedDurationMinutes: Math.max(1, minutes) }),
   setIsCalculatingDistance: (loading) => set({ isCalculatingDistance: loading }),
   setDistanceRouteCalculated: (calculated) => set({ distanceRouteCalculated: calculated }),
+  setIsFixedZoneRate: (isFixed, zoneName = null) =>
+    set({ isFixedZoneRate: isFixed, matchedZoneName: zoneName || null }),
   setCustomerDetails: (details) =>
     set({
       customerName: details.name,
@@ -189,6 +194,8 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       estimatedDurationMinutes: 40,
       isCalculatingDistance: false,
       distanceRouteCalculated: false,
+      isFixedZoneRate: false,
+      matchedZoneName: null,
       isModalOpen: false,
       currentStep: 1,
     }),
