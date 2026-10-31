@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/auth';
 import { writeFile, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,8 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
+    const requestedFolder = ((formData.get('folder') as string) || 'routes').toLowerCase();
+    const folder = requestedFolder === 'reviews' ? 'reviews' : 'routes';
 
     if (!file) {
       return NextResponse.json({ error: 'No image file provided.' }, { status: 400 });
@@ -40,15 +43,27 @@ export async function POST(req: NextRequest) {
       .toLowerCase()
       .replace(/[^a-z0-9_-]/g, '_')
       .slice(0, 30);
-    const uniqueName = `route_${sanitizedBase || 'custom'}_${Date.now()}${cleanExt}`;
+    const uniqueName = `${folder}_${sanitizedBase || 'custom'}_${Date.now()}${cleanExt}`;
 
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'routes');
+    // 1. Primary write to persistent public uploads directory
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', folder);
     await mkdir(uploadDir, { recursive: true });
-
     const filePath = path.join(uploadDir, uniqueName);
     await writeFile(filePath, buffer);
 
-    const publicUrl = `/uploads/routes/${uniqueName}`;
+    // 2. If Next.js standalone folder exists, also mirror write so it serves immediately
+    const standaloneUploadDir = path.join(process.cwd(), '.next', 'standalone', 'public', 'uploads', folder);
+    if (existsSync(path.join(process.cwd(), '.next', 'standalone'))) {
+      try {
+        await mkdir(standaloneUploadDir, { recursive: true });
+        await writeFile(path.join(standaloneUploadDir, uniqueName), buffer);
+      } catch (mirrorErr) {
+        // Non-critical mirror write
+        console.warn('Standalone mirror write warning:', mirrorErr);
+      }
+    }
+
+    const publicUrl = `/uploads/${folder}/${uniqueName}`;
 
     return NextResponse.json({ success: true, url: publicUrl });
   } catch (err: any) {

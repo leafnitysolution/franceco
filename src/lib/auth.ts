@@ -1,13 +1,16 @@
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@fastforwardshuttle.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123456';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const SESSION_COOKIE_NAME = 'pgt_admin_v2';
-const SECRET = process.env.JWT_SECRET || 'francego_shuttle_super_secret_key_2026';
+const SECRET = process.env.JWT_SECRET || '';
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function signPayload(payload: string): string {
+  if (!SECRET) {
+    throw new Error('CRITICAL: JWT_SECRET environment variable is not configured.');
+  }
   return crypto.createHmac('sha256', SECRET).update(payload).digest('hex');
 }
 
@@ -42,6 +45,10 @@ async function verifyToken(token: string): Promise<boolean> {
 }
 
 export async function verifyAdminCredentials(email: string, pass: string): Promise<boolean> {
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    console.error('CRITICAL: ADMIN_EMAIL or ADMIN_PASSWORD is not set in environment variables.');
+    return false;
+  }
   const cleanEmail = email.trim().toLowerCase();
   const expectedEmail = ADMIN_EMAIL.trim().toLowerCase();
   const emailMatch =

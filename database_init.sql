@@ -14,6 +14,9 @@
 
 BEGIN;
 
+-- Force UTF-8 client encoding for accents, euro signs and special characters
+SET client_encoding = 'UTF8';
+
 -- -----------------------------------------------------------------------------
 -- 1. Table: LocationCategory
 -- -----------------------------------------------------------------------------
@@ -466,31 +469,48 @@ VALUES
 ON CONFLICT ("slug") DO NOTHING;
 
 -- 4. Insert Verified Customer Reviews
-INSERT INTO "Review" ("id", "authorName", "location", "routeText", "rating", "comment", "isPublished", "createdAt")
+INSERT INTO "Review" ("id", "authorName", "location", "routeText", "rating", "title", "comment", "imageUrl", "authorAvatar", "source", "isPublished", "createdAt")
 VALUES
     (
-        'rev_1', 'Sarah & Family', 'London, UK', 'CDG Airport → Disneyland Paris', 5,
+        'rev_1', 'Sarah & Family', 'London, UK 🇬🇧', 'CDG Airport → Disneyland Paris', 5,
+        'Outstanding chauffeur, kids loved the trip!',
         'Outstanding service! Our chauffeur met us directly inside CDG Terminal 2F holding a sign with my name. He helped with all 4 of our heavy suitcases and had baby & booster seats already installed in the clean Mercedes van. Fantastic start to our Disney holiday!',
+        '/images/reviews/review_family_travel.jpg', '/images/reviews/avatar_sarah.jpg', 'TripAdvisor',
         true, CURRENT_TIMESTAMP
     ),
     (
-        'rev_2', 'Michael R.', 'New York, USA', 'Orly Airport → Paris City Center', 5,
-        'Punctual, luxurious vehicle, and polite English-speaking driver. The fare was 100% fixed at 60€ with no meters or hidden fees. Paid the driver upon arrival at our hotel. Highly recommended!',
+        'rev_2', 'Michael & David', 'New York, USA 🇺🇸', 'Orly Airport → Paris City Center', 5,
+        'Punctual, luxurious van & fixed transparent fare',
+        'Punctual, luxurious vehicle, and polite English-speaking driver. The fare was 100% fixed with no meters or hidden fees. Paid the driver upon arrival at our hotel. Highly recommended!',
+        '/images/reviews/review_luxury_van.jpg', '/images/reviews/avatar_michael.jpg', 'Google Review',
         true, CURRENT_TIMESTAMP
     ),
     (
-        'rev_3', 'Elena & David', 'Madrid, Spain', 'Beauvais Airport → Disneyland Paris', 5,
+        'rev_3', 'Elena & Lucas', 'Madrid, Spain 🇪🇸', 'Beauvais Airport → Disneyland Paris', 5,
+        'Direct hassle-free transfer from Beauvais to Disney',
         'Beauvais Airport is quite far from Disney, but our driver made the trip smooth and comfortable. Free booster seats for our kids, smooth driving, and great recommendations for Paris sightseeing.',
+        '/images/reviews/review_family_disney.jpg', '/images/reviews/avatar_elena.jpg', 'TripAdvisor',
         true, CURRENT_TIMESTAMP
     ),
     (
-        'rev_4', 'Jean-Pierre M.', 'Montreal, Canada', 'Paris City → Château de Versailles', 5,
+        'rev_4', 'Jean-Pierre & Sophie', 'Montreal, Canada 🇨🇦', 'Paris City → Château de Versailles', 5,
+        'Arrived early, very polite and impeccable Mercedes',
         'Booked a private chauffeur for our family trip to Versailles Palace. The driver arrived 10 minutes early at our Paris hotel lobby and was waiting right on time for our return pickup. 10/10 service!',
+        '/images/reviews/review_couple_paris.jpg', '/images/reviews/avatar_jean.jpg', 'TripAdvisor',
         true, CURRENT_TIMESTAMP
     ),
     (
-        'rev_5', 'Arthur C.', 'Manchester, UK', 'Paris → Giverny Monet Gardens', 5,
+        'rev_5', 'Arthur & Emma', 'Manchester, UK 🇬🇧', 'Paris → Giverny Monet Gardens', 5,
+        'Chauffeur was waiting right at terminal arrivals',
         'Wonderful day trip to Claude Monet gardens in Giverny. Our driver was extremely accommodating, courteous, and professional!',
+        '/images/reviews/review_airport_meet.jpg', '/images/reviews/avatar_emma.jpg', 'TripAdvisor',
+        true, CURRENT_TIMESTAMP
+    ),
+    (
+        'rev_6', 'Robert Davis', 'Chicago, USA 🇺🇸', 'Paris City Center → Champagne Region Tour', 5,
+        'Executive business class service at its best',
+        'Executive business class service at its best. Spotless Mercedes van, polite driver, and complete peace of mind throughout our Paris travels.',
+        '/images/reviews/review_business_client.jpg', '/images/reviews/avatar_david.jpg', 'Google Review',
         true, CURRENT_TIMESTAMP
     )
 ON CONFLICT ("id") DO NOTHING;

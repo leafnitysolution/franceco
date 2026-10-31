@@ -74,7 +74,8 @@ export async function GET(req: NextRequest) {
       process.env.GOOGLE_MAPS_API_KEY ||
       process.env.GOOGLE_PLACES_API_KEY ||
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564';
+      (process.env.GOOGLE_MAPS_API_KEY || '');
+    if (!apiKey) return NextResponse.json({ predictions: [] });
 
     const payload: Record<string, any> = {
       input,

@@ -46,7 +46,7 @@ export async function GET() {
     process.env.GOOGLE_MAPS_API_KEY ||
     process.env.GOOGLE_PLACES_API_KEY ||
     process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-    'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564';
+    (process.env.GOOGLE_MAPS_API_KEY || '');
   const googlePlaceId = (await getSetting('GOOGLE_PLACE_ID')) || process.env.GOOGLE_PLACE_ID || 'ChIJK_W2Fipt5kcRCOpTeqfLY6g';
   const googleReviewsUrl = (await getSetting('GOOGLE_REVIEWS_URL')) || process.env.GOOGLE_REVIEWS_URL || 'https://maps.app.goo.gl/DwYGzJ9yDqszXAPW7';
 

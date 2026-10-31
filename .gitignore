@@ -41,3 +41,10 @@ next-env.d.ts
 prisma/dev.db
 scratch/
 
+# User uploads (preserved across git pulls)
+public/uploads/*
+!public/uploads/.gitkeep
+!public/uploads/routes/.gitkeep
+!public/uploads/reviews/.gitkeep
+
+

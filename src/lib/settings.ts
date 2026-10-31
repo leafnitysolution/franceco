@@ -43,7 +43,7 @@ export async function ensureSettingsTable(): Promise<void> {
  */
 export const DEFAULT_SETTINGS: Record<string, string> = {
   // Google Maps Platform
-  GOOGLE_MAPS_API_KEY: 'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564',
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || '',
   GOOGLE_PLACE_ID: 'ChIJK_W2Fipt5kcRCOpTeqfLY6g',
   GOOGLE_REVIEWS_URL: 'https://maps.app.goo.gl/DwYGzJ9yDqszXAPW7',
 

@@ -217,6 +217,13 @@ server {
     # Client upload size for route images / attachments
     client_max_body_size 20M;
 
+    # Persistent uploaded media (serves directly from disk, never wiped on rebuilds)
+    location /uploads/ {
+        alias /var/www/francego/public/uploads/;
+        expires 30d;
+        access_log off;
+    }
+
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;

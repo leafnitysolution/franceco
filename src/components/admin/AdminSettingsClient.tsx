@@ -346,7 +346,7 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
                 type={showGoogleKey ? 'text' : 'password'}
                 value={settings.GOOGLE_MAPS_API_KEY || ''}
                 onChange={(e) => handleInputChange('GOOGLE_MAPS_API_KEY', e.target.value)}
-                placeholder="AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564"
+                placeholder=""
                 className="w-full px-4 py-2.5 pr-20 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">

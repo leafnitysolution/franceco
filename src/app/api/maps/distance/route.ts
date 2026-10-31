@@ -99,7 +99,8 @@ export async function POST(req: NextRequest) {
       process.env.GOOGLE_MAPS_API_KEY ||
       process.env.GOOGLE_PLACES_API_KEY ||
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      'AIzaSyAbKOFmzULGRBcEaqygSCIMjncsjrjL564';
+      (process.env.GOOGLE_MAPS_API_KEY || '');
+    if (!apiKey) return NextResponse.json({ error: 'Google Maps API key not configured.' }, { status: 503 });
 
     // 2. Call Google Routes API (Modern v2 endpoint)
     let distanceKm = 35;

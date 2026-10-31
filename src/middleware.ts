@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const SESSION_COOKIE_NAME = 'pgt_admin_v2';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@fastforwardshuttle.com';
-const SECRET = process.env.JWT_SECRET || 'francego_shuttle_super_secret_key_2026';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const SECRET = process.env.JWT_SECRET || '';
 
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -17,7 +17,7 @@ function constantTimeEqual(a: string, b: string): boolean {
 // Edge-compatible HMAC-SHA256 verification with token expiration check
 async function verifyToken(token: string): Promise<boolean> {
   try {
-    if (!token || !token.includes('.')) return false;
+    if (!token || !token.includes('.') || !SECRET || !ADMIN_EMAIL) return false;
     const [expiresAtStr, providedSig] = token.split('.');
     const expiresAt = Number(expiresAtStr);
 
