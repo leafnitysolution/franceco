@@ -8,9 +8,17 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   serverExternalPackages: ['nodemailer'],
   images: {
-    dangerouslyAllowSVG: false,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    dangerouslyAllowSVG: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
+    ],
   },
   async headers() {
     return [

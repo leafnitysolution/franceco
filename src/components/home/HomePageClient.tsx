@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -81,6 +82,34 @@ function getRouteImage(slug: string, originCode: string, destCode: string): stri
   }
 
   return '/images/routes_unique/cdg-to-paris-city.jpg';
+}
+
+function RouteCardImage({
+  src,
+  alt,
+  fallbackSrc,
+}: {
+  src: string;
+  alt: string;
+  fallbackSrc: string;
+}) {
+  const [currentSrc, setCurrentSrc] = useState(src);
+
+  return (
+    <Image
+      src={currentSrc}
+      alt={alt}
+      fill
+      sizes="(max-width: 640px) 100px, 120px"
+      className="object-cover group-hover:scale-105 transition-transform duration-500"
+      unoptimized={currentSrc.startsWith('http')}
+      onError={() => {
+        if (currentSrc !== fallbackSrc) {
+          setCurrentSrc(fallbackSrc);
+        }
+      }}
+    />
+  );
 }
 
 interface HomePageClientProps {
@@ -253,19 +282,17 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
             const imgPath = route.imageUrl || getRouteImage(route.slug, route.origin.shortCode, route.destination.shortCode);
             return (
               <div
-                key={route.id}
+                key={`${route.id}-${route.imageUrl || 'default'}`}
                 onClick={() => router.push(`/transfers/${route.slug}`)}
                 className="bg-white border border-[#E5D7BC]/90 hover:border-gold-500 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group cursor-pointer"
               >
                 <div className="flex gap-3 sm:gap-4 items-start">
                   {/* Left: Illustrative Route Picture */}
                   <div className="relative w-24 sm:w-28 h-24 sm:h-28 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-100">
-                    <Image
+                    <RouteCardImage
                       src={imgPath}
                       alt={`Transfer from ${route.origin.name} to ${route.destination.name}`}
-                      fill
-                      sizes="(max-width: 640px) 100px, 120px"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      fallbackSrc={getRouteImage(route.slug, route.origin.shortCode, route.destination.shortCode)}
                     />
                     <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/65 backdrop-blur-xs text-[9px] font-bold text-white flex items-center gap-1">
                       <Compass className="w-2.5 h-2.5 text-gold-400" />
