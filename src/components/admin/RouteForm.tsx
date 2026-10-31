@@ -22,21 +22,20 @@ import {
 } from 'lucide-react';
 
 const ROUTE_IMAGE_PRESETS = [
-  { label: '🏰 Disneyland Paris', url: '/images/routes/cdg-to-disneyland-paris.jpg' },
-  { label: '🗼 Paris Eiffel Tower', url: '/images/routes/cdg-to-paris-city.jpg' },
-  { label: '🏛️ Arc de Triomphe', url: '/images/routes/orly-to-paris-city.jpg' },
-  { label: '🖼️ Musée du Louvre', url: '/images/routes/paris-louvre.jpg' },
-  { label: '👑 Palace of Versailles', url: '/images/routes/paris-to-versailles.jpg' },
-  { label: '🍾 Champagne & Reims', url: '/images/routes/paris-to-champagne.jpg' },
-  { label: '🏰 Fontainebleau Castle', url: '/images/routes/paris-to-fontainebleau.jpg' },
-  { label: '🌸 Monet Gardens Giverny', url: '/images/routes/paris-to-giverny.jpg' },
-  { label: '🏰 Loire Valley Châteaux', url: '/images/routes/paris-to-loire-valley.jpg' },
-  { label: '⛪ Mont Saint-Michel', url: '/images/routes/paris-to-mont-saint-michel.jpg' },
-  { label: '🌊 Normandy D-Day Beaches', url: '/images/routes/paris-to-normandy.jpg' },
-  { label: '🎢 Parc Astérix', url: '/images/routes/cdg-to-parc-asterix.jpg' },
-  { label: '🚆 Eurostar Train Station', url: '/images/routes/paris-train-stations.jpg' },
-  { label: '🛫 Orly Airport', url: '/images/routes/orly-to-paris-city.jpg' },
-  { label: '✈️ Beauvais Airport', url: '/images/routes/beauvais-to-paris-city.jpg' },
+  { label: '🏰 Disneyland Paris', url: '/images/destinations/disneyland_paris.jpg' },
+  { label: '🗼 Paris Eiffel Tower', url: '/images/destinations/eiffel_tower.jpg' },
+  { label: '🏛️ Arc de Triomphe', url: '/images/destinations/arc_de_triomphe.jpg' },
+  { label: '🖼️ Musée du Louvre', url: '/images/destinations/louvre_museum.jpg' },
+  { label: '👑 Palace of Versailles', url: '/images/destinations/versailles_palace.jpg' },
+  { label: '🍾 Champagne & Reims', url: '/images/destinations/reims_champagne.jpg' },
+  { label: '🏰 Fontainebleau Castle', url: '/images/destinations/fontainebleau_palace.jpg' },
+  { label: '🌸 Monet Gardens Giverny', url: '/images/destinations/giverny_monet_gardens.jpg' },
+  { label: '🏰 Loire Valley Châteaux', url: '/images/destinations/chambord_loire_valley.jpg' },
+  { label: '⛪ Mont Saint-Michel', url: '/images/destinations/mont_saint_michel.jpg' },
+  { label: '🌊 Normandy D-Day Beaches', url: '/images/destinations/normandy_beaches.jpg' },
+  { label: '🎢 Parc Astérix', url: '/images/destinations/parc_asterix.jpg' },
+  { label: '🚆 Eurostar Train Station', url: '/images/destinations/paris_gare_du_nord.jpg' },
+  { label: '✈️ Beauvais Airport', url: '/images/destinations/beauvais_airport.jpg' },
 ];
 
 interface RouteFormProps {

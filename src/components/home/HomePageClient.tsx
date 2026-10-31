@@ -50,50 +50,47 @@ function getRouteImage(slug: string, originCode: string, destCode: string): stri
 
   // 1. Specific Destination Tours & Excursions
   if (normalized.includes('champagne') || normalized.includes('reims')) {
-    return '/images/routes/paris-to-champagne.jpg';
+    return '/images/destinations/reims_champagne.jpg';
   }
   if (normalized.includes('fontainebleau') || normalized.includes('barbizon')) {
-    return '/images/routes/paris-to-fontainebleau.jpg';
+    return '/images/destinations/fontainebleau_palace.jpg';
   }
   if (normalized.includes('giverny') || normalized.includes('monet')) {
-    return '/images/routes/paris-to-giverny.jpg';
+    return '/images/destinations/giverny_monet_gardens.jpg';
   }
   if (normalized.includes('loire') || normalized.includes('chambord') || normalized.includes('amboise')) {
-    return '/images/routes/paris-to-loire-valley.jpg';
+    return '/images/destinations/chambord_loire_valley.jpg';
   }
   if (normalized.includes('mont-saint-michel') || normalized.includes('michel')) {
-    return '/images/routes/paris-to-mont-saint-michel.jpg';
+    return '/images/destinations/mont_saint_michel.jpg';
   }
   if (normalized.includes('normandy') || normalized.includes('omaha')) {
-    return '/images/routes/paris-to-normandy.jpg';
+    return '/images/destinations/normandy_beaches.jpg';
   }
   if (normalized.includes('versailles')) {
-    return '/images/routes/paris-to-versailles.jpg';
+    return '/images/destinations/versailles_palace.jpg';
   }
   if (normalized.includes('asterix')) {
-    return '/images/routes/cdg-to-parc-asterix.jpg';
+    return '/images/destinations/parc_asterix.jpg';
   }
   if (normalized.includes('train') || normalized.includes('gare-du-nord') || normalized.includes('eurostar')) {
-    return '/images/routes/paris-train-stations.jpg';
+    return '/images/destinations/paris_gare_du_nord.jpg';
   }
 
   // 2. Specific Airport & Disneyland Route Pairings
-  if (normalized.includes('cdg') && normalized.includes('disney')) return '/images/routes/cdg-to-disneyland-paris.jpg';
-  if (normalized.includes('orly') && normalized.includes('disney')) return '/images/routes/orly-to-disneyland-paris.jpg';
-  if (normalized.includes('beauvais') && normalized.includes('disney')) return '/images/routes/beauvais-to-disneyland-paris.jpg';
-  if (normalized.includes('cdg') && normalized.includes('paris')) return '/images/routes/cdg-to-paris-city.jpg';
-  if (normalized.includes('orly') && normalized.includes('paris')) return '/images/routes/orly-to-paris-city.jpg';
-  if (normalized.includes('beauvais') && normalized.includes('paris')) return '/images/routes/beauvais-to-paris-city.jpg';
-  if (normalized.includes('paris') && normalized.includes('disney')) return '/images/routes/paris-to-disneyland.jpg';
+  if (normalized.includes('disney')) return '/images/destinations/disneyland_paris.jpg';
+  if (normalized.includes('beauvais')) return '/images/destinations/beauvais_airport.jpg';
+  if (normalized.includes('orly')) return '/images/destinations/arc_de_triomphe.jpg';
+  if (normalized.includes('cdg')) return '/images/destinations/eiffel_tower.jpg';
 
   // 3. Fallbacks by short code
-  if (originCode === 'DLP' || destCode === 'DLP') return '/images/routes/cdg-to-disneyland-paris.jpg';
-  if (originCode === 'BVA' || destCode === 'BVA') return '/images/routes/beauvais-to-paris-city.jpg';
-  if (originCode === 'ORY' || destCode === 'ORY') return '/images/routes/orly-to-paris-city.jpg';
-  if (originCode === 'CDG' || destCode === 'CDG') return '/images/routes/cdg-to-paris-city.jpg';
-  if (originCode === 'PAR' || destCode === 'PAR') return '/images/routes/paris-louvre.jpg';
+  if (originCode === 'DLP' || destCode === 'DLP') return '/images/destinations/disneyland_paris.jpg';
+  if (originCode === 'BVA' || destCode === 'BVA') return '/images/destinations/beauvais_airport.jpg';
+  if (originCode === 'ORY' || destCode === 'ORY') return '/images/destinations/arc_de_triomphe.jpg';
+  if (originCode === 'CDG' || destCode === 'CDG') return '/images/destinations/eiffel_tower.jpg';
+  if (originCode === 'PAR' || destCode === 'PAR') return '/images/destinations/louvre_museum.jpg';
 
-  return '/images/routes/cdg-to-paris-city.jpg';
+  return '/images/destinations/eiffel_tower.jpg';
 }
 
 interface HomePageClientProps {
