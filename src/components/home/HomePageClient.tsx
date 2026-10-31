@@ -10,7 +10,7 @@ import { FaqAccordion } from '@/components/UI/FaqAccordion';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useBookingStore } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
-import { TripAdvisorLogo, RepubliqueFrancaiseBadge, TripAdvisorTravellersChoiceCard } from '@/components/UI/TrustBadges';
+import { TripAdvisorLogo, RepubliqueFrancaiseBadge, TripAdvisorTravellersChoiceCard, TripAdvisorLockupLogo } from '@/components/UI/TrustBadges';
 import {
   ShieldCheck,
   Clock,
@@ -189,12 +189,9 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
             <div className="text-[10px] text-slate-500 font-medium">{t('verifiedReviewsCount')}</div>
           </div>
 
-          {/* OFFICIAL TRIPADVISOR BADGE WITH VECTOR LOGO */}
-          <div className="p-2 flex flex-col items-center justify-center space-y-0.5">
-            <div className="flex items-center justify-center gap-1.5">
-              <TripAdvisorLogo className="w-5 h-5 shrink-0" />
-              <span className="font-black text-navy-900 text-xs tracking-tight">Tripadvisor</span>
-            </div>
+          {/* OFFICIAL TRIPADVISOR BADGE WITH BRAND LOGO */}
+          <div className="p-2 flex flex-col items-center justify-center space-y-1">
+            <TripAdvisorLockupLogo className="h-5.5 w-auto" />
             <div className="text-[10px] text-slate-500 font-medium">Ranked #6 Travellers' Choice</div>
           </div>
 

@@ -1,4 +1,20 @@
 import React from 'react';
+import Image from 'next/image';
+
+/**
+ * Official TripAdvisor Brand Lockup Logo (Owl + Registered Wordmark)
+ */
+export function TripAdvisorLockupLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+  return (
+    <Image
+      src="/images/tripadvisor_logo.svg"
+      alt="Tripadvisor"
+      width={120}
+      height={26}
+      className={`object-contain ${className}`}
+    />
+  );
+}
 
 /**
  * Official TripAdvisor Owl Vector Emblem
