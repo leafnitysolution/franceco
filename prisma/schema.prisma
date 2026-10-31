@@ -92,7 +92,11 @@ model Review {
   location     String   @default("Paris, France")
   routeText    String   @default("Paris Airport Transfer")
   rating       Int      @default(5)
+  title        String?  // Headline e.g. "Reliable and punctual service"
   comment      String
+  imageUrl     String?  // Real customer photo with driver / car / Disney
+  authorAvatar String?  // Profile avatar photo
+  source       String   @default("TripAdvisor") // "TripAdvisor", "Google", "Verified Booking"
   isPublished  Boolean  @default(true)
   createdAt    DateTime @default(now())
 }

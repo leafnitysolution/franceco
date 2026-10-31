@@ -1,8 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { submitReviewAction } from '@/lib/actions/reviews';
-import { Star, ShieldCheck, CheckCircle2, MessageSquare, X, ExternalLink, Loader2 } from 'lucide-react';
+import {
+  Star,
+  ShieldCheck,
+  CheckCircle2,
+  MessageSquare,
+  X,
+  ExternalLink,
+  Loader2,
+  Upload,
+  Camera,
+} from 'lucide-react';
 
 interface ReviewItem {
   id: string | number;
@@ -11,7 +22,11 @@ interface ReviewItem {
   routeText: string;
   rating: number;
   dateText: string;
+  title?: string | null;
   comment: string;
+  imageUrl?: string | null;
+  authorAvatar?: string | null;
+  source?: string | null;
   verified?: boolean;
 }
 
@@ -30,7 +45,11 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
       dateText: r.createdAt
         ? new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
         : 'Recent',
+      title: r.title || null,
       comment: r.comment || '',
+      imageUrl: r.imageUrl || null,
+      authorAvatar: r.authorAvatar || null,
+      source: r.source || 'TripAdvisor',
       verified: true,
     }))
   );
@@ -42,6 +61,8 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [rating, setRating] = useState(5);
@@ -65,7 +86,11 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
               routeText: ext.route || 'Private Transfer',
               rating: ext.rating || 5,
               dateText: ext.date || 'Recent',
+              title: ext.title || null,
               comment: ext.review || '',
+              imageUrl: ext.imageUrl || null,
+              authorAvatar: ext.authorAvatar || null,
+              source: ext.source || 'TripAdvisor',
               verified: ext.verified ?? true,
             }));
 
@@ -73,7 +98,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
             setReviews((prev) => {
               const existingIds = new Set(prev.map((p) => String(p.id)));
               const uniqueExternal = externalNormalized.filter((e) => !existingIds.has(String(e.id)));
-              return [...uniqueExternal, ...prev];
+              return [...prev, ...uniqueExternal];
             });
           }
         }
@@ -85,25 +110,67 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
     loadExternalReviews();
   }, []);
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Please upload a valid image (JPG, PNG, WebP).');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    setErrorMsg('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'reviews');
+
+      const res = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        throw new Error(resData.error || 'Failed to upload photo.');
+      }
+
+      setUploadedPhotoUrl(resData.url);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Image upload failed.');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMsg('');
     setSuccessMsg('');
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     formData.set('rating', rating.toString());
+    if (uploadedPhotoUrl) {
+      formData.set('imageUrl', uploadedPhotoUrl);
+    }
 
     const res = await submitReviewAction(formData);
-
     setIsSubmitting(false);
 
     if (res.success) {
-      setSuccessMsg('Thank you! Your review has been submitted and is awaiting approval. It will appear here once approved by our team.');
+      setSuccessMsg(
+        'Thank you! Your review and photo have been submitted and are awaiting moderation approval.'
+      );
       setTimeout(() => {
         setIsModalOpen(false);
         setSuccessMsg('');
-      }, 3000);
+        setUploadedPhotoUrl('');
+        form.reset();
+      }, 3500);
     } else {
       setErrorMsg(res.error || 'Failed to submit review.');
     }
@@ -156,7 +223,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white font-black text-xs sm:text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center gap-2"
+            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white font-black text-xs sm:text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center gap-2 cursor-pointer"
           >
             <MessageSquare className="w-4 h-4" />
             <span>Write a review</span>
@@ -165,43 +232,84 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
       </div>
 
       {/* REVIEWS LIST GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {reviews.map((r) => (
           <div
             key={r.id}
-            className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-md hover:shadow-xl transition-all duration-300 space-y-4 flex flex-col justify-between"
+            className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-2xl transition-all duration-300 space-y-4 flex flex-col justify-between"
           >
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  {[...Array(r.rating || 5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
+              {/* Header: Avatar, Name, Source */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {r.authorAvatar ? (
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gold-400/40 shrink-0">
+                      <Image
+                        src={r.authorAvatar}
+                        alt={r.authorName}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-slate-900 text-gold-400 font-black text-xs flex items-center justify-center shrink-0">
+                      {r.authorName.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+
+                  <div className="min-w-0">
+                    <div className="font-black text-slate-900 text-sm truncate">{r.authorName}</div>
+                    <div className="text-[11px] text-slate-500 font-semibold truncate">{r.location}</div>
+                  </div>
                 </div>
 
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1">
+                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1 shrink-0">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                  <span>Verified Review</span>
+                  <span>{r.source || 'Verified'}</span>
                 </span>
               </div>
 
+              {/* Star Rating */}
+              <div className="flex items-center gap-1">
+                {[...Array(r.rating || 5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+
+              {/* Customer Photo */}
+              {r.imageUrl && (
+                <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+                  <Image
+                    src={r.imageUrl}
+                    alt={`Photo from ${r.authorName}`}
+                    fill
+                    className="object-cover"
+                    unoptimized={r.imageUrl.startsWith('http')}
+                  />
+                  <div className="absolute bottom-2 left-2 right-2 bg-slate-950/80 backdrop-blur-sm px-2.5 py-1 rounded-xl text-white text-[10px] font-bold truncate">
+                    {r.routeText}
+                  </div>
+                </div>
+              )}
+
+              {/* Headline */}
+              {r.title && (
+                <h4 className="font-black text-slate-900 text-sm leading-snug">
+                  &ldquo;{r.title}&rdquo;
+                </h4>
+              )}
+
+              {/* Comment */}
               <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed italic">
-                "{r.comment}"
+                &ldquo;{r.comment}&rdquo;
               </p>
             </div>
 
+            {/* Footer */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-              <div>
-                <div className="font-black text-slate-900 text-sm">{r.authorName}</div>
-                <div className="text-[11px] text-slate-500 font-semibold">{r.location}</div>
-              </div>
-
-              <div className="text-right">
-                <div className="text-brand-600 font-bold text-[11px]">{r.routeText}</div>
-                <div className="text-[10px] text-slate-400 font-medium">
-                  {r.dateText}
-                </div>
-              </div>
+              <span className="text-brand-600 font-bold text-[11px] truncate">{r.routeText}</span>
+              <span className="text-[10px] text-slate-400 font-medium shrink-0 ml-2">{r.dateText}</span>
             </div>
           </div>
         ))}
@@ -209,78 +317,49 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
 
       {/* WRITE A REVIEW INTERACTIVE MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative space-y-6">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200"
+              className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="space-y-1">
+            <div className="space-y-1 mb-6">
+              <div className="inline-flex items-center gap-1.5 text-xs font-black text-gold-700 bg-gold-50 px-3 py-1 rounded-full border border-gold-200">
+                <Camera className="w-3.5 h-3.5 text-gold-600" />
+                <span>Customer Voices</span>
+              </div>
               <h3 className="text-xl font-black text-slate-900">Write a Customer Review</h3>
               <p className="text-xs text-slate-500 font-medium">
-                Share your transfer experience with FastForward Shuttle.
+                Share your transfer experience and attach a photo from your trip.
               </p>
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
+              <div className="p-3 mb-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold">
                 {errorMsg}
               </div>
             )}
 
             {successMsg && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
+              <div className="p-4 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
                 {successMsg}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Rating */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Your Full Name</label>
-                <input
-                  type="text"
-                  name="authorName"
-                  required
-                  placeholder="e.g. Sarah Jenkins"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 font-medium focus:outline-none focus:border-brand-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Country / City</label>
-                  <input
-                    type="text"
-                    name="location"
-                    placeholder="e.g. London, UK"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-brand-500"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Transfer Route Taken</label>
-                  <input
-                    type="text"
-                    name="routeText"
-                    placeholder="e.g. CDG to Disneyland"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-brand-500"
-                  />
-                </div>
-              </div>
-
-              {/* Star Selector */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 block">Rating</label>
+                <label className="text-xs font-bold text-slate-700 block">Your Rating</label>
                 <div className="flex items-center gap-1.5">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setRating(star)}
-                      className="p-1 hover:scale-110 transition-transform"
+                      className="p-1 hover:scale-110 transition-transform cursor-pointer"
                     >
                       <Star
                         className={`w-6 h-6 ${
@@ -295,23 +374,125 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
                 </div>
               </div>
 
+              {/* Name & Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Full Name *</label>
+                  <input
+                    type="text"
+                    name="authorName"
+                    required
+                    placeholder="e.g. Sarah Jenkins"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Country / City *</label>
+                  <input
+                    type="text"
+                    name="location"
+                    required
+                    placeholder="e.g. London, UK"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+              </div>
+
+              {/* Route & Title */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Transfer Route</label>
+                  <input
+                    type="text"
+                    name="routeText"
+                    placeholder="e.g. CDG to Disneyland"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700">Headline</label>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="e.g. Amazing driver, on-time!"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+              </div>
+
+              {/* Comment */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Review Comment</label>
+                <label className="text-xs font-bold text-slate-700">Review *</label>
                 <textarea
                   name="comment"
                   required
                   rows={4}
                   placeholder="Describe your driver, punctuality, and overall trip experience..."
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 font-medium focus:outline-none focus:border-brand-500"
-                ></textarea>
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 font-medium focus:outline-none focus:border-gold-500 leading-relaxed"
+                />
+              </div>
+
+              {/* Photo Upload */}
+              <div className="space-y-2 border border-slate-200 rounded-2xl p-4 bg-slate-50/70">
+                <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span>Attach Photo with Driver / Trip</span>
+                  <span className="text-[10px] text-slate-400">Optional</span>
+                </label>
+
+                {uploadedPhotoUrl ? (
+                  <div className="relative rounded-xl overflow-hidden border border-slate-200 h-32 bg-slate-900">
+                    <Image
+                      src={uploadedPhotoUrl}
+                      alt="Uploaded preview"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setUploadedPhotoUrl('')}
+                      className="absolute top-2 right-2 px-2.5 py-1 bg-red-600 text-white text-[10px] font-bold rounded-lg shadow hover:bg-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-slate-300 hover:border-gold-500 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-white">
+                    {isUploadingPhoto ? (
+                      <div className="flex items-center gap-2 text-xs font-bold text-gold-600">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Uploading photo...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="w-6 h-6 text-slate-400 mb-1" />
+                        <span className="text-xs font-bold text-slate-700">
+                          Click to upload customer selfie or van photo
+                        </span>
+                        <span className="text-[10px] text-slate-400">JPG, PNG up to 8MB</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      disabled={isUploadingPhoto}
+                      className="hidden"
+                    />
+                  </label>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isSubmitting || isUploadingPhoto}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>SUBMIT REVIEW</span>}
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <span>SUBMIT REVIEW</span>
+                )}
               </button>
             </form>
           </div>

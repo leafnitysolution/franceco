@@ -127,12 +127,22 @@ CREATE TABLE IF NOT EXISTS "Review" (
     "location" TEXT NOT NULL DEFAULT 'Paris, France',
     "routeText" TEXT NOT NULL DEFAULT 'Paris Airport Transfer',
     "rating" INTEGER NOT NULL DEFAULT 5,
+    "title" TEXT,
     "comment" TEXT NOT NULL,
+    "imageUrl" TEXT,
+    "authorAvatar" TEXT,
+    "source" TEXT NOT NULL DEFAULT 'TripAdvisor',
     "isPublished" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
 );
+
+-- Backwards-compatibility migrations for existing tables
+ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "title" TEXT;
+ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "authorAvatar" TEXT;
+ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "source" TEXT DEFAULT 'TripAdvisor';
 
 -- -----------------------------------------------------------------------------
 -- 6. Table: ContactSubmission

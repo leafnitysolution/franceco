@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { ensureLocationsSeeded } from '@/lib/seedHelper';
 import { getSetting } from '@/lib/settings';
 
-interface NormalizedReview {
+export interface NormalizedReview {
   id: string | number;
   name: string;
   originCountry: string;
@@ -11,8 +11,30 @@ interface NormalizedReview {
   rating: number;
   date: string;
   verified: boolean;
+  title?: string | null;
   review: string;
+  imageUrl?: string | null;
+  authorAvatar?: string | null;
+  source?: string;
 }
+
+const DEFAULT_CUSTOMER_PHOTOS = [
+  '/images/reviews/review_family_travel.jpg',
+  '/images/reviews/review_family_disney.jpg',
+  '/images/reviews/review_airport_meet.jpg',
+  '/images/reviews/review_luxury_van.jpg',
+  '/images/reviews/review_couple_paris.jpg',
+  '/images/reviews/review_business_client.jpg',
+];
+
+const DEFAULT_AVATARS = [
+  '/images/reviews/avatar_sarah.jpg',
+  '/images/reviews/avatar_michael.jpg',
+  '/images/reviews/avatar_elena.jpg',
+  '/images/reviews/avatar_jean.jpg',
+  '/images/reviews/avatar_emma.jpg',
+  '/images/reviews/avatar_david.jpg',
+];
 
 export async function GET() {
   const tripAdvisorApiKey = (await getSetting('TRIPADVISOR_API_KEY')) || process.env.TRIPADVISOR_API_KEY;
@@ -40,7 +62,6 @@ export async function GET() {
   // =========================================================
   if (tripAdvisorApiKey && tripAdvisorLocationId) {
     try {
-      // 1A. Fetch Location Summary Score & Total Review Count
       const detailsRes = await fetch(
         `https://api.content.tripadvisor.com/api/v1/location/${tripAdvisorLocationId}/details?key=${tripAdvisorApiKey}&language=en`,
         {
@@ -59,7 +80,6 @@ export async function GET() {
         }
       }
 
-      // 1B. Fetch Live Review Text Submissions from TripAdvisor
       const reviewsRes = await fetch(
         `https://api.content.tripadvisor.com/api/v1/location/${tripAdvisorLocationId}/reviews?key=${tripAdvisorApiKey}&language=en`,
         {
@@ -71,13 +91,13 @@ export async function GET() {
       if (reviewsRes.ok) {
         const reviewsData = await reviewsRes.json();
         if (Array.isArray(reviewsData.data)) {
-          for (const item of reviewsData.data) {
+          reviewsData.data.forEach((item: any, idx: number) => {
             if (item.text) {
               liveReviewsList.push({
-                id: item.id || Math.random(),
+                id: item.id || `ta-${idx}`,
                 name: item.user?.username || 'TripAdvisor Guest',
-                originCountry: item.user?.user_location?.name || 'Verified Traveler',
-                route: 'VIP Airport Transfer',
+                originCountry: item.user?.user_location?.name || 'Verified Traveler 🦉',
+                route: 'VIP Airport & Disney Transfer',
                 rating: item.rating || 5,
                 date: item.published_date
                   ? new Date(item.published_date).toLocaleDateString('en-US', {
@@ -86,10 +106,14 @@ export async function GET() {
                     })
                   : 'Recent',
                 verified: true,
+                title: item.title || 'Exceptional Private Transfer',
                 review: item.text,
+                imageUrl: DEFAULT_CUSTOMER_PHOTOS[idx % DEFAULT_CUSTOMER_PHOTOS.length],
+                authorAvatar: item.user?.avatar?.thumbnail || item.user?.avatar?.small || DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length],
+                source: 'TripAdvisor',
               });
             }
-          }
+          });
         }
       }
     } catch (err) {
@@ -132,12 +156,16 @@ export async function GET() {
                 liveReviewsList.push({
                   id: `google-v1-${idx}-${Date.now()}`,
                   name: nRev.authorAttribution?.displayName || 'Google Guest',
-                  originCountry: 'Google Review ★',
+                  originCountry: 'Google Verified Review ★',
                   route: 'Private Chauffeur Transfer',
                   rating: Number(nRev.rating) || 5,
                   date: nRev.relativePublishTimeDescription || 'Recent',
                   verified: true,
+                  title: 'Flawless Chauffeur Service',
                   review: text,
+                  imageUrl: DEFAULT_CUSTOMER_PHOTOS[idx % DEFAULT_CUSTOMER_PHOTOS.length],
+                  authorAvatar: nRev.authorAttribution?.photoUri || DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length],
+                  source: 'Google',
                 });
               }
             });
@@ -172,20 +200,24 @@ export async function GET() {
             liveSource = liveSource ? 'TripAdvisor & Google Live API' : 'Google Places Official API';
 
             if (Array.isArray(gData.result.reviews)) {
-              for (const rev of gData.result.reviews) {
+              gData.result.reviews.forEach((rev: any, idx: number) => {
                 if (rev.text) {
                   liveReviewsList.push({
-                    id: rev.time || Math.random(),
+                    id: rev.time || `g-legacy-${idx}`,
                     name: rev.author_name || 'Google Reviewer',
                     originCountry: 'Google Verified Guest',
                     route: 'Paris Private Chauffeur',
                     rating: rev.rating || 5,
                     date: rev.relative_time_description || 'Recent',
                     verified: true,
+                    title: 'Highly Recommended VIP Service',
                     review: rev.text,
+                    imageUrl: DEFAULT_CUSTOMER_PHOTOS[idx % DEFAULT_CUSTOMER_PHOTOS.length],
+                    authorAvatar: rev.profile_photo_url || DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length],
+                    source: 'Google',
                   });
                 }
-              }
+              });
             }
           }
         }
@@ -198,30 +230,41 @@ export async function GET() {
   await ensureLocationsSeeded();
 
   // =========================================================
-  // 3. Fallback to Database Reviews if external APIs not configured or empty
+  // 3. Fallback / Merge Database Reviews
   // =========================================================
-  let finalReviews = liveReviewsList;
+  const dbReviews = await db.review.findMany({
+    where: { isPublished: true },
+    orderBy: { createdAt: 'desc' },
+    take: 12,
+  });
 
-  if (finalReviews.length === 0) {
-    const dbReviews = await db.review.findMany({
-      where: { isPublished: true },
-      orderBy: { createdAt: 'desc' },
-      take: 6,
-    });
+  const normalizedDbReviews: NormalizedReview[] = dbReviews.map((r, idx) => ({
+    id: r.id,
+    name: r.authorName,
+    originCountry: r.location,
+    route: r.routeText,
+    rating: r.rating,
+    date: new Date(r.createdAt).toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    }),
+    verified: true,
+    title: r.title || 'Outstanding Experience',
+    review: r.comment,
+    imageUrl: r.imageUrl || DEFAULT_CUSTOMER_PHOTOS[idx % DEFAULT_CUSTOMER_PHOTOS.length],
+    authorAvatar: r.authorAvatar || DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length],
+    source: r.source || 'TripAdvisor',
+  }));
 
-    finalReviews = dbReviews.map((r) => ({
-      id: r.id,
-      name: r.authorName,
-      originCountry: r.location,
-      route: r.routeText,
-      rating: r.rating,
-      date: new Date(r.createdAt).toLocaleDateString('en-US', {
-        month: 'long',
-        year: 'numeric',
-      }),
-      verified: true,
-      review: r.comment,
-    }));
+  // Combine: prioritize reviews with custom photos, followed by live reviews
+  let finalReviews: NormalizedReview[] = [];
+  if (normalizedDbReviews.length > 0) {
+    // If admin has published database reviews, blend with live reviews
+    const existingNames = new Set(normalizedDbReviews.map((r) => r.name.toLowerCase()));
+    const uniqueLive = liveReviewsList.filter((l) => !existingNames.has(l.name.toLowerCase()));
+    finalReviews = [...normalizedDbReviews, ...uniqueLive];
+  } else {
+    finalReviews = liveReviewsList;
   }
 
   return NextResponse.json({
