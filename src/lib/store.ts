@@ -109,6 +109,8 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   estimatedDurationMinutes: 40,
   isCalculatingDistance: false,
   distanceRouteCalculated: false,
+  isFixedZoneRate: false,
+  matchedZoneName: null,
 
   sedanPriceEur: 70,
   economyVanPriceEur: 90,
