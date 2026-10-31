@@ -257,7 +257,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-start justify-between gap-1">
                       <h3 className="font-serif text-sm sm:text-base font-bold text-navy-900 group-hover:text-gold-700 transition-colors leading-snug line-clamp-2">
-                        Transfers from {route.origin.name} to {route.destination.name}
+                        {route.origin.name} to {route.destination.name}
                       </h3>
                       <div className="text-right shrink-0">
                         <span className="text-base sm:text-lg font-black text-rose-600 block leading-tight">
