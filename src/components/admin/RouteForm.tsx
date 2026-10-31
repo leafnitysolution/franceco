@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { LocationItem, RouteWithLocations } from '@/types';
 import { createRouteAction, updateRouteAction, createLocationAction } from '@/lib/actions/routes';
@@ -18,6 +18,8 @@ import {
   Building2,
   CheckCircle2,
   X,
+  Upload,
+  RefreshCw,
   Image as ImageIcon,
 } from 'lucide-react';
 
@@ -80,6 +82,45 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured ?? false);
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError('');
+
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+
+      const res = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        body: fd,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setImageUrl(data.url);
+      } else {
+        setUploadError(data.error || 'Failed to upload image.');
+      }
+    } catch (err: any) {
+      setUploadError(err.message || 'Error uploading image.');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageUrl('');
+    setUploadError('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   // Dynamic FAQs State
   let parsedFaqs = [];
@@ -529,57 +570,148 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
               {imageUrl && (
                 <button
                   type="button"
-                  onClick={() => setImageUrl('')}
-                  className="text-[11px] font-bold text-red-600 hover:underline"
+                  onClick={handleRemoveImage}
+                  className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1 hover:underline cursor-pointer"
                 >
-                  Reset to Auto
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remove Image</span>
                 </button>
               )}
             </div>
 
-            {/* Live Image Preview */}
-            <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center">
-              {imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={imageUrl}
-                  alt="Route Preview"
-                  className="w-full h-full object-cover"
-                />
+            {/* Hidden File Input for Native File Picker */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+              className="hidden"
+            />
+
+            {/* Upload Error Banner */}
+            {uploadError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-bold flex items-center justify-between">
+                <span>{uploadError}</span>
+                <button type="button" onClick={() => setUploadError('')} className="text-red-400 hover:text-red-600">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Live Image Preview Area */}
+            <div className="relative w-full h-48 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner flex items-center justify-center group">
+              {isUploading ? (
+                <div className="text-center p-6 space-y-2">
+                  <Loader2 className="w-8 h-8 mx-auto text-gold-600 animate-spin" />
+                  <div className="text-xs font-bold text-slate-700">Uploading image to server...</div>
+                </div>
+              ) : imageUrl ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageUrl}
+                    alt="Route Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Overlay Action Controls */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3.5 py-2 rounded-xl bg-white text-slate-900 font-bold text-xs shadow-md hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-gold-700" />
+                      <span>Change Image</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="px-3.5 py-2 rounded-xl bg-red-600 text-white font-bold text-xs shadow-md hover:bg-red-700 transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                  <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-xs text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Custom Image Active</span>
+                  </div>
+                </>
               ) : (
-                <div className="text-center p-4 text-slate-400 space-y-1">
-                  <ImageIcon className="w-8 h-8 mx-auto opacity-40 text-slate-500" />
-                  <div className="text-xs font-bold text-slate-600">Auto-Matched Route Image</div>
-                  <div className="text-[10px] text-slate-400">Select a preset below or enter a custom image URL</div>
+                <div className="text-center p-6 text-slate-400 space-y-2">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mx-auto shadow-2xs">
+                    <ImageIcon className="w-6 h-6 text-slate-400" />
+                  </div>
+                  <div className="text-xs font-bold text-slate-600">No Custom Image Assigned</div>
+                  <div className="text-[11px] text-slate-400 max-w-xs">
+                    Automatic route fallback will be used, or upload your own image below.
+                  </div>
                 </div>
               )}
+            </div>
+
+            {/* Prominent Upload & Remove Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-[#F7F2E7] hover:bg-[#EFE5D3] border border-[#E5D7BC] text-gold-900 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-gold-700" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 text-gold-700" />
+                    <span>Upload Image from Computer / Phone</span>
+                  </>
+                )}
+              </button>
+
               {imageUrl && (
-                <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-xs text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>Custom Image Active</span>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="py-2.5 px-3.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                  title="Remove custom image and revert to auto"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Remove</span>
+                </button>
               )}
             </div>
 
             {/* Custom URL Input */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Image URL or Local Path</label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="/images/routes/cdg-to-disneyland-paris.jpg or https://..."
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold font-mono focus:outline-none focus:border-brand-500"
-              />
-              <p className="text-[10px] text-slate-500">
-                Select from the popular presets below or paste any custom web image link.
-              </p>
+            <div className="space-y-1 pt-1">
+              <label className="text-xs font-bold text-slate-700">Or Paste Image URL / Path</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="/images/routes_unique/cdg-to-disneyland-paris.jpg or https://..."
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-bold font-mono focus:outline-none focus:border-brand-500"
+                />
+                {imageUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="p-2 text-slate-400 hover:text-red-600 rounded-lg"
+                    title="Clear"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Quick Presets */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2 pt-1 border-t border-slate-100">
               <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                Popular Landmark Presets:
+                Quick Landmark Presets (Click to Assign):
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {ROUTE_IMAGE_PRESETS.map((preset) => {
@@ -589,7 +721,7 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
                       key={preset.url}
                       type="button"
                       onClick={() => setImageUrl(preset.url)}
-                      className={`text-[11px] font-bold px-2.5 py-1.5 rounded-xl border transition-all ${
+                      className={`text-[11px] font-bold px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-gold-700 text-white border-gold-700 shadow-sm'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
