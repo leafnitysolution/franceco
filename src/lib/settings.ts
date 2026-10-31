@@ -29,13 +29,20 @@ export async function ensureSettingsTable(): Promise<void> {
       CREATE UNIQUE INDEX IF NOT EXISTS "SystemSetting_key_key" ON "SystemSetting"("key")
     `);
     // Ensure Route and Review tables have all required columns
-    await db.$executeRawUnsafe(`
-      ALTER TABLE "Route" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
-      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "title" TEXT;
-      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
-      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "authorAvatar" TEXT;
-      ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "source" TEXT DEFAULT 'TripAdvisor';
-    `);
+    const migrationStatements = [
+      'ALTER TABLE "Route" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT',
+      'ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "title" TEXT',
+      'ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT',
+      'ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "authorAvatar" TEXT',
+      `ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "source" TEXT DEFAULT 'TripAdvisor'`,
+    ];
+    for (const sql of migrationStatements) {
+      try {
+        await db.$executeRawUnsafe(sql);
+      } catch {
+        // Safe skip if already migrated
+      }
+    }
     isTableInitialized = true;
   } catch (err) {
     console.warn('[SETTINGS NOTICE] SystemSetting table auto-ensure warning:', err);
