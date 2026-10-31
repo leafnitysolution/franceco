@@ -235,16 +235,17 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
             return (
               <div
                 key={route.id}
-                className="bg-white border border-[#E5D7BC]/90 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group"
+                onClick={() => router.push(`/transfers/${route.slug}`)}
+                className="bg-white border border-[#E5D7BC]/90 hover:border-gold-500 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group cursor-pointer"
               >
-                <div className="flex gap-4">
+                <div className="flex gap-3 sm:gap-4 items-start">
                   {/* Left: Illustrative Route Picture */}
-                  <div className="relative w-28 sm:w-32 h-28 sm:h-32 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-100">
+                  <div className="relative w-24 sm:w-28 h-24 sm:h-28 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-100">
                     <Image
                       src={imgPath}
                       alt={`Transfer from ${route.origin.name} to ${route.destination.name}`}
                       fill
-                      sizes="(max-width: 640px) 120px, 140px"
+                      sizes="(max-width: 640px) 100px, 120px"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/65 backdrop-blur-xs text-[9px] font-bold text-white flex items-center gap-1">
@@ -255,8 +256,8 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
 
                   {/* Right: Route Details & Price */}
                   <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-start justify-between gap-1">
-                      <h3 className="font-serif text-sm sm:text-base font-bold text-navy-900 group-hover:text-gold-700 transition-colors leading-snug line-clamp-2">
+                    <div className="flex items-start justify-between gap-1.5">
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-navy-900 group-hover:text-gold-700 transition-colors leading-snug">
                         {route.origin.name} to {route.destination.name}
                       </h3>
                       <div className="text-right shrink-0">
@@ -280,20 +281,20 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                   <button
                     type="button"
-                    onClick={() => handleBookRoute(route)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBookRoute(route);
+                    }}
                     className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center gap-1.5"
                   >
                     <span>Book Now</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
-                  <Link
-                    href={`/transfers/${route.slug}`}
-                    className="text-xs font-bold text-slate-500 hover:text-gold-700 flex items-center gap-0.5 transition-colors"
-                  >
+                  <span className="text-xs font-bold text-slate-500 group-hover:text-gold-700 flex items-center gap-0.5 transition-colors">
                     <span>View Details</span>
                     <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
+                  </span>
                 </div>
               </div>
             );
