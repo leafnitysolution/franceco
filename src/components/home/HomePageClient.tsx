@@ -46,51 +46,41 @@ interface RouteData {
 }
 
 function getRouteImage(slug: string, originCode: string, destCode: string): string {
-  const normalized = slug.toLowerCase();
+  if (slug) {
+    const cleanSlug = slug.toLowerCase().trim();
+    const knownSlugs = [
+      'cdg-to-disneyland-paris',
+      'orly-to-disneyland-paris',
+      'beauvais-to-disneyland-paris',
+      'disneyland-to-cdg-airport',
+      'disneyland-to-orly-airport',
+      'cdg-to-paris-city',
+      'orly-to-paris-city',
+      'beauvais-to-paris-city',
+      'paris-to-cdg-airport',
+      'paris-to-orly-airport',
+      'paris-to-disneyland',
+      'paris-to-versailles',
+      'cdg-to-versailles',
+      'versailles-to-paris',
+      'paris-train-stations-to-disneyland',
+      'paris-train-stations-to-paris',
+      'paris-to-giverny',
+      'cdg-to-giverny',
+      'cdg-to-parc-asterix',
+      'paris-to-parc-asterix',
+      'paris-to-fontainebleau',
+      'paris-to-champagne',
+      'paris-to-normandy',
+      'paris-to-mont-saint-michel',
+      'paris-to-loire-valley',
+    ];
+    if (knownSlugs.includes(cleanSlug)) {
+      return `/images/routes_unique/${cleanSlug}.jpg`;
+    }
+  }
 
-  // 1. Specific Destination Tours & Excursions
-  if (normalized.includes('champagne') || normalized.includes('reims')) {
-    return '/images/destinations/reims_champagne.jpg';
-  }
-  if (normalized.includes('fontainebleau') || normalized.includes('barbizon')) {
-    return '/images/destinations/fontainebleau_palace.jpg';
-  }
-  if (normalized.includes('giverny') || normalized.includes('monet')) {
-    return '/images/destinations/giverny_monet_gardens.jpg';
-  }
-  if (normalized.includes('loire') || normalized.includes('chambord') || normalized.includes('amboise')) {
-    return '/images/destinations/chambord_loire_valley.jpg';
-  }
-  if (normalized.includes('mont-saint-michel') || normalized.includes('michel')) {
-    return '/images/destinations/mont_saint_michel.jpg';
-  }
-  if (normalized.includes('normandy') || normalized.includes('omaha')) {
-    return '/images/destinations/normandy_beaches.jpg';
-  }
-  if (normalized.includes('versailles')) {
-    return '/images/destinations/versailles_palace.jpg';
-  }
-  if (normalized.includes('asterix')) {
-    return '/images/destinations/parc_asterix.jpg';
-  }
-  if (normalized.includes('train') || normalized.includes('gare-du-nord') || normalized.includes('eurostar')) {
-    return '/images/destinations/paris_gare_du_nord.jpg';
-  }
-
-  // 2. Specific Airport & Disneyland Route Pairings
-  if (normalized.includes('disney')) return '/images/destinations/disneyland_paris.jpg';
-  if (normalized.includes('beauvais')) return '/images/destinations/beauvais_airport.jpg';
-  if (normalized.includes('orly')) return '/images/destinations/arc_de_triomphe.jpg';
-  if (normalized.includes('cdg')) return '/images/destinations/eiffel_tower.jpg';
-
-  // 3. Fallbacks by short code
-  if (originCode === 'DLP' || destCode === 'DLP') return '/images/destinations/disneyland_paris.jpg';
-  if (originCode === 'BVA' || destCode === 'BVA') return '/images/destinations/beauvais_airport.jpg';
-  if (originCode === 'ORY' || destCode === 'ORY') return '/images/destinations/arc_de_triomphe.jpg';
-  if (originCode === 'CDG' || destCode === 'CDG') return '/images/destinations/eiffel_tower.jpg';
-  if (originCode === 'PAR' || destCode === 'PAR') return '/images/destinations/louvre_museum.jpg';
-
-  return '/images/destinations/eiffel_tower.jpg';
+  return '/images/routes_unique/cdg-to-paris-city.jpg';
 }
 
 interface HomePageClientProps {
