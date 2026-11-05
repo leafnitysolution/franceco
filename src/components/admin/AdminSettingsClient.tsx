@@ -10,6 +10,11 @@ import {
 } from '@/lib/actions/settings';
 import { BookingAddon, DEFAULT_BOOKING_ADDONS } from '@/lib/addons';
 import {
+  HeroSlide,
+  DEFAULT_HERO_SLIDES,
+  DEFAULT_HERO_INTERVAL_SECONDS,
+} from '@/lib/heroSlides';
+import {
   Key,
   MapPin,
   Compass,
@@ -40,6 +45,11 @@ import {
   Trash2,
   Plus,
   RotateCcw,
+  Upload,
+  ImageIcon,
+  ArrowUp,
+  ArrowDown,
+  Layers,
 } from 'lucide-react';
 
 interface AdminSettingsClientProps {
@@ -144,6 +154,124 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
     handleInputChange('BOOKING_ADDONS', JSON.stringify(DEFAULT_BOOKING_ADDONS));
   };
 
+  // Homepage Hero Slideshow State
+  const parseInitialHeroSlides = (): HeroSlide[] => {
+    try {
+      if (initialSettings.HOMEPAGE_HERO_SLIDES && initialSettings.HOMEPAGE_HERO_SLIDES.trim().length > 0) {
+        const parsed = JSON.parse(initialSettings.HOMEPAGE_HERO_SLIDES);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return DEFAULT_HERO_SLIDES;
+  };
+
+  const parseInitialHeroInterval = (): number => {
+    const val = parseFloat(initialSettings.HOMEPAGE_HERO_INTERVAL || '');
+    if (!isNaN(val) && val >= 2 && val <= 30) {
+      return val;
+    }
+    return DEFAULT_HERO_INTERVAL_SECONDS;
+  };
+
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(parseInitialHeroSlides);
+  const [heroInterval, setHeroInterval] = useState<number>(parseInitialHeroInterval);
+  const [uploadingSlideIndex, setUploadingSlideIndex] = useState<number | null>(null);
+  const [slideUploadError, setSlideUploadError] = useState<string | null>(null);
+
+  const updateSlide = (index: number, patch: Partial<HeroSlide>) => {
+    setHeroSlides((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], ...patch };
+      handleInputChange('HOMEPAGE_HERO_SLIDES', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const toggleSlideActive = (index: number) => {
+    setHeroSlides((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], isActive: updated[index].isActive === false };
+      handleInputChange('HOMEPAGE_HERO_SLIDES', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteSlide = (index: number) => {
+    if (heroSlides.length <= 1) {
+      alert('You must keep at least 1 hero slide.');
+      return;
+    }
+    setHeroSlides((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
+      handleInputChange('HOMEPAGE_HERO_SLIDES', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const moveSlide = (index: number, direction: 'UP' | 'DOWN') => {
+    setHeroSlides((prev) => {
+      const targetIndex = direction === 'UP' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[targetIndex];
+      copy[targetIndex] = temp;
+      handleInputChange('HOMEPAGE_HERO_SLIDES', JSON.stringify(copy));
+      return copy;
+    });
+  };
+
+  const addNewSlide = () => {
+    const newSlide: HeroSlide = {
+      id: `hero_${Date.now()}`,
+      src: '/images/france_transfer_hero.jpg',
+      alt: 'Luxury Chauffeur Transfer in France',
+      title: 'New Destination / Tour',
+      badge: 'Fixed Rates • 24/7 Service',
+      isActive: true,
+    };
+    setHeroSlides((prev) => {
+      const updated = [...prev, newSlide];
+      handleInputChange('HOMEPAGE_HERO_SLIDES', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const resetSlidesToDefaults = () => {
+    setHeroSlides(DEFAULT_HERO_SLIDES);
+    setHeroInterval(DEFAULT_HERO_INTERVAL_SECONDS);
+    handleInputChange('HOMEPAGE_HERO_SLIDES', JSON.stringify(DEFAULT_HERO_SLIDES));
+    handleInputChange('HOMEPAGE_HERO_INTERVAL', String(DEFAULT_HERO_INTERVAL_SECONDS));
+  };
+
+  const handleSlideImageUpload = async (index: number, file: File) => {
+    setUploadingSlideIndex(index);
+    setSlideUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'hero');
+
+      const res = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        updateSlide(index, { src: data.url });
+      } else {
+        setSlideUploadError(data.error || 'Failed to upload hero image.');
+      }
+    } catch (err: any) {
+      setSlideUploadError(err.message || 'Image upload error.');
+    } finally {
+      setUploadingSlideIndex(null);
+    }
+  };
+
   const handleInputChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
     setSaveSuccess(null);
@@ -176,10 +304,12 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
       const payload = {
         ...settings,
         BOOKING_ADDONS: JSON.stringify(addons),
+        HOMEPAGE_HERO_SLIDES: JSON.stringify(heroSlides),
+        HOMEPAGE_HERO_INTERVAL: String(heroInterval),
       };
       const res = await adminSaveSettingsAction(payload);
       if (res.success) {
-        setSaveSuccess('All API credentials & platform configurations successfully updated in database!');
+        setSaveSuccess('All API credentials, add-ons & hero slideshow settings successfully updated!');
       } else {
         setSaveError(res.error || 'Failed to save settings.');
       }
@@ -940,7 +1070,250 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. TRANSACTIONAL EMAIL (SMTP) */}
+      {/* 5. HOMEPAGE HERO SLIDESHOW MANAGER */}
+      {/* ========================================================================= */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+              <ImageIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">
+                Homepage Hero Slideshow Manager
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                Upload new photos, edit destination titles, sub-badges, and configure slide transition intervals without touching code.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 self-start lg:self-auto">
+            {/* Rotation Interval Setting */}
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <span>Interval:</span>
+              <input
+                type="number"
+                step="0.5"
+                min="2"
+                max="30"
+                value={heroInterval}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value) || 5.5;
+                  setHeroInterval(val);
+                  handleInputChange('HOMEPAGE_HERO_INTERVAL', String(val));
+                }}
+                className="w-12 text-center bg-white border border-slate-200 rounded px-1 py-0.5 text-xs font-black text-slate-900"
+              />
+              <span className="text-[10px] text-slate-400">sec</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={resetSlidesToDefaults}
+              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Reset all slides back to factory defaults"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Defaults</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={addNewSlide}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:brightness-105 text-white text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Slide</span>
+            </button>
+          </div>
+        </div>
+
+        {slideUploadError && (
+          <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{slideUploadError}</span>
+          </div>
+        )}
+
+        {/* Slides List */}
+        <div className="space-y-5">
+          {heroSlides.map((slide, index) => (
+            <div
+              key={slide.id || `slide_${index}`}
+              className={`p-5 rounded-2xl border transition-all ${
+                slide.isActive !== false
+                  ? 'border-slate-200 bg-slate-50/40 hover:bg-slate-50/80'
+                  : 'border-slate-200/60 bg-slate-100/50 opacity-60'
+              }`}
+            >
+              {/* Card Header Controls */}
+              <div className="flex items-center justify-between border-b border-slate-200/60 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-lg bg-[#0B192C] text-[#D4AF37] font-black text-xs font-mono">
+                    Slide #{index + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toggleSlideActive(index)}
+                    className={`px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider transition-colors cursor-pointer ${
+                      slide.isActive !== false
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-300 text-slate-700'
+                    }`}
+                  >
+                    {slide.isActive !== false ? 'Active' : 'Disabled'}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveSlide(index, 'UP')}
+                    disabled={index === 0}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                    title="Move slide earlier in rotation"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveSlide(index, 'DOWN')}
+                    disabled={index === heroSlides.length - 1}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                    title="Move slide later in rotation"
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteSlide(index)}
+                    disabled={heroSlides.length <= 1}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-30 disabled:pointer-events-none transition-colors ml-1"
+                    title="Delete this slide"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Card Body: Thumbnail & Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                {/* Thumbnail Preview & Upload Action */}
+                <div className="md:col-span-4 space-y-2.5">
+                  <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner group">
+                    <img
+                      src={slide.src}
+                      alt={slide.title || 'Slide Preview'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/france_transfer_hero.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                      <span className="text-[11px] font-bold text-white drop-shadow">
+                        {slide.title}
+                      </span>
+                    </div>
+                  </div>
+
+                  <label className="w-full px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-300 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs">
+                    {uploadingSlideIndex === index ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                        <span>Uploading Photo...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Upload New Photo</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleSlideImageUpload(index, file);
+                      }}
+                      disabled={uploadingSlideIndex === index}
+                    />
+                  </label>
+                </div>
+
+                {/* Text Fields */}
+                <div className="md:col-span-8 space-y-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-500">
+                      Image Path or URL
+                    </label>
+                    <input
+                      type="text"
+                      value={slide.src}
+                      onChange={(e) => updateSlide(index, { src: e.target.value })}
+                      placeholder="/images/france_transfer_hero.jpg or /uploads/hero/..."
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase text-slate-500">
+                        Slide Title (Floating Pill Badge)
+                      </label>
+                      <input
+                        type="text"
+                        value={slide.title}
+                        onChange={(e) => updateSlide(index, { title: e.target.value })}
+                        placeholder="e.g. Disneyland Paris Direct Transfers"
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase text-slate-500">
+                        Sub-Badge Text
+                      </label>
+                      <input
+                        type="text"
+                        value={slide.badge}
+                        onChange={(e) => updateSlide(index, { badge: e.target.value })}
+                        placeholder="e.g. All Disney Hotels & Parks"
+                        className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-500">
+                      Image Alt Text (SEO & Accessibility)
+                    </label>
+                    <input
+                      type="text"
+                      value={slide.alt}
+                      onChange={(e) => updateSlide(index, { alt: e.target.value })}
+                      placeholder="e.g. Private chauffeur transfer to Disneyland Paris"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 text-[11px] text-blue-900 font-medium flex items-center gap-2">
+          <Info className="w-4 h-4 text-blue-600 shrink-0" />
+          <span>
+            Slide #1 is automatically optimized for instant Core Web Vitals (LCP) performance. The rest load smoothly in the background. Remember to click <strong>&quot;Save All Settings&quot;</strong> below to publish changes to the homepage.
+          </span>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 6. TRANSACTIONAL EMAIL (SMTP) */}
       {/* ========================================================================= */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">

@@ -118,9 +118,18 @@ interface HomePageClientProps {
   categories?: CategoryItem[];
   featuredRoutes: RouteData[];
   defaultFaqs: { question: string; answer: string }[];
+  heroSlides?: any[];
+  heroIntervalSeconds?: number;
 }
 
-export function HomePageClient({ locations, categories, featuredRoutes, defaultFaqs }: HomePageClientProps) {
+export function HomePageClient({
+  locations,
+  categories,
+  featuredRoutes,
+  defaultFaqs,
+  heroSlides,
+  heroIntervalSeconds,
+}: HomePageClientProps) {
   const { t } = useLanguage();
   const router = useRouter();
   const store = useBookingStore();
@@ -158,7 +167,7 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
       {/* HERO SECTION WITH BACKGROUND IMAGE */}
       <section className="relative pt-6 lg:pt-12 pb-12 lg:pb-20 overflow-hidden lg:min-h-[620px] flex items-center">
         {/* Dynamic Background Slideshow with Smooth Cross-fade */}
-        <HeroBackgroundSlider />
+        <HeroBackgroundSlider slides={heroSlides} intervalSeconds={heroIntervalSeconds} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-8">
           {/* Main 2-Column Split Layout */}

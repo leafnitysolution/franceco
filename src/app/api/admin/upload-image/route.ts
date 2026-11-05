@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const requestedFolder = ((formData.get('folder') as string) || 'routes').toLowerCase();
-    const folder = requestedFolder === 'reviews' ? 'reviews' : 'routes';
+    const folder = requestedFolder === 'hero' ? 'hero' : requestedFolder === 'reviews' ? 'reviews' : 'routes';
 
     if (!file) {
       return NextResponse.json({ error: 'No image file provided.' }, { status: 400 });

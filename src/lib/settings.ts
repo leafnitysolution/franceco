@@ -69,6 +69,10 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   // Configurable Booking Add-ons / Extras
   BOOKING_ADDONS: '',
 
+  // Homepage Dynamic Hero Slideshow & Interval
+  HOMEPAGE_HERO_SLIDES: '',
+  HOMEPAGE_HERO_INTERVAL: '5.5',
+
   // Transactional Email / SMTP
   SMTP_HOST: 'smtp-mail.outlook.com',
   SMTP_PORT: '587',
