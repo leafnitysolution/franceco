@@ -8,6 +8,7 @@ import { sendBookingConfirmationEmails } from '@/lib/email';
 import { getAdminSession } from '@/lib/auth';
 import { findZoneRoute } from '@/lib/zoneResolver';
 import { headers } from 'next/headers';
+import { getBookingAddons, calculateAddonsTotal } from '@/lib/addons';
 
 // Simple In-Memory Sliding Window Rate Limiter (5 bookings per hour per IP)
 const rateLimitMap = new Map<string, number[]>();
@@ -132,8 +133,31 @@ export async function createBookingAction(formData: BookingFormValues) {
       }
     }
 
-    // Exact fare computation server-side
-    const finalTotalFareEur = validated.isReturn ? calculatedOneWayFare * 2 : calculatedOneWayFare;
+    // Compute configured add-ons server-side
+    const availableAddons = await getBookingAddons();
+    const selectedAddonObjects = availableAddons.filter((a) =>
+      (validated.selectedAddonIds || []).includes(a.id)
+    );
+    const addonsOneWayTotal = calculateAddonsTotal(validated.selectedAddonIds || [], availableAddons);
+    const addonsFinalTotal = validated.isReturn ? addonsOneWayTotal * 2 : addonsOneWayTotal;
+
+    // Exact fare computation server-side: Base vehicle fare + selected add-ons
+    const finalTotalFareEur =
+      (validated.isReturn ? calculatedOneWayFare * 2 : calculatedOneWayFare) + addonsFinalTotal;
+
+    // Format special notes with selected add-ons for dispatch and emails
+    let consolidatedNotes = validated.notes?.trim() || '';
+    if (selectedAddonObjects.length > 0) {
+      const addonsSummary = selectedAddonObjects
+        .map(
+          (a) =>
+            `• ${a.title} (+€${a.priceEur.toFixed(2)}${validated.isReturn ? ' x 2 round-trip' : ''})`
+        )
+        .join('\n');
+      consolidatedNotes = `[SELECTED ADD-ONS & EXTRAS]\n${addonsSummary}${
+        consolidatedNotes ? `\n\n[CUSTOMER NOTES]\n${consolidatedNotes}` : ''
+      }`;
+    }
 
     // 6. Idempotent Database Transaction
     const bookingRef = generateBookingRef();
@@ -160,7 +184,7 @@ export async function createBookingAction(formData: BookingFormValues) {
           customerName: validated.customerName,
           customerEmail: validated.customerEmail,
           customerPhone: validated.customerPhone,
-          notes: validated.notes || null,
+          notes: consolidatedNotes || null,
         },
         include: {
           origin: true,

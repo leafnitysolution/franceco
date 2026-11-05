@@ -39,15 +39,21 @@ import {
   Info,
   Navigation,
   Compass,
+  Tv,
+  PawPrint,
+  Wine,
+  Wifi,
 } from 'lucide-react';
+import { BookingAddon, DEFAULT_BOOKING_ADDONS, calculateAddonsTotal } from '@/lib/addons';
 
 interface FullPageBookingClientProps {
   locations: LocationItem[];
   categories?: CategoryItem[];
   routes?: any[];
+  addons?: BookingAddon[];
 }
 
-export function FullPageBookingClient({ locations, categories, routes }: FullPageBookingClientProps) {
+export function FullPageBookingClient({ locations, categories, routes, addons }: FullPageBookingClientProps) {
   const router = useRouter();
   const store = useBookingStore();
 
@@ -200,7 +206,23 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
   };
 
   const currentPrice = getVehiclePrice(store.vehicleTier);
-  const totalFare = store.isReturn && store.serviceMode !== 'HOURLY_TOUR' ? currentPrice * 2 : currentPrice;
+
+  const availableAddons = useMemo(() => {
+    const list = addons && addons.length > 0 ? addons : DEFAULT_BOOKING_ADDONS;
+    return list.filter((a) => a.isActive !== false);
+  }, [addons]);
+
+  const selectedAddonObjects = useMemo(() => {
+    return availableAddons.filter((a) => store.selectedAddonIds.includes(a.id));
+  }, [availableAddons, store.selectedAddonIds]);
+
+  const addonsOneWayTotal = useMemo(() => {
+    return calculateAddonsTotal(store.selectedAddonIds, availableAddons);
+  }, [store.selectedAddonIds, availableAddons]);
+
+  const addonsTotal = store.isReturn ? addonsOneWayTotal * 2 : addonsOneWayTotal;
+  const vehicleFare = store.isReturn && store.serviceMode !== 'HOURLY_TOUR' ? currentPrice * 2 : currentPrice;
+  const totalFare = vehicleFare + addonsTotal;
 
   // Navigation handlers
   const handleNextToStep2 = () => {
@@ -283,6 +305,7 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
         luggageCount: store.luggageCount,
         babySeats: store.babySeats,
         boosterSeats: store.boosterSeats,
+        selectedAddonIds: store.selectedAddonIds,
         customerName: fullName,
         customerEmail: store.customerEmail,
         customerPhone: store.customerPhone,
@@ -745,6 +768,105 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
                     </p>
                   </div>
 
+                  {/* Journey Add-ons & Extras */}
+                  {availableAddons.length > 0 && (
+                    <div className="space-y-3.5 border-t border-slate-100 pt-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                            <span>Add-ons &amp; Special Features</span>
+                          </h3>
+                          <p className="text-[11px] text-slate-500 font-medium">
+                            Choose extra amenities to customize your ride with TV entertainment, pets, or refreshments.
+                          </p>
+                        </div>
+                        {store.selectedAddonIds.length > 0 && (
+                          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 self-start sm:self-auto">
+                            {store.selectedAddonIds.length} {store.selectedAddonIds.length === 1 ? 'addon' : 'addons'} selected (+€{addonsTotal.toFixed(2)})
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        {availableAddons.map((addon) => {
+                          const isSelected = store.selectedAddonIds.includes(addon.id);
+                          return (
+                            <div
+                              key={addon.id}
+                              onClick={() => store.toggleAddon(addon.id)}
+                              className={`group relative p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                                isSelected
+                                  ? 'border-[#C5A059] bg-[#C5A059]/5 ring-2 ring-[#C5A059]/20 shadow-xs'
+                                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                                    isSelected
+                                      ? 'bg-[#0B192C] text-[#D4AF37]'
+                                      : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                                  }`}
+                                >
+                                  {addon.icon === 'tv' && <Tv className="w-5 h-5" />}
+                                  {addon.icon === 'paw' && <PawPrint className="w-5 h-5" />}
+                                  {addon.icon === 'wine' && <Wine className="w-5 h-5" />}
+                                  {addon.icon === 'clock' && <Clock className="w-5 h-5" />}
+                                  {addon.icon === 'wifi' && <Wifi className="w-5 h-5" />}
+                                  {(!addon.icon || addon.icon === 'sparkles') && <Sparkles className="w-5 h-5 text-[#C5A059]" />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <h4 className="text-xs font-bold text-slate-900 truncate">
+                                      {addon.title}
+                                    </h4>
+                                    <span className="text-xs font-black text-slate-900 shrink-0">
+                                      +€{addon.priceEur.toFixed(2)}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-1">
+                                    {addon.description}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between border-t border-slate-100 pt-2.5 mt-1">
+                                <span className="text-[10px] text-slate-400 font-semibold">
+                                  {store.isReturn ? 'Per journey leg' : 'One-way transfer'}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    store.toggleAddon(addon.id);
+                                  }}
+                                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                    isSelected
+                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                  }`}
+                                >
+                                  {isSelected ? (
+                                    <>
+                                      <Check className="w-3.5 h-3.5" />
+                                      <span>Added</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Plus className="w-3.5 h-3.5" />
+                                      <span>Add Option</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Child & Booster Seat Toggle */}
                   <div className="space-y-3 border-t border-slate-100 pt-4">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -1191,6 +1313,27 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
                       </div>
                     </div>
 
+                    {/* Selected Add-ons Confirmation Summary */}
+                    {selectedAddonObjects.length > 0 && (
+                      <div className="space-y-2 border-t border-slate-200/80 pt-4">
+                        <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                          Selected Journey Add-ons &amp; Extras
+                        </h3>
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60 divide-y divide-slate-200/60 text-xs">
+                          {selectedAddonObjects.map((addon) => (
+                            <div key={addon.id} className="py-1.5 flex items-center justify-between">
+                              <span className="font-bold text-slate-800">
+                                • {addon.title} {store.isReturn ? '(Round-trip)' : ''}
+                              </span>
+                              <span className="font-extrabold text-slate-900">
+                                +€{(addon.priceEur * (store.isReturn ? 2 : 1)).toFixed(2)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Price Summary */}
                     <div className="border-t border-slate-200 pt-4 flex justify-between items-center text-slate-900 font-extrabold text-lg">
                       <span>Total Guaranteed Fare:</span>
@@ -1269,10 +1412,54 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
                 </div>
               </div>
 
-              {/* Selected Vehicle & Price Tag */}
-              <div className="flex items-center justify-between bg-slate-100 p-3.5 rounded-xl text-xs font-bold text-slate-900">
-                <span>{store.vehicleTier.replace('_', ' ')}</span>
-                <span className="text-base font-black">€{totalFare.toFixed(2)}</span>
+              {/* Selected Vehicle & Price Breakdown Tag */}
+              <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl text-xs space-y-2 text-slate-900">
+                <div className="flex items-center justify-between font-bold">
+                  <span>
+                    {store.vehicleTier.replace('_', ' ')}
+                    {store.isReturn && store.serviceMode !== 'HOURLY_TOUR' ? ' (x2 Return)' : ''}
+                  </span>
+                  <span className="font-extrabold">€{vehicleFare.toFixed(2)}</span>
+                </div>
+
+                {selectedAddonObjects.length > 0 && (
+                  <div className="border-t border-slate-200/70 pt-2 space-y-1">
+                    <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
+                      Selected Add-ons &amp; Extras
+                    </span>
+                    {selectedAddonObjects.map((addon) => (
+                      <div
+                        key={addon.id}
+                        className="flex items-center justify-between text-[11px] text-slate-700 font-semibold"
+                      >
+                        <span className="truncate pr-2">
+                          • {addon.title} {store.isReturn ? '(x2)' : ''}
+                        </span>
+                        <span className="shrink-0 font-bold text-slate-900">
+                          +€{(addon.priceEur * (store.isReturn ? 2 : 1)).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {(store.babySeats > 0 || store.boosterSeats > 0) && (
+                  <div className="flex items-center justify-between text-[11px] text-emerald-700 font-bold border-t border-slate-200/70 pt-1.5">
+                    <span>
+                      Child Seats ({store.babySeats > 0 ? `${store.babySeats} Baby` : ''}
+                      {store.babySeats > 0 && store.boosterSeats > 0 ? ', ' : ''}
+                      {store.boosterSeats > 0 ? `${store.boosterSeats} Booster` : ''})
+                    </span>
+                    <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-[10px]">
+                      FREE
+                    </span>
+                  </div>
+                )}
+
+                <div className="border-t border-slate-200 pt-2 flex items-center justify-between font-black text-slate-900 text-sm">
+                  <span>Total Fare:</span>
+                  <span className="text-base text-slate-900">€{totalFare.toFixed(2)}</span>
+                </div>
               </div>
 
               {/* Add Return Button */}
@@ -1358,7 +1545,14 @@ export function FullPageBookingClient({ locations, categories, routes }: FullPag
               )}
               <div className="text-xs font-bold text-slate-800">
                 <span className="text-slate-400 block text-[10px] uppercase">Your choice</span>
-                <span>{store.vehicleTier.replace('_', ' ')} (€{totalFare.toFixed(2)})</span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span>{store.vehicleTier.replace('_', ' ')} (€{totalFare.toFixed(2)})</span>
+                  {selectedAddonObjects.length > 0 && (
+                    <span className="text-[10px] font-extrabold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">
+                      +{selectedAddonObjects.length} {selectedAddonObjects.length === 1 ? 'addon' : 'addons'}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

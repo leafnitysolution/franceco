@@ -1,5 +1,6 @@
 import { FullPageBookingClient } from '@/components/booking/FullPageBookingClient';
 import { getPublicLocations, getPublicCategories, getPublicRoutes } from '@/lib/publicData';
+import { getBookingAddons } from '@/lib/addons';
 
 export const revalidate = 0;
 
@@ -10,10 +11,11 @@ export const metadata = {
 };
 
 export default async function BookPage() {
-  const [locations, categories, routes] = await Promise.all([
+  const [locations, categories, routes, addons] = await Promise.all([
     getPublicLocations(),
     getPublicCategories(),
     getPublicRoutes(),
+    getBookingAddons(),
   ]);
 
   return (
@@ -21,6 +23,7 @@ export default async function BookPage() {
       locations={locations as any}
       categories={categories as any}
       routes={routes as any}
+      addons={addons}
     />
   );
 }

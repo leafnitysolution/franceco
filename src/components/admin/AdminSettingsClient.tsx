@@ -8,6 +8,7 @@ import {
   adminSearchTripAdvisorAction,
   adminTestEmailAction,
 } from '@/lib/actions/settings';
+import { BookingAddon, DEFAULT_BOOKING_ADDONS } from '@/lib/addons';
 import {
   Key,
   MapPin,
@@ -31,6 +32,14 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  Tv,
+  PawPrint,
+  Wine,
+  Clock,
+  Wifi,
+  Trash2,
+  Plus,
+  RotateCcw,
 } from 'lucide-react';
 
 interface AdminSettingsClientProps {
@@ -71,6 +80,69 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
   // SMTP Test State
   const [testingSmtp, setTestingSmtp] = useState(false);
   const [smtpTestResult, setSmtpTestResult] = useState<any | null>(null);
+
+  // Booking Add-ons / Extras State
+  const parseInitialAddons = (): BookingAddon[] => {
+    try {
+      if (initialSettings.BOOKING_ADDONS && initialSettings.BOOKING_ADDONS.trim().length > 0) {
+        const parsed = JSON.parse(initialSettings.BOOKING_ADDONS);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return DEFAULT_BOOKING_ADDONS;
+  };
+
+  const [addons, setAddons] = useState<BookingAddon[]>(parseInitialAddons);
+
+  const updateAddon = (index: number, patch: Partial<BookingAddon>) => {
+    setAddons((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], ...patch };
+      handleInputChange('BOOKING_ADDONS', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const toggleAddonActive = (index: number) => {
+    setAddons((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], isActive: !updated[index].isActive };
+      handleInputChange('BOOKING_ADDONS', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteAddon = (index: number) => {
+    setAddons((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
+      handleInputChange('BOOKING_ADDONS', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const addNewAddon = () => {
+    const newId = `addon_${Date.now()}`;
+    const newItem: BookingAddon = {
+      id: newId,
+      title: 'New Custom Add-on',
+      description: 'Describe this optional amenity or feature for passengers.',
+      priceEur: 20,
+      icon: 'sparkles',
+      isActive: true,
+    };
+    setAddons((prev) => {
+      const updated = [...prev, newItem];
+      handleInputChange('BOOKING_ADDONS', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const resetAddonsToDefaults = () => {
+    setAddons(DEFAULT_BOOKING_ADDONS);
+    handleInputChange('BOOKING_ADDONS', JSON.stringify(DEFAULT_BOOKING_ADDONS));
+  };
 
   const handleInputChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -707,7 +779,164 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. TRANSACTIONAL EMAIL (SMTP) */}
+      {/* 4. BOOKING ADD-ONS & EXTRA FEATURES (TV, PET, CUSTOM OPTIONS) */}
+      {/* ========================================================================= */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#C5A059]">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">
+                Booking Add-ons &amp; Optional Features
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                Configure extras available during booking (TV on board, Pet Friendly, Champagne, Extra Waiting Time). Set prices and toggle availability.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={resetAddonsToDefaults}
+              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Reset all add-ons back to factory defaults"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Defaults</span>
+            </button>
+            <button
+              type="button"
+              onClick={addNewAddon}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Custom Add-on</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Add-ons List */}
+        <div className="space-y-4">
+          {addons.map((addon, index) => (
+            <div
+              key={addon.id}
+              className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                addon.isActive
+                  ? 'border-slate-200 bg-slate-50/50 hover:bg-slate-50'
+                  : 'border-slate-200/60 bg-slate-100/50 opacity-60'
+              }`}
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                {/* Active Toggle & Icon & Basic info */}
+                <div className="flex items-start sm:items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleAddonActive(index)}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-colors cursor-pointer shrink-0 ${
+                      addon.isActive
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-300 text-slate-700'
+                    }`}
+                  >
+                    {addon.isActive ? 'Active' : 'Disabled'}
+                  </button>
+
+                  {/* Icon Selector */}
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
+                      {addon.icon === 'tv' && <Tv className="w-4 h-4" />}
+                      {addon.icon === 'paw' && <PawPrint className="w-4 h-4" />}
+                      {addon.icon === 'wine' && <Wine className="w-4 h-4" />}
+                      {addon.icon === 'clock' && <Clock className="w-4 h-4" />}
+                      {addon.icon === 'wifi' && <Wifi className="w-4 h-4" />}
+                      {(!addon.icon || addon.icon === 'sparkles') && <Sparkles className="w-4 h-4 text-[#C5A059]" />}
+                    </div>
+
+                    <select
+                      value={addon.icon || 'sparkles'}
+                      onChange={(e) => updateAddon(index, { icon: e.target.value as any })}
+                      className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#C5A059] cursor-pointer"
+                    >
+                      <option value="tv">TV / Entertainment</option>
+                      <option value="paw">Pet / Paw</option>
+                      <option value="wine">Champagne / Drinks</option>
+                      <option value="clock">Waiting Time / Clock</option>
+                      <option value="wifi">High-speed Wi-Fi</option>
+                      <option value="sparkles">VIP / Sparkles</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Price in € */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-[#C5A059]">
+                    <span className="text-xs font-black text-slate-500 mr-1.5">€</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={addon.priceEur}
+                      onChange={(e) => updateAddon(index, { priceEur: Math.max(0, Number(e.target.value) || 0) })}
+                      className="w-20 text-xs font-black text-slate-900 bg-transparent focus:outline-none"
+                    />
+                    <span className="text-[10px] font-bold text-slate-400">EUR</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => deleteAddon(index)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200/80 transition-colors cursor-pointer"
+                    title="Remove this add-on"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Title & Description inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3.5 pt-3 border-t border-slate-200/60">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-500">
+                    Add-on Title
+                  </label>
+                  <input
+                    type="text"
+                    value={addon.title}
+                    onChange={(e) => updateAddon(index, { title: e.target.value })}
+                    placeholder="e.g. TV on Board"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase text-slate-500">
+                    Description for Passenger
+                  </label>
+                  <input
+                    type="text"
+                    value={addon.description}
+                    onChange={(e) => updateAddon(index, { description: e.target.value })}
+                    placeholder="e.g. In-vehicle high-definition entertainment"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#C5A059]"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200 text-[11px] text-amber-900 font-medium flex items-center gap-2">
+          <Info className="w-4 h-4 text-amber-600 shrink-0" />
+          <span>
+            Selected add-ons are included in the customer&apos;s total price, confirmed in their booking email, and forwarded to chauffeur WhatsApp dispatches. Remember to click <strong>&quot;Save All Settings&quot;</strong> below to apply changes.
+          </span>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 5. TRANSACTIONAL EMAIL (SMTP) */}
       {/* ========================================================================= */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">

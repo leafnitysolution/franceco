@@ -54,6 +54,7 @@ export const bookingFormSchema = z
     luggageCount: z.number().int().min(0).max(20, 'Maximum 20 luggage items'),
     babySeats: z.number().int().min(0).max(6, 'Maximum 6 baby seats'),
     boosterSeats: z.number().int().min(0).max(6, 'Maximum 6 booster seats'),
+    selectedAddonIds: z.array(z.string()).optional(),
     customerName: z.string().trim().min(2, 'Full name required').max(100),
     customerEmail: z.string().trim().email('Valid email address required').max(150),
     customerPhone: z

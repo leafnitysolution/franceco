@@ -79,6 +79,7 @@ export function CheckoutModal() {
         luggageCount: store.luggageCount,
         babySeats: store.babySeats,
         boosterSeats: store.boosterSeats,
+        selectedAddonIds: store.selectedAddonIds,
         customerName: store.customerName,
         customerEmail: store.customerEmail,
         customerPhone: store.customerPhone,

@@ -66,6 +66,9 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   // B2B Partner API
   PARTNER_API_KEY: 'your_b2b_secret_partner_key_2026',
 
+  // Configurable Booking Add-ons / Extras
+  BOOKING_ADDONS: '',
+
   // Transactional Email / SMTP
   SMTP_HOST: 'smtp-mail.outlook.com',
   SMTP_PORT: '587',

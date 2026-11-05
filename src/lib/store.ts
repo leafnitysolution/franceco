@@ -26,6 +26,7 @@ interface BookingStoreState {
   customerEmail: string;
   customerPhone: string;
   notes: string;
+  selectedAddonIds: string[];
   isModalOpen: boolean;
   currentStep: 1 | 2 | 3;
   
@@ -64,6 +65,8 @@ interface BookingStoreState {
   setHandLuggageCount: (bags: number) => void;
   setBabySeats: (seats: number) => void;
   setBoosterSeats: (seats: number) => void;
+  toggleAddon: (addonId: string) => void;
+  setSelectedAddonIds: (ids: string[]) => void;
   setRentalHours: (hours: number) => void;
   setEstimatedKm: (km: number) => void;
   setEstimatedDurationMinutes: (minutes: number) => void;
@@ -101,6 +104,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   customerEmail: '',
   customerPhone: '',
   notes: '',
+  selectedAddonIds: [],
   isModalOpen: false,
   currentStep: 1,
 
@@ -144,6 +148,15 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   setHandLuggageCount: (bags) => set({ handLuggageCount: bags }),
   setBabySeats: (seats) => set({ babySeats: Math.max(0, seats) }),
   setBoosterSeats: (seats) => set({ boosterSeats: Math.max(0, seats) }),
+  toggleAddon: (addonId) => {
+    const { selectedAddonIds } = get();
+    if (selectedAddonIds.includes(addonId)) {
+      set({ selectedAddonIds: selectedAddonIds.filter((id) => id !== addonId) });
+    } else {
+      set({ selectedAddonIds: [...selectedAddonIds, addonId] });
+    }
+  },
+  setSelectedAddonIds: (ids) => set({ selectedAddonIds: ids }),
   setRentalHours: (hours) => set({ rentalHours: Math.max(1, hours) }),
   setEstimatedKm: (km) => set({ estimatedKm: Math.max(1, km) }),
   setEstimatedDurationMinutes: (minutes) => set({ estimatedDurationMinutes: Math.max(1, minutes) }),
@@ -187,6 +200,7 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
       handLuggageCount: 0,
       babySeats: 0,
       boosterSeats: 0,
+      selectedAddonIds: [],
       customerName: '',
       customerEmail: '',
       customerPhone: '',
