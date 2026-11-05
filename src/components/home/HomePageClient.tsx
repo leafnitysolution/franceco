@@ -8,6 +8,7 @@ import { BookingWidget } from '@/components/booking/BookingWidget';
 import { FleetShowcase } from '@/components/UI/FleetShowcase';
 import { CustomerReviews } from '@/components/UI/CustomerReviews';
 import { FaqAccordion } from '@/components/UI/FaqAccordion';
+import { HeroBackgroundSlider } from '@/components/home/HeroBackgroundSlider';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useBookingStore } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
@@ -156,18 +157,8 @@ export function HomePageClient({ locations, categories, featuredRoutes, defaultF
     <div className="space-y-16 pb-20 bg-[#FBF9F5] text-navy-900">
       {/* HERO SECTION WITH BACKGROUND IMAGE */}
       <section className="relative pt-6 lg:pt-12 pb-12 lg:pb-20 overflow-hidden lg:min-h-[620px] flex items-center">
-        {/* Background Image & Gradient Overlay */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/france_transfer_hero.jpg"
-            alt="Paris Chauffeur Transfer Background"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B192C]/55 via-[#0B192C]/30 to-transparent" />
-        </div>
+        {/* Dynamic Background Slideshow with Smooth Cross-fade */}
+        <HeroBackgroundSlider />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-8">
           {/* Main 2-Column Split Layout */}
