@@ -213,11 +213,12 @@ export function FullPageBookingClient({ locations, categories, routes, addons }:
   }, [addons]);
 
   const selectedAddonObjects = useMemo(() => {
-    return availableAddons.filter((a) => store.selectedAddonIds.includes(a.id));
+    const selected = store.selectedAddonIds || [];
+    return availableAddons.filter((a) => selected.includes(a.id));
   }, [availableAddons, store.selectedAddonIds]);
 
   const addonsOneWayTotal = useMemo(() => {
-    return calculateAddonsTotal(store.selectedAddonIds, availableAddons);
+    return calculateAddonsTotal(store.selectedAddonIds || [], availableAddons);
   }, [store.selectedAddonIds, availableAddons]);
 
   const addonsTotal = store.isReturn ? addonsOneWayTotal * 2 : addonsOneWayTotal;
@@ -781,16 +782,16 @@ export function FullPageBookingClient({ locations, categories, routes, addons }:
                             Choose extra amenities to customize your ride with TV entertainment, pets, or refreshments.
                           </p>
                         </div>
-                        {store.selectedAddonIds.length > 0 && (
+                        {(store.selectedAddonIds || []).length > 0 && (
                           <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 self-start sm:self-auto">
-                            {store.selectedAddonIds.length} {store.selectedAddonIds.length === 1 ? 'addon' : 'addons'} selected (+€{addonsTotal.toFixed(2)})
+                            {(store.selectedAddonIds || []).length} {(store.selectedAddonIds || []).length === 1 ? 'addon' : 'addons'} selected (+€{addonsTotal.toFixed(2)})
                           </span>
                         )}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         {availableAddons.map((addon) => {
-                          const isSelected = store.selectedAddonIds.includes(addon.id);
+                          const isSelected = (store.selectedAddonIds || []).includes(addon.id);
                           return (
                             <div
                               key={addon.id}

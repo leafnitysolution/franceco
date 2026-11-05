@@ -149,11 +149,11 @@ export const useBookingStore = create<BookingStoreState>((set, get) => ({
   setBabySeats: (seats) => set({ babySeats: Math.max(0, seats) }),
   setBoosterSeats: (seats) => set({ boosterSeats: Math.max(0, seats) }),
   toggleAddon: (addonId) => {
-    const { selectedAddonIds } = get();
-    if (selectedAddonIds.includes(addonId)) {
-      set({ selectedAddonIds: selectedAddonIds.filter((id) => id !== addonId) });
+    const list = get().selectedAddonIds || [];
+    if (list.includes(addonId)) {
+      set({ selectedAddonIds: list.filter((id) => id !== addonId) });
     } else {
-      set({ selectedAddonIds: [...selectedAddonIds, addonId] });
+      set({ selectedAddonIds: [...list, addonId] });
     }
   },
   setSelectedAddonIds: (ids) => set({ selectedAddonIds: ids }),

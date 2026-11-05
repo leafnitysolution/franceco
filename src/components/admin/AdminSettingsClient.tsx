@@ -173,7 +173,11 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
     setSaveError(null);
 
     startTransition(async () => {
-      const res = await adminSaveSettingsAction(settings);
+      const payload = {
+        ...settings,
+        BOOKING_ADDONS: JSON.stringify(addons),
+      };
+      const res = await adminSaveSettingsAction(payload);
       if (res.success) {
         setSaveSuccess('All API credentials & platform configurations successfully updated in database!');
       } else {
