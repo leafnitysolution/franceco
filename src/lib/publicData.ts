@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { db } from './db';
 import { ensureLocationsSeeded } from './seedHelper';
 
@@ -399,24 +397,12 @@ function resolveSafePublicPhoto(
   const fallback = defaultList[fallbackIndex % defaultList.length];
   if (!url || typeof url !== 'string') return fallback;
   const trimmed = url.trim();
-  if (!trimmed || trimmed === 'null' || trimmed === 'undefined') return fallback;
-
-  if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed.startsWith('/uploads/')) {
+    return fallback;
+  }
+  if (trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('/images/')) {
     return trimmed;
   }
-
-  if (trimmed.startsWith('/')) {
-    try {
-      const relPath = trimmed.replace(/^\//, '');
-      const fullPath = path.join(process.cwd(), 'public', relPath);
-      if (fs.existsSync(fullPath)) {
-        return trimmed;
-      }
-    } catch {
-      // Fallback
-    }
-  }
-
   return fallback;
 }
 
