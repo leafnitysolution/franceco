@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { db } from '@/lib/db';
+import { getPublicReviews } from '@/lib/publicData';
 import { ReviewsPageClient } from '@/components/reviews/ReviewsPageClient';
 
 export const revalidate = 0;
@@ -11,36 +11,7 @@ export const metadata = {
 };
 
 export default async function ReviewsPage() {
-  let reviews: any[] = [];
-  try {
-    reviews = await db.review.findMany({
-      where: { isPublished: true },
-      orderBy: { createdAt: 'desc' },
-    });
-  } catch (err) {
-    console.warn('Database query failed in ReviewsPage, using verified fallbacks:', err);
-    reviews = [
-      {
-        id: 'rev-fb-1',
-        authorName: 'Sarah Jenkins',
-        location: 'London, United Kingdom',
-        routeText: 'CDG Airport to Disneyland Paris',
-        rating: 5,
-        comment: 'Driver was waiting with our name sign right outside customs. Spotless Mercedes van and free booster seats for the kids. Highly recommended!',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'rev-fb-2',
-        authorName: 'Marco Rossi',
-        location: 'Milan, Italy',
-        routeText: 'Orly Airport to Paris City Center',
-        rating: 5,
-        comment: 'Flight was delayed by 45 minutes but driver tracked our flight and waited without extra charge. Outstanding service.',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-  }
-
+  const reviews = await getPublicReviews();
   const serializedReviews = JSON.parse(JSON.stringify(reviews));
 
   return (

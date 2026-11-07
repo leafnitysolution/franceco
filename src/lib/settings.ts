@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { db } from './db';
 
 // Lightweight memory cache with 30s TTL to prevent redundant database hits on high-frequency calls
@@ -87,6 +89,44 @@ export async function ensureSettingsTable(): Promise<void> {
         // Safe skip
       }
     }
+        // Auto-heal any reviews pointing to missing or orphaned upload paths
+    try {
+      const allDbReviews = await db.review.findMany();
+      const DEFAULT_CANONICAL_PHOTOS = [
+        '/images/reviews/review_family_travel.jpg',
+        '/images/reviews/review_luxury_van.jpg',
+        '/images/reviews/review_family_disney.jpg',
+        '/images/reviews/review_couple_paris.jpg',
+        '/images/reviews/review_airport_meet.jpg',
+        '/images/reviews/review_business_client.jpg',
+      ];
+      for (let i = 0; i < allDbReviews.length; i++) {
+        const rev = allDbReviews[i];
+        let needsUpdate = false;
+        let safeImageUrl = rev.imageUrl;
+
+        if (safeImageUrl && safeImageUrl.startsWith('/')) {
+          const filePath = path.join(process.cwd(), 'public', safeImageUrl.replace(/^\//, ''));
+          if (!fs.existsSync(filePath)) {
+            safeImageUrl = DEFAULT_CANONICAL_PHOTOS[i % DEFAULT_CANONICAL_PHOTOS.length];
+            needsUpdate = true;
+          }
+        } else if (!safeImageUrl || safeImageUrl === 'null' || safeImageUrl === 'undefined') {
+          safeImageUrl = DEFAULT_CANONICAL_PHOTOS[i % DEFAULT_CANONICAL_PHOTOS.length];
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+          await db.review.update({
+            where: { id: rev.id },
+            data: { imageUrl: safeImageUrl },
+          });
+        }
+      }
+    } catch (autoHealErr) {
+      console.warn('[SETTINGS NOTICE] Review photo auto-heal notice:', autoHealErr);
+    }
+
     isTableInitialized = true;
   } catch (err) {
     console.warn('[SETTINGS NOTICE] SystemSetting table auto-ensure warning:', err);

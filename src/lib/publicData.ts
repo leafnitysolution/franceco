@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { db } from './db';
 import { ensureLocationsSeeded } from './seedHelper';
 
@@ -387,6 +389,36 @@ export async function getPublicCategories(): Promise<any[]> {
   return serialize(DEFAULT_CATEGORIES);
 }
 
+
+
+function resolveSafePublicPhoto(
+  url: string | null | undefined,
+  fallbackIndex: number,
+  defaultList: string[]
+): string {
+  const fallback = defaultList[fallbackIndex % defaultList.length];
+  if (!url || typeof url !== 'string') return fallback;
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined') return fallback;
+
+  if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('/')) {
+    try {
+      const relPath = trimmed.replace(/^\//, '');
+      const fullPath = path.join(process.cwd(), 'public', relPath);
+      if (fs.existsSync(fullPath)) {
+        return trimmed;
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  return fallback;
+}
 
 export async function getPublicReviews(): Promise<any[]> {
   const DEFAULT_PHOTOS = [
