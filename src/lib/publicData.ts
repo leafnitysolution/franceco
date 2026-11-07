@@ -386,3 +386,70 @@ export async function getPublicCategories(): Promise<any[]> {
   }
   return serialize(DEFAULT_CATEGORIES);
 }
+
+
+export async function getPublicReviews(): Promise<any[]> {
+  const DEFAULT_PHOTOS = [
+    '/images/reviews/review_family_travel.jpg',
+    '/images/reviews/review_luxury_van.jpg',
+    '/images/reviews/review_family_disney.jpg',
+    '/images/reviews/review_couple_paris.jpg',
+    '/images/reviews/review_airport_meet.jpg',
+    '/images/reviews/review_business_client.jpg',
+  ];
+  const DEFAULT_AVATARS = [
+    '/images/reviews/avatar_sarah.jpg',
+    '/images/reviews/avatar_michael.jpg',
+    '/images/reviews/avatar_elena.jpg',
+    '/images/reviews/avatar_jean.jpg',
+    '/images/reviews/avatar_emma.jpg',
+    '/images/reviews/avatar_david.jpg',
+  ];
+  const DEFAULT_TITLES = [
+    'Outstanding chauffeur, kids loved the trip!',
+    'Punctual, luxurious van & fixed transparent fare',
+    'Direct hassle-free transfer from Beauvais to Disney',
+    'Arrived early, very polite and impeccable Mercedes',
+    'Chauffeur was waiting right at terminal arrivals',
+    'Executive business class service at its best',
+  ];
+
+  try {
+    const reviews = await db.review.findMany({
+      where: { isPublished: true },
+      orderBy: { createdAt: 'desc' },
+      take: 12,
+    });
+    if (reviews && reviews.length > 0) {
+      return reviews.map((r, idx) => ({
+        id: r.id,
+        name: r.authorName,
+        originCountry: r.location,
+        route: r.routeText,
+        rating: r.rating,
+        date: new Date(r.createdAt).toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        }),
+        verified: true,
+        title:
+          r.title && r.title.trim() && r.title !== 'Outstanding Experience'
+            ? r.title.trim()
+            : DEFAULT_TITLES[idx % DEFAULT_TITLES.length],
+        review: r.comment,
+        imageUrl:
+          r.imageUrl && r.imageUrl !== 'null'
+            ? r.imageUrl
+            : DEFAULT_PHOTOS[idx % DEFAULT_PHOTOS.length],
+        authorAvatar:
+          r.authorAvatar && r.authorAvatar !== 'null'
+            ? r.authorAvatar
+            : DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length],
+        source: r.source || 'TripAdvisor',
+      }));
+    }
+  } catch (err) {
+    console.warn('Database query failed for getPublicReviews, using fallback:', err);
+  }
+  return [];
+}

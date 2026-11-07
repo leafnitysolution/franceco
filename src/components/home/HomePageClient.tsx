@@ -120,6 +120,7 @@ interface HomePageClientProps {
   defaultFaqs: { question: string; answer: string }[];
   heroSlides?: any[];
   heroIntervalSeconds?: number;
+  initialReviews?: any[];
 }
 
 export function HomePageClient({
@@ -129,6 +130,7 @@ export function HomePageClient({
   defaultFaqs,
   heroSlides,
   heroIntervalSeconds,
+  initialReviews,
 }: HomePageClientProps) {
   const { t } = useLanguage();
   const router = useRouter();
@@ -355,7 +357,7 @@ export function HomePageClient({
 
       {/* CUSTOMER REVIEWS */}
       <section id="reviews" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <CustomerReviews />
+        <CustomerReviews initialReviews={initialReviews} />
       </section>
 
       {/* FAQ SECTION */}

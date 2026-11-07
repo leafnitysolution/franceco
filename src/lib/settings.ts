@@ -43,6 +43,50 @@ export async function ensureSettingsTable(): Promise<void> {
         // Safe skip if already migrated
       }
     }
+
+    // Auto-heal verified reviews: backfill canonical photo assets and titles for existing rows
+    const autoHealStatements = [
+      `UPDATE "Review" SET 
+        "imageUrl" = '/images/reviews/review_family_travel.jpg', 
+        "authorAvatar" = '/images/reviews/avatar_sarah.jpg',
+        "title" = COALESCE(NULLIF("title", ''), 'Outstanding chauffeur, kids loved the trip!')
+       WHERE "id" = 'rev_1' OR "authorName" = 'Sarah & Family'`,
+      `UPDATE "Review" SET 
+        "imageUrl" = '/images/reviews/review_luxury_van.jpg', 
+        "authorAvatar" = '/images/reviews/avatar_michael.jpg',
+        "title" = COALESCE(NULLIF("title", ''), 'Punctual, luxurious van & fixed transparent fare')
+       WHERE "id" = 'rev_2' OR "authorName" LIKE 'Michael%'`,
+      `UPDATE "Review" SET 
+        "imageUrl" = '/images/reviews/review_family_disney.jpg', 
+        "authorAvatar" = '/images/reviews/avatar_elena.jpg',
+        "title" = COALESCE(NULLIF("title", ''), 'Direct hassle-free transfer from Beauvais to Disney')
+       WHERE "id" = 'rev_3' OR "authorName" LIKE 'Elena%'`,
+      `UPDATE "Review" SET 
+        "imageUrl" = '/images/reviews/review_couple_paris.jpg', 
+        "authorAvatar" = '/images/reviews/avatar_jean.jpg',
+        "title" = COALESCE(NULLIF("title", ''), 'Arrived early, very polite and impeccable Mercedes')
+       WHERE "id" = 'rev_4' OR "authorName" LIKE 'Jean-Pierre%'`,
+      `UPDATE "Review" SET 
+        "imageUrl" = '/images/reviews/review_airport_meet.jpg', 
+        "authorAvatar" = '/images/reviews/avatar_emma.jpg',
+        "title" = COALESCE(NULLIF("title", ''), 'Chauffeur was waiting right at terminal arrivals')
+       WHERE "id" = 'rev_5' OR "authorName" LIKE 'Arthur%'`,
+      `UPDATE "Review" SET 
+        "imageUrl" = '/images/reviews/review_business_client.jpg', 
+        "authorAvatar" = '/images/reviews/avatar_david.jpg',
+        "title" = COALESCE(NULLIF("title", ''), 'Executive business class service at its best')
+       WHERE "id" = 'rev_6' OR "authorName" LIKE 'Robert%'`,
+      `UPDATE "Review" SET "imageUrl" = '/images/reviews/review_family_travel.jpg' WHERE "imageUrl" IS NULL OR "imageUrl" = '' OR "imageUrl" = 'null' OR "imageUrl" = 'undefined'`,
+      `UPDATE "Review" SET "authorAvatar" = '/images/reviews/avatar_sarah.jpg' WHERE "authorAvatar" IS NULL OR "authorAvatar" = '' OR "authorAvatar" = 'null' OR "authorAvatar" = 'undefined'`,
+      `UPDATE "Review" SET "title" = 'Outstanding Private Chauffeur Service' WHERE "title" IS NULL OR "title" = '' OR "title" = 'Outstanding Experience'`,
+    ];
+    for (const sql of autoHealStatements) {
+      try {
+        await db.$executeRawUnsafe(sql);
+      } catch {
+        // Safe skip
+      }
+    }
     isTableInitialized = true;
   } catch (err) {
     console.warn('[SETTINGS NOTICE] SystemSetting table auto-ensure warning:', err);

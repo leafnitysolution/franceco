@@ -417,7 +417,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                             alt={r.name}
                             fill
                             className="object-cover"
-                            unoptimized={r.imageUrl.startsWith('http')}
+                            unoptimized
                           />
                         </div>
                       )}
@@ -511,7 +511,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                         alt={`Photo from ${review.authorName}`}
                         fill
                         className="object-cover"
-                        unoptimized={review.imageUrl.startsWith('http')}
+                        unoptimized
                       />
                     </div>
                   ) : (

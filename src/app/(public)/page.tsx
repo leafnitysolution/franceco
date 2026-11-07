@@ -1,16 +1,17 @@
 import { HomePageClient } from '@/components/home/HomePageClient';
-import { getPublicLocations, getPublicCategories, getPublicRoutes } from '@/lib/publicData';
+import { getPublicLocations, getPublicCategories, getPublicRoutes, getPublicReviews } from '@/lib/publicData';
 import { getHeroSlides, getHeroIntervalSeconds } from '@/lib/heroSlides';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [locations, categories, allRoutes, heroSlides, heroIntervalSeconds] = await Promise.all([
+  const [locations, categories, allRoutes, heroSlides, heroIntervalSeconds, initialReviews] = await Promise.all([
     getPublicLocations(),
     getPublicCategories(),
     getPublicRoutes(),
     getHeroSlides(),
     getHeroIntervalSeconds(),
+    getPublicReviews(),
   ]);
 
   const featuredRoutes = allRoutes.filter((r) => r.isActive !== false);
@@ -51,6 +52,7 @@ export default async function HomePage() {
       defaultFaqs={defaultFaqs}
       heroSlides={heroSlides}
       heroIntervalSeconds={heroIntervalSeconds}
+      initialReviews={initialReviews}
     />
   );
 }

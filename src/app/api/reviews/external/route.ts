@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { ensureLocationsSeeded } from '@/lib/seedHelper';
-import { getSetting } from '@/lib/settings';
+import { getSetting, ensureSettingsTable } from '@/lib/settings';
+import fs from 'fs';
+import path from 'path';
 
 export interface NormalizedReview {
   id: string | number;
@@ -20,10 +22,10 @@ export interface NormalizedReview {
 
 const DEFAULT_CUSTOMER_PHOTOS = [
   '/images/reviews/review_family_travel.jpg',
-  '/images/reviews/review_family_disney.jpg',
-  '/images/reviews/review_airport_meet.jpg',
   '/images/reviews/review_luxury_van.jpg',
+  '/images/reviews/review_family_disney.jpg',
   '/images/reviews/review_couple_paris.jpg',
+  '/images/reviews/review_airport_meet.jpg',
   '/images/reviews/review_business_client.jpg',
 ];
 
@@ -35,6 +37,46 @@ const DEFAULT_AVATARS = [
   '/images/reviews/avatar_emma.jpg',
   '/images/reviews/avatar_david.jpg',
 ];
+
+const DEFAULT_TITLES = [
+  'Outstanding chauffeur, kids loved the trip!',
+  'Punctual, luxurious van & fixed transparent fare',
+  'Direct hassle-free transfer from Beauvais to Disney',
+  'Arrived early, very polite and impeccable Mercedes',
+  'Chauffeur was waiting right at terminal arrivals',
+  'Executive business class service at its best',
+];
+
+function resolveSafePhoto(
+  url: string | null | undefined,
+  fallbackIndex: number,
+  defaultList: string[]
+): string {
+  const fallback = defaultList[fallbackIndex % defaultList.length];
+  if (!url || typeof url !== 'string') return fallback;
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined') return fallback;
+
+  // External image URL
+  if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+    return trimmed;
+  }
+
+  // Local image path: ensure file actually exists in public directory
+  if (trimmed.startsWith('/')) {
+    try {
+      const relPath = trimmed.replace(/^\//, '');
+      const fullPath = path.join(process.cwd(), 'public', relPath);
+      if (fs.existsSync(fullPath)) {
+        return trimmed;
+      }
+    } catch {
+      // Ignore filesystem access check errors and return safe fallback
+    }
+  }
+
+  return fallback;
+}
 
 export async function GET() {
   const tripAdvisorApiKey = (await getSetting('TRIPADVISOR_API_KEY')) || process.env.TRIPADVISOR_API_KEY;
@@ -228,6 +270,7 @@ export async function GET() {
   }
 
   await ensureLocationsSeeded();
+  await ensureSettingsTable();
 
   // =========================================================
   // 3. Fallback / Merge Database Reviews
@@ -249,10 +292,13 @@ export async function GET() {
       year: 'numeric',
     }),
     verified: true,
-    title: r.title || 'Outstanding Experience',
+    title:
+      r.title && r.title.trim() && r.title !== 'Outstanding Experience'
+        ? r.title.trim()
+        : DEFAULT_TITLES[idx % DEFAULT_TITLES.length],
     review: r.comment,
-    imageUrl: r.imageUrl || DEFAULT_CUSTOMER_PHOTOS[idx % DEFAULT_CUSTOMER_PHOTOS.length],
-    authorAvatar: r.authorAvatar || DEFAULT_AVATARS[idx % DEFAULT_AVATARS.length],
+    imageUrl: resolveSafePhoto(r.imageUrl, idx, DEFAULT_CUSTOMER_PHOTOS),
+    authorAvatar: resolveSafePhoto(r.authorAvatar, idx, DEFAULT_AVATARS),
     source: r.source || 'TripAdvisor',
   }));
 

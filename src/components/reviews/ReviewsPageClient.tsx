@@ -34,7 +34,17 @@ interface ReviewsPageClientProps {
   initialReviews: any[];
 }
 
+const DEFAULT_CUSTOMER_PHOTOS = [
+  '/images/reviews/review_family_travel.jpg',
+  '/images/reviews/review_luxury_van.jpg',
+  '/images/reviews/review_family_disney.jpg',
+  '/images/reviews/review_couple_paris.jpg',
+  '/images/reviews/review_airport_meet.jpg',
+  '/images/reviews/review_business_client.jpg',
+];
+
 export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
+  const [failedImages, setFailedImages] = useState<Record<string | number, boolean>>({});
   const [reviews, setReviews] = useState<ReviewItem[]>(() =>
     initialReviews.map((r) => ({
       id: r.id,
@@ -233,7 +243,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
 
       {/* REVIEWS LIST GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-        {reviews.map((r) => (
+        {reviews.map((r, idx) => (
           <div
             key={r.id}
             className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-2xl transition-all duration-300 space-y-4 flex flex-col justify-between"
@@ -277,21 +287,33 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
                 ))}
               </div>
 
-              {/* Customer Photo */}
-              {r.imageUrl && (
-                <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-                  <Image
-                    src={r.imageUrl}
-                    alt={`Photo from ${r.authorName}`}
-                    fill
-                    className="object-cover"
-                    unoptimized={r.imageUrl.startsWith('http')}
-                  />
-                  <div className="absolute bottom-2 left-2 right-2 bg-slate-950/80 backdrop-blur-sm px-2.5 py-1 rounded-xl text-white text-[10px] font-bold truncate">
-                    {r.routeText}
+              {/* Customer Photo (Guaranteed Self-Healing) */}
+              {(() => {
+                const isPhotoFailed = !!failedImages[r.id];
+                const fallbackPhoto = DEFAULT_CUSTOMER_PHOTOS[idx % DEFAULT_CUSTOMER_PHOTOS.length];
+                const candidatePhoto = r.imageUrl && r.imageUrl !== 'null' && r.imageUrl !== 'undefined' ? r.imageUrl : fallbackPhoto;
+                const displayPhoto = isPhotoFailed ? fallbackPhoto : candidatePhoto;
+
+                return displayPhoto ? (
+                  <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+                    <Image
+                      src={displayPhoto}
+                      alt={`Photo from ${r.authorName}`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={() => {
+                        if (!isPhotoFailed) {
+                          setFailedImages((prev) => ({ ...prev, [r.id]: true }));
+                        }
+                      }}
+                    />
+                    <div className="absolute bottom-2 left-2 right-2 bg-slate-950/80 backdrop-blur-sm px-2.5 py-1 rounded-xl text-white text-[10px] font-bold truncate">
+                      {r.routeText}
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : null;
+              })()}
 
               {/* Headline */}
               {r.title && (
