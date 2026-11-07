@@ -516,7 +516,75 @@ VALUES
         '/images/reviews/review_business_client.jpg', '/images/reviews/avatar_david.jpg', 'Google Review',
         true, CURRENT_TIMESTAMP
     )
-ON CONFLICT ("id") DO NOTHING;
+ON CONFLICT ("id") DO UPDATE SET
+    "authorName" = EXCLUDED."authorName",
+    "location" = EXCLUDED."location",
+    "routeText" = EXCLUDED."routeText",
+    "rating" = EXCLUDED."rating",
+    "title" = EXCLUDED."title",
+    "comment" = EXCLUDED."comment",
+    "imageUrl" = EXCLUDED."imageUrl",
+    "authorAvatar" = EXCLUDED."authorAvatar",
+    "source" = EXCLUDED."source",
+    "isPublished" = EXCLUDED."isPublished";
+
+
+-- -----------------------------------------------------------------------------
+-- 5. Insert Default System Settings (Add-ons, Hero Slides, Intervals, API URLs)
+-- -----------------------------------------------------------------------------
+INSERT INTO "SystemSetting" ("id", "key", "value", "group", "label", "isSecret", "createdAt", "updatedAt")
+VALUES
+    (
+        'set_addons',
+        'BOOKING_ADDONS',
+        '[{"id":"tv_on_board","title":"TV on Board","description":"In-vehicle high-definition display with streaming entertainment & YouTube during your journey.","priceEur":20,"icon":"tv","isActive":true},{"id":"pet_friendly","title":"Pet on Board","description":"Pet-friendly transfer with vehicle sanitized and prepared for your furry companion.","priceEur":20,"icon":"paw","isActive":true},{"id":"champagne_bottle","title":"Chilled Champagne & Refreshments","description":"Bottle of premium French champagne served chilled with glassware and cold mineral waters.","priceEur":45,"icon":"wine","isActive":true},{"id":"extra_wait_time","title":"Extra Waiting Time (Up to 1 hr)","description":"Additional 60 minutes of flexible chauffeur standby beyond the standard 60-minute airport grace period.","priceEur":30,"icon":"clock","isActive":true},{"id":"vip_meet_greet","title":"VIP Chauffeur Meet & Luggage Porter","description":"Personal chauffeur meets you inside the terminal with an iPad name board and assists with all heavy bags.","priceEur":15,"icon":"sparkles","isActive":true}]',
+        'BOOKING',
+        'Configurable Booking Addons',
+        false,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    ),
+    (
+        'set_hero_slides',
+        'HOMEPAGE_HERO_SLIDES',
+        '[{"id":"paris","src":"/images/france_transfer_hero.jpg","alt":"Paris Airport & City Center Luxury Chauffeur Transfer","title":"Paris Airports & City Center","badge":"CDG • Orly • City Hotels","isActive":true},{"id":"disney","src":"/images/destinations/disneyland_paris.jpg","alt":"Disneyland Paris Family Shuttle Transfer","title":"Disneyland Paris Direct Transfers","badge":"All Disney Hotels & Parks","isActive":true},{"id":"meet-greet","src":"/images/meet_greet_driver.jpg","alt":"VIP Airport Meet and Greet Chauffeur at Arrival Gate","title":"Terminal VIP Meet & Greet","badge":"Flight Tracking • Name Board","isActive":true},{"id":"versailles","src":"/images/destinations/versailles_palace.jpg","alt":"Palace of Versailles and Excursion Transfers","title":"Versailles & Day Excursions","badge":"Private Tours & Historic Castles","isActive":true}]',
+        'HOMEPAGE',
+        'Homepage Hero Slideshow',
+        false,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    ),
+    (
+        'set_hero_interval',
+        'HOMEPAGE_HERO_INTERVAL',
+        '5.5',
+        'HOMEPAGE',
+        'Slideshow Rotation Interval (seconds)',
+        false,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    ),
+    (
+        'set_tripadvisor_url',
+        'TRIPADVISOR_URL',
+        'https://www.tripadvisor.com',
+        'REVIEWS',
+        'TripAdvisor Profile URL',
+        false,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    ),
+    (
+        'set_google_reviews_url',
+        'GOOGLE_REVIEWS_URL',
+        'https://maps.app.goo.gl/DwYGzJ9yDqszXAPW7',
+        'REVIEWS',
+        'Google Maps Reviews URL',
+        false,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    )
+ON CONFLICT ("key") DO NOTHING;
 
 -- Commit transaction
 COMMIT;
