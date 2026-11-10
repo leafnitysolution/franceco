@@ -9,6 +9,7 @@ import { getAdminSession } from '@/lib/auth';
 import { findZoneRoute } from '@/lib/zoneResolver';
 import { headers } from 'next/headers';
 import { getBookingAddons, calculateAddonsTotal } from '@/lib/addons';
+import { getPricingSettings } from '@/lib/settings';
 
 // Simple In-Memory Sliding Window Rate Limiter (5 bookings per hour per IP)
 const rateLimitMap = new Map<string, number[]>();
@@ -127,11 +128,29 @@ export async function createBookingAction(formData: BookingFormValues) {
           else if (validated.vehicleTier === 'ECONOMY_VAN') calculatedOneWayFare = zoneMatch.pricing.economyVan;
           else if (validated.vehicleTier === 'BUSINESS_VAN') calculatedOneWayFare = zoneMatch.pricing.businessVan;
           else if (validated.vehicleTier === 'MINIBUS') calculatedOneWayFare = zoneMatch.pricing.minibus;
+        } else if (validated.totalFareEur && validated.totalFareEur > 0) {
+          // Dynamic distance route submitted by customer
+          calculatedOneWayFare = validated.isReturn
+            ? Math.round(validated.totalFareEur / 2)
+            : validated.totalFareEur;
         }
       } catch (err) {
         console.warn('Server-side zone matching check skipped:', err);
       }
     }
+
+    // Enforce configured minimum floor fares so no trip can ever be booked below minimum floor price
+    const pricingRules = await getPricingSettings();
+    const tierMinFloor =
+      validated.vehicleTier === 'SEDAN'
+        ? pricingRules.minFareSedan
+        : validated.vehicleTier === 'ECONOMY_VAN'
+        ? pricingRules.minFareEconomyVan
+        : validated.vehicleTier === 'BUSINESS_VAN'
+        ? pricingRules.minFareBusinessVan
+        : pricingRules.minFareMinibus;
+
+    calculatedOneWayFare = Math.max(tierMinFloor, calculatedOneWayFare);
 
     // Compute configured add-ons server-side
     const availableAddons = await getBookingAddons();

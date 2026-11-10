@@ -125,21 +125,29 @@ export function RepubliqueFrancaiseBadge({
 export function TripAdvisorTravellersChoiceCard({
   className = '',
   theme = 'dark',
+  compact = false,
 }: {
   className?: string;
   theme?: 'dark' | 'light';
+  compact?: boolean;
 }) {
   const isDark = theme === 'dark';
   return (
     <div
-      className={`rounded-2xl p-4 sm:p-5 flex items-center gap-4 sm:gap-5 border backdrop-blur-md transition-all ${
+      className={`rounded-2xl ${
+        compact ? 'p-2.5 sm:p-3 gap-3' : 'p-4 sm:p-5 gap-4 sm:gap-5'
+      } flex items-center border backdrop-blur-md transition-all ${
         isDark
           ? 'bg-slate-900/80 border-white/15 text-white shadow-xl'
           : 'bg-white/95 border-slate-200 text-slate-900 shadow-md'
       } ${className}`}
     >
       {/* TripAdvisor Official Logo Icon Badge */}
-      <div className="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-md border border-[#00AA6C]/30 bg-[#00AA6C] flex items-center justify-center">
+      <div
+        className={`relative shrink-0 ${
+          compact ? 'w-11 h-11 sm:w-12 sm:h-12 rounded-xl' : 'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl'
+        } overflow-hidden shadow-md border border-[#00AA6C]/30 bg-[#00AA6C] flex items-center justify-center`}
+      >
         <Image
           src="/images/tripadvisor_icon.jpg"
           alt="TripAdvisor Official Award"
@@ -150,16 +158,16 @@ export function TripAdvisorTravellersChoiceCard({
       </div>
 
       {/* Text Info */}
-      <div className="space-y-1 text-left min-w-0">
+      <div className="space-y-0.5 text-left min-w-0">
         <div
-          className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+          className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
             isDark ? 'text-slate-300' : 'text-slate-500'
           }`}
         >
           <span>TRIPADVISOR TRAVELLERS&apos; CHOICE</span>
           <span className="text-[9px] font-black bg-[#00AA6C] text-black px-1.5 py-0.5 rounded font-mono">2025</span>
         </div>
-        <div className="text-sm sm:text-base font-bold leading-snug">
+        <div className={`${compact ? 'text-xs sm:text-xs' : 'text-sm sm:text-base'} font-bold leading-snug`}>
           Awarded for consistent great reviews from global travellers.
         </div>
         <div

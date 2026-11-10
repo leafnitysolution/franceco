@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSetting } from '@/lib/settings';
+import { getSetting, getPricingSettings, PricingEngineSettings } from '@/lib/settings';
 import { db } from '@/lib/db';
-import { findZoneRoute } from '@/lib/zoneResolver';
+import { findZoneRoute, detectZone } from '@/lib/zoneResolver';
 
 interface RouteCacheEntry {
   distanceKm: number;
@@ -40,13 +40,32 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-function calculateTierPrices(distanceKm: number) {
-  return {
-    sedan: Math.max(40, Math.round(distanceKm * 2.0)),
-    economyVan: Math.max(55, Math.round(distanceKm * 2.7)),
-    businessVan: Math.max(70, Math.round(distanceKm * 3.5)),
-    minibus: Math.max(90, Math.round(distanceKm * 4.5)),
-  };
+function calculateDynamicTierPrices(
+  distanceKm: number,
+  pricing: PricingEngineSettings,
+  isParisIntramuros: boolean = false
+) {
+  const base = pricing.baseBookingFee || 0;
+  let sedan = Math.round(base + distanceKm * pricing.ratePerKmSedan);
+  let economyVan = Math.round(base + distanceKm * pricing.ratePerKmEconomyVan);
+  let businessVan = Math.round(base + distanceKm * pricing.ratePerKmBusinessVan);
+  let minibus = Math.round(base + distanceKm * pricing.ratePerKmMinibus);
+
+  // 1. Enforce minimum floor fares per vehicle tier
+  sedan = Math.max(pricing.minFareSedan, sedan);
+  economyVan = Math.max(pricing.minFareEconomyVan, economyVan);
+  businessVan = Math.max(pricing.minFareBusinessVan, businessVan);
+  minibus = Math.max(pricing.minFareMinibus, minibus);
+
+  // 2. Enforce Paris Intra-Muros minimum if trip is within Paris City Center
+  if (isParisIntramuros && pricing.parisIntramurosMinFare > 0) {
+    sedan = Math.max(pricing.parisIntramurosMinFare, sedan);
+    economyVan = Math.max(Math.round(pricing.parisIntramurosMinFare * 1.25), economyVan);
+    businessVan = Math.max(Math.round(pricing.parisIntramurosMinFare * 1.65), businessVan);
+    minibus = Math.max(Math.round(pricing.parisIntramurosMinFare * 2.3), minibus);
+  }
+
+  return { sedan, economyVan, businessVan, minibus };
 }
 
 export async function POST(req: NextRequest) {
@@ -169,7 +188,16 @@ export async function POST(req: NextRequest) {
 
     const isFixedZoneRate = Boolean(matchedZone);
     const matchedZoneLabel = matchedZone?.zoneLabel;
-    const pricing = matchedZone ? matchedZone.pricing : calculateTierPrices(distanceKm);
+
+    // Load admin pricing rules and check intra-Paris boundary
+    const pricingCfg = await getPricingSettings();
+    const originZone = detectZone(origin, body.originLocation);
+    const destZone = detectZone(destination, body.destinationLocation);
+    const isParisIntramuros = originZone === 'PAR' && destZone === 'PAR';
+
+    const pricing = matchedZone
+      ? matchedZone.pricing
+      : calculateDynamicTierPrices(distanceKm, pricingCfg, isParisIntramuros);
 
     const resultEntry: RouteCacheEntry = {
       distanceKm,

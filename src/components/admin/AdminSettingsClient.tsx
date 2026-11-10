@@ -50,6 +50,11 @@ import {
   ArrowUp,
   ArrowDown,
   Layers,
+  Calculator,
+  Car,
+  DollarSign,
+  Coins,
+  ShieldAlert,
 } from 'lucide-react';
 
 interface AdminSettingsClientProps {
@@ -90,6 +95,106 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
   // SMTP Test State
   const [testingSmtp, setTestingSmtp] = useState(false);
   const [smtpTestResult, setSmtpTestResult] = useState<any | null>(null);
+
+  // Dynamic Auto-Rate & Minimum Pricing Engine Simulator State
+  const [simDistanceKm, setSimDistanceKm] = useState<number>(12);
+  const [simIsParis, setSimIsParis] = useState<boolean>(false);
+
+  const getSimulatedPricing = () => {
+    const minSedan = Math.max(20, parseFloat(settings.MIN_FARE_SEDAN) || 60);
+    const minEcoVan = Math.max(30, parseFloat(settings.MIN_FARE_ECONOMY_VAN) || 80);
+    const minBizVan = Math.max(40, parseFloat(settings.MIN_FARE_BUSINESS_VAN) || 110);
+    const minMinibus = Math.max(60, parseFloat(settings.MIN_FARE_MINIBUS) || 160);
+
+    const rateSedan = Math.max(1.0, parseFloat(settings.RATE_PER_KM_SEDAN) || 2.2);
+    const rateEcoVan = Math.max(1.2, parseFloat(settings.RATE_PER_KM_ECONOMY_VAN) || 2.9);
+    const rateBizVan = Math.max(1.5, parseFloat(settings.RATE_PER_KM_BUSINESS_VAN) || 3.8);
+    const rateMinibus = Math.max(2.0, parseFloat(settings.RATE_PER_KM_MINIBUS) || 5.0);
+
+    const baseFee = Math.max(0, parseFloat(settings.BASE_BOOKING_FEE) || 0);
+    const parisMin = Math.max(30, parseFloat(settings.PARIS_INTRAMUROS_MIN_FARE) || 65);
+
+    const calcSedanDist = Math.round(baseFee + simDistanceKm * rateSedan);
+    const calcEcoVanDist = Math.round(baseFee + simDistanceKm * rateEcoVan);
+    const calcBizVanDist = Math.round(baseFee + simDistanceKm * rateBizVan);
+    const calcMinibusDist = Math.round(baseFee + simDistanceKm * rateMinibus);
+
+    let finalSedan = Math.max(minSedan, calcSedanDist);
+    let finalEcoVan = Math.max(minEcoVan, calcEcoVanDist);
+    let finalBizVan = Math.max(minBizVan, calcBizVanDist);
+    let finalMinibus = Math.max(minMinibus, calcMinibusDist);
+
+    let sedanFloorApplied = finalSedan === minSedan && calcSedanDist < minSedan;
+    let ecoFloorApplied = finalEcoVan === minEcoVan && calcEcoVanDist < minEcoVan;
+    let isParisApplied = false;
+
+    if (simIsParis && parisMin > 0) {
+      if (parisMin > finalSedan) {
+        finalSedan = parisMin;
+        isParisApplied = true;
+      }
+      const parisEco = Math.round(parisMin * 1.25);
+      if (parisEco > finalEcoVan) {
+        finalEcoVan = parisEco;
+        isParisApplied = true;
+      }
+      finalBizVan = Math.max(Math.round(parisMin * 1.65), finalBizVan);
+      finalMinibus = Math.max(Math.round(parisMin * 2.3), finalMinibus);
+    }
+
+    return {
+      sedan: finalSedan,
+      ecoVan: finalEcoVan,
+      bizVan: finalBizVan,
+      minibus: finalMinibus,
+      sedanFloorApplied,
+      ecoFloorApplied,
+      isParisApplied,
+      calcSedanDist,
+      calcEcoVanDist,
+    };
+  };
+
+  const applyPricingPreset = (preset: 'standard' | 'premium' | 'high_season') => {
+    if (preset === 'standard') {
+      handleInputChange('MIN_FARE_SEDAN', '60');
+      handleInputChange('MIN_FARE_ECONOMY_VAN', '80');
+      handleInputChange('MIN_FARE_BUSINESS_VAN', '110');
+      handleInputChange('MIN_FARE_MINIBUS', '160');
+      handleInputChange('RATE_PER_KM_SEDAN', '2.2');
+      handleInputChange('RATE_PER_KM_ECONOMY_VAN', '2.9');
+      handleInputChange('RATE_PER_KM_BUSINESS_VAN', '3.8');
+      handleInputChange('RATE_PER_KM_MINIBUS', '5.0');
+      handleInputChange('BASE_BOOKING_FEE', '0');
+      handleInputChange('PARIS_INTRAMUROS_MIN_FARE', '65');
+    } else if (preset === 'premium') {
+      handleInputChange('MIN_FARE_SEDAN', '70');
+      handleInputChange('MIN_FARE_ECONOMY_VAN', '95');
+      handleInputChange('MIN_FARE_BUSINESS_VAN', '130');
+      handleInputChange('MIN_FARE_MINIBUS', '180');
+      handleInputChange('RATE_PER_KM_SEDAN', '2.5');
+      handleInputChange('RATE_PER_KM_ECONOMY_VAN', '3.3');
+      handleInputChange('RATE_PER_KM_BUSINESS_VAN', '4.2');
+      handleInputChange('RATE_PER_KM_MINIBUS', '5.5');
+      handleInputChange('BASE_BOOKING_FEE', '5');
+      handleInputChange('PARIS_INTRAMUROS_MIN_FARE', '75');
+    } else if (preset === 'high_season') {
+      // +15% surge
+      const bump = (val: string, fallback: number) => {
+        const num = parseFloat(val) || fallback;
+        return (Math.round(num * 1.15 * 10) / 10).toString();
+      };
+      handleInputChange('MIN_FARE_SEDAN', bump(settings.MIN_FARE_SEDAN, 60));
+      handleInputChange('MIN_FARE_ECONOMY_VAN', bump(settings.MIN_FARE_ECONOMY_VAN, 80));
+      handleInputChange('MIN_FARE_BUSINESS_VAN', bump(settings.MIN_FARE_BUSINESS_VAN, 110));
+      handleInputChange('MIN_FARE_MINIBUS', bump(settings.MIN_FARE_MINIBUS, 160));
+      handleInputChange('RATE_PER_KM_SEDAN', bump(settings.RATE_PER_KM_SEDAN, 2.2));
+      handleInputChange('RATE_PER_KM_ECONOMY_VAN', bump(settings.RATE_PER_KM_ECONOMY_VAN, 2.9));
+      handleInputChange('RATE_PER_KM_BUSINESS_VAN', bump(settings.RATE_PER_KM_BUSINESS_VAN, 3.8));
+      handleInputChange('RATE_PER_KM_MINIBUS', bump(settings.RATE_PER_KM_MINIBUS, 5.0));
+      handleInputChange('PARIS_INTRAMUROS_MIN_FARE', bump(settings.PARIS_INTRAMUROS_MIN_FARE, 65));
+    }
+  };
 
   // Booking Add-ons / Extras State
   const parseInitialAddons = (): BookingAddon[] => {
@@ -622,6 +727,344 @@ export function AdminSettingsClient({ initialSettings }: AdminSettingsClientProp
             </p>
           </div>
         </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* AUTO-RATE & MINIMUM PRICING ENGINE */}
+      {/* ========================================================================= */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+              <Calculator className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-black text-slate-900">Auto-Rate & Minimum Pricing Engine</h2>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                  Live Automatic Protection
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">
+                Guarantees profitable fares by enforcing minimum floor prices for short trips (e.g. Paris intra-muros or short rides) and customizable per-kilometer rates for custom addresses.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-slate-400">Presets:</span>
+            <button
+              type="button"
+              onClick={() => applyPricingPreset('standard')}
+              className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition-all cursor-pointer"
+            >
+              Standard
+            </button>
+            <button
+              type="button"
+              onClick={() => applyPricingPreset('premium')}
+              className="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[11px] font-bold border border-amber-200 transition-all cursor-pointer"
+            >
+              VIP Premium
+            </button>
+            <button
+              type="button"
+              onClick={() => applyPricingPreset('high_season')}
+              className="px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 text-[11px] font-bold border border-purple-200 transition-all cursor-pointer"
+            >
+              +15% Surge
+            </button>
+          </div>
+        </div>
+
+        {/* 1. Minimum Floor Fares */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-emerald-600" />
+              <span>1. Minimum Floor Fares (€) — Guaranteed Lowest Charge for Any Ride</span>
+            </h3>
+            <span className="text-[11px] text-slate-400 font-medium">
+              Stops trips from being too cheap on short distances
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <label className="text-[11px] font-bold text-slate-600">Sedan Min Fare</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="20"
+                  value={settings.MIN_FARE_SEDAN || '60'}
+                  onChange={(e) => handleInputChange('MIN_FARE_SEDAN', e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 block">Default: €60 floor</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <label className="text-[11px] font-bold text-slate-600">Economy Van Min</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="30"
+                  value={settings.MIN_FARE_ECONOMY_VAN || '80'}
+                  onChange={(e) => handleInputChange('MIN_FARE_ECONOMY_VAN', e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 block">Default: €80 floor</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <label className="text-[11px] font-bold text-slate-600">Business Van Min</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="40"
+                  value={settings.MIN_FARE_BUSINESS_VAN || '110'}
+                  onChange={(e) => handleInputChange('MIN_FARE_BUSINESS_VAN', e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 block">Default: €110 floor</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+              <label className="text-[11px] font-bold text-slate-600">Minibus Min Fare</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="60"
+                  value={settings.MIN_FARE_MINIBUS || '160'}
+                  onChange={(e) => handleInputChange('MIN_FARE_MINIBUS', e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+              <span className="text-[10px] text-slate-400 block">Default: €160 floor</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Per-Kilometer Distance Rates */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <Car className="w-4 h-4 text-blue-600" />
+              <span>2. Distance Pricing Rates (€ / km) — Applied when ride distance exceeds floor</span>
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1">
+              <label className="text-[11px] font-bold text-slate-700">Sedan Rate</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1.0"
+                  value={settings.RATE_PER_KM_SEDAN || '2.2'}
+                  onChange={(e) => handleInputChange('RATE_PER_KM_SEDAN', e.target.value)}
+                  className="w-full pl-7 pr-10 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">/km</span>
+              </div>
+              <span className="text-[10px] text-slate-500 block">Default: €2.20 / km</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1">
+              <label className="text-[11px] font-bold text-slate-700">Economy Van Rate</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1.0"
+                  value={settings.RATE_PER_KM_ECONOMY_VAN || '2.9'}
+                  onChange={(e) => handleInputChange('RATE_PER_KM_ECONOMY_VAN', e.target.value)}
+                  className="w-full pl-7 pr-10 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">/km</span>
+              </div>
+              <span className="text-[10px] text-slate-500 block">Default: €2.90 / km</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1">
+              <label className="text-[11px] font-bold text-slate-700">Business Van Rate</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1.0"
+                  value={settings.RATE_PER_KM_BUSINESS_VAN || '3.8'}
+                  onChange={(e) => handleInputChange('RATE_PER_KM_BUSINESS_VAN', e.target.value)}
+                  className="w-full pl-7 pr-10 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">/km</span>
+              </div>
+              <span className="text-[10px] text-slate-500 block">Default: €3.80 / km</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1">
+              <label className="text-[11px] font-bold text-slate-700">Minibus Rate</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1.0"
+                  value={settings.RATE_PER_KM_MINIBUS || '5.0'}
+                  onChange={(e) => handleInputChange('RATE_PER_KM_MINIBUS', e.target.value)}
+                  className="w-full pl-7 pr-10 py-2 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">/km</span>
+              </div>
+              <span className="text-[10px] text-slate-500 block">Default: €5.00 / km</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Paris Intra-Muros & Base Dispatch Rules */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                <span>🗼 Paris Intra-Muros Minimum Fare</span>
+              </label>
+              <div className="relative w-28">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="30"
+                  value={settings.PARIS_INTRAMUROS_MIN_FARE || '65'}
+                  onChange={(e) => handleInputChange('PARIS_INTRAMUROS_MIN_FARE', e.target.value)}
+                  className="w-full pl-6 pr-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-amber-900/80 leading-relaxed">
+              Applied automatically whenever both pickup and drop-off are inside Paris City Center (all 20 arrondissements). Guarantees you never do a city transfer for cheap.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <span>🏁 Base Dispatch Fee (Optional)</span>
+              </label>
+              <div className="relative w-28">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">€</span>
+                <input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={settings.BASE_BOOKING_FEE || '0'}
+                  onChange={(e) => handleInputChange('BASE_BOOKING_FEE', e.target.value)}
+                  className="w-full pl-6 pr-3 py-1.5 rounded-xl bg-white border border-slate-300 text-xs font-black text-slate-900 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Fixed initial booking fee added to the per-km calculation (e.g. €0 or €10) before minimum floor evaluation.
+            </p>
+          </div>
+        </div>
+
+        {/* 4. Interactive Live Simulator */}
+        {(() => {
+          const sim = getSimulatedPricing();
+          return (
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 text-white space-y-4 shadow-lg border border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    Interactive Pricing Simulator
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-400 text-[11px]">Test Distance:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="500"
+                      value={simDistanceKm}
+                      onChange={(e) => setSimDistanceKm(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-16 px-2 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-white text-center"
+                    />
+                    <span className="text-slate-400 text-[11px]">km</span>
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={simIsParis}
+                      onChange={(e) => setSimIsParis(e.target.checked)}
+                      className="rounded accent-amber-500 w-3.5 h-3.5"
+                    />
+                    <span className="text-[11px] text-amber-300 font-bold">Inside Paris City?</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
+                  <div className="text-[10px] text-slate-400 font-bold">SEDAN</div>
+                  <div className="text-2xl font-black text-amber-400">€{sim.sedan}</div>
+                  <div className="text-[10px] font-bold text-slate-300">
+                    {sim.isParisApplied ? (
+                      <span className="text-amber-300">● Paris Floor</span>
+                    ) : sim.sedanFloorApplied ? (
+                      <span className="text-emerald-400">● Floor (€{settings.MIN_FARE_SEDAN || 60})</span>
+                    ) : (
+                      <span className="text-blue-400">● Rate ({simDistanceKm}km x €{settings.RATE_PER_KM_SEDAN || '2.2'})</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
+                  <div className="text-[10px] text-slate-400 font-bold">ECONOMY VAN</div>
+                  <div className="text-2xl font-black text-amber-400">€{sim.ecoVan}</div>
+                  <div className="text-[10px] font-bold text-slate-300">
+                    {sim.isParisApplied ? (
+                      <span className="text-amber-300">● Paris Floor</span>
+                    ) : sim.ecoFloorApplied ? (
+                      <span className="text-emerald-400">● Floor (€{settings.MIN_FARE_ECONOMY_VAN || 80})</span>
+                    ) : (
+                      <span className="text-blue-400">● Rate ({simDistanceKm}km x €{settings.RATE_PER_KM_ECONOMY_VAN || '2.9'})</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
+                  <div className="text-[10px] text-slate-400 font-bold">BUSINESS VAN</div>
+                  <div className="text-2xl font-black text-amber-400">€{sim.bizVan}</div>
+                  <div className="text-[10px] font-bold text-slate-400">Executive Class</div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 space-y-1">
+                  <div className="text-[10px] text-slate-400 font-bold">MINIBUS</div>
+                  <div className="text-2xl font-black text-amber-400">€{sim.minibus}</div>
+                  <div className="text-[10px] font-bold text-slate-400">Up to 16 Pax</div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* ========================================================================= */}

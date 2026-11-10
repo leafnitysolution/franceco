@@ -76,7 +76,7 @@ export async function ensureSettingsTable(): Promise<void> {
         "authorAvatar" = '/images/reviews/avatar_david.jpg',
         "title" = COALESCE(NULLIF("title", ''), 'Executive business class service at its best')
        WHERE "id" = 'rev_6' OR "authorName" LIKE 'Robert%'`,
-      `UPDATE "Review" SET "imageUrl" = '/images/reviews/review_family_travel.jpg' WHERE "imageUrl" LIKE '/uploads/%' OR "imageUrl" IS NULL OR "imageUrl" = '' OR "imageUrl" = 'null' OR "imageUrl" = 'undefined'`,
+      `UPDATE "Review" SET "imageUrl" = '/images/reviews/review_family_travel.jpg' WHERE "imageUrl" IS NULL OR "imageUrl" = '' OR "imageUrl" = 'null' OR "imageUrl" = 'undefined'`,
       `UPDATE "Review" SET "authorAvatar" = '/images/reviews/avatar_sarah.jpg' WHERE "authorAvatar" IS NULL OR "authorAvatar" = '' OR "authorAvatar" = 'null' OR "authorAvatar" = 'undefined'`,
       `UPDATE "Review" SET "title" = 'Outstanding Private Chauffeur Service' WHERE "title" IS NULL OR "title" = '' OR "title" = 'Outstanding Experience'`,
     ];
@@ -116,6 +116,18 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   // Homepage Dynamic Hero Slideshow & Interval
   HOMEPAGE_HERO_SLIDES: '',
   HOMEPAGE_HERO_INTERVAL: '5.5',
+
+  // Dynamic Auto-Rate & Minimum Pricing Engine
+  MIN_FARE_SEDAN: '60',
+  MIN_FARE_ECONOMY_VAN: '80',
+  MIN_FARE_BUSINESS_VAN: '110',
+  MIN_FARE_MINIBUS: '160',
+  RATE_PER_KM_SEDAN: '2.2',
+  RATE_PER_KM_ECONOMY_VAN: '2.9',
+  RATE_PER_KM_BUSINESS_VAN: '3.8',
+  RATE_PER_KM_MINIBUS: '5.0',
+  BASE_BOOKING_FEE: '0',
+  PARIS_INTRAMUROS_MIN_FARE: '65',
 
   // Transactional Email / SMTP
   SMTP_HOST: 'smtp-mail.outlook.com',
@@ -233,4 +245,59 @@ export function invalidateSettingsCache(key?: string): void {
   } else {
     settingsCache.clear();
   }
+}
+
+export interface PricingEngineSettings {
+  minFareSedan: number;
+  minFareEconomyVan: number;
+  minFareBusinessVan: number;
+  minFareMinibus: number;
+  ratePerKmSedan: number;
+  ratePerKmEconomyVan: number;
+  ratePerKmBusinessVan: number;
+  ratePerKmMinibus: number;
+  baseBookingFee: number;
+  parisIntramurosMinFare: number;
+}
+
+/**
+ * Returns dynamic pricing configuration with floor minimums and per-km rates.
+ */
+export async function getPricingSettings(): Promise<PricingEngineSettings> {
+  const [
+    minSedan,
+    minEcoVan,
+    minBizVan,
+    minMinibus,
+    rateSedan,
+    rateEcoVan,
+    rateBizVan,
+    rateMinibus,
+    baseFee,
+    parisMin,
+  ] = await Promise.all([
+    getSetting('MIN_FARE_SEDAN', '60'),
+    getSetting('MIN_FARE_ECONOMY_VAN', '80'),
+    getSetting('MIN_FARE_BUSINESS_VAN', '110'),
+    getSetting('MIN_FARE_MINIBUS', '160'),
+    getSetting('RATE_PER_KM_SEDAN', '2.2'),
+    getSetting('RATE_PER_KM_ECONOMY_VAN', '2.9'),
+    getSetting('RATE_PER_KM_BUSINESS_VAN', '3.8'),
+    getSetting('RATE_PER_KM_MINIBUS', '5.0'),
+    getSetting('BASE_BOOKING_FEE', '0'),
+    getSetting('PARIS_INTRAMUROS_MIN_FARE', '65'),
+  ]);
+
+  return {
+    minFareSedan: Math.max(20, parseFloat(minSedan) || 60),
+    minFareEconomyVan: Math.max(30, parseFloat(minEcoVan) || 80),
+    minFareBusinessVan: Math.max(40, parseFloat(minBizVan) || 110),
+    minFareMinibus: Math.max(60, parseFloat(minMinibus) || 160),
+    ratePerKmSedan: Math.max(1.0, parseFloat(rateSedan) || 2.2),
+    ratePerKmEconomyVan: Math.max(1.2, parseFloat(rateEcoVan) || 2.9),
+    ratePerKmBusinessVan: Math.max(1.5, parseFloat(rateBizVan) || 3.8),
+    ratePerKmMinibus: Math.max(2.0, parseFloat(rateMinibus) || 5.0),
+    baseBookingFee: Math.max(0, parseFloat(baseFee) || 0),
+    parisIntramurosMinFare: Math.max(30, parseFloat(parisMin) || 65),
+  };
 }

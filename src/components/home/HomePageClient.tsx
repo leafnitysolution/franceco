@@ -167,32 +167,32 @@ export function HomePageClient({
   return (
     <div className="space-y-16 pb-20 bg-[#FBF9F5] text-navy-900">
       {/* HERO SECTION WITH BACKGROUND IMAGE */}
-      <section className="relative pt-6 lg:pt-12 pb-12 lg:pb-20 overflow-hidden lg:min-h-[620px] flex items-center">
+      <section className="relative pt-4 sm:pt-6 lg:pt-7 pb-6 sm:pb-8 lg:pb-10 overflow-hidden flex items-center">
         {/* Dynamic Background Slideshow with Smooth Cross-fade */}
         <HeroBackgroundSlider slides={heroSlides} intervalSeconds={heroIntervalSeconds} />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           {/* Main 2-Column Split Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
             {/* LEFT COLUMN: HEADLINE & BADGES (Hidden on Mobile/Android, Visible on Desktop) */}
-            <div className="hidden lg:block lg:col-span-6 space-y-6 text-white">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gold-300 text-xs font-bold shadow-sm">
+            <div className="hidden lg:block lg:col-span-6 space-y-3.5 text-white">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-gold-300 text-[11px] font-bold shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-gold-400" />
                 <span className="uppercase tracking-wider">{t('heroBadge')}</span>
               </div>
 
-              <div className="space-y-4">
-                <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.15] drop-shadow-md">
+              <div className="space-y-2">
+                <h1 className="font-serif text-3xl sm:text-4xl lg:text-4xl xl:text-[44px] font-bold text-white tracking-tight leading-[1.12] drop-shadow-md">
                   {t('heroTitle')}
                 </h1>
 
-                <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed drop-shadow-sm">
+                <p className="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed drop-shadow-sm max-w-xl line-clamp-3">
                   {t('heroDesc')}
                 </p>
               </div>
 
               {/* TRUST HIGHLIGHT BULLETS */}
-              <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-bold text-white">
+              <div className="grid grid-cols-2 gap-2 pt-1 text-xs font-bold text-white">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
                   <span>{t('fixedPricing')}</span>
@@ -212,11 +212,11 @@ export function HomePageClient({
               </div>
 
               {/* TRIPADVISOR TRAVELLERS' CHOICE 2025 AWARD CARD (DESKTOP) */}
-              <TripAdvisorTravellersChoiceCard theme="dark" className="mt-4" />
+              <TripAdvisorTravellersChoiceCard theme="dark" compact className="mt-2.5" />
             </div>
 
             {/* RIGHT COLUMN: BOOKING ENGINE WIDGET */}
-            <div className="lg:col-span-6 space-y-4">
+            <div className="lg:col-span-6 space-y-3">
               <BookingWidget locations={locations} categories={categories} routes={featuredRoutes as any} />
               
               {/* TRIPADVISOR TRAVELLERS' CHOICE 2025 AWARD CARD (MOBILE / TABLET) */}

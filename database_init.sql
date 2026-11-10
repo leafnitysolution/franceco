@@ -583,7 +583,17 @@ VALUES
         false,
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
-    )
+    ),
+    ('set_min_sedan', 'MIN_FARE_SEDAN', '60', 'PRICING', 'Sedan Minimum Floor Fare', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_min_ecovan', 'MIN_FARE_ECONOMY_VAN', '80', 'PRICING', 'Economy Van Minimum Floor Fare', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_min_bizvan', 'MIN_FARE_BUSINESS_VAN', '110', 'PRICING', 'Business Van Minimum Floor Fare', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_min_minibus', 'MIN_FARE_MINIBUS', '160', 'PRICING', 'Minibus Minimum Floor Fare', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_rate_sedan', 'RATE_PER_KM_SEDAN', '2.2', 'PRICING', 'Sedan Rate Per Km', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_rate_ecovan', 'RATE_PER_KM_ECONOMY_VAN', '2.9', 'PRICING', 'Economy Van Rate Per Km', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_rate_bizvan', 'RATE_PER_KM_BUSINESS_VAN', '3.8', 'PRICING', 'Business Van Rate Per Km', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_rate_minibus', 'RATE_PER_KM_MINIBUS', '5.0', 'PRICING', 'Minibus Rate Per Km', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_base_fee', 'BASE_BOOKING_FEE', '0', 'PRICING', 'Base Dispatch Booking Fee', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('set_paris_min', 'PARIS_INTRAMUROS_MIN_FARE', '65', 'PRICING', 'Paris Intra-Muros Minimum Fare', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT ("key") DO NOTHING;
 
 -- Commit transaction

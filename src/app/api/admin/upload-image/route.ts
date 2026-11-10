@@ -8,15 +8,19 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const isAdmin = await getAdminSession();
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Unauthorized: Admin authentication required.' }, { status: 401 });
-    }
-
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const requestedFolder = ((formData.get('folder') as string) || 'routes').toLowerCase();
     const folder = requestedFolder === 'hero' ? 'hero' : requestedFolder === 'reviews' ? 'reviews' : 'routes';
+
+    // Reviews folder allows public customer uploads (with strict validation).
+    // All other folders (hero, routes) require admin authentication.
+    if (folder !== 'reviews') {
+      const isAdmin = await getAdminSession();
+      if (!isAdmin) {
+        return NextResponse.json({ error: 'Unauthorized: Admin authentication required.' }, { status: 401 });
+      }
+    }
 
     if (!file) {
       return NextResponse.json({ error: 'No image file provided.' }, { status: 400 });
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
     if (!validTypes.includes(file.type.toLowerCase())) {
-      return NextResponse.json({ error: 'Invalid file format. Please upload JPG, PNG, WEBP, or SVG.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid file format. Please upload JPG, PNG, or WEBP.' }, { status: 400 });
     }
 
     // Limit to 10MB
@@ -51,14 +55,13 @@ export async function POST(req: NextRequest) {
     const filePath = path.join(uploadDir, uniqueName);
     await writeFile(filePath, buffer);
 
-    // 2. If Next.js standalone folder exists, also mirror write so it serves immediately
+    // 2. If Next.js standalone folder exists, mirror write so it serves immediately
     const standaloneUploadDir = path.join(process.cwd(), '.next', 'standalone', 'public', 'uploads', folder);
     if (existsSync(path.join(process.cwd(), '.next', 'standalone'))) {
       try {
         await mkdir(standaloneUploadDir, { recursive: true });
         await writeFile(path.join(standaloneUploadDir, uniqueName), buffer);
       } catch (mirrorErr) {
-        // Non-critical mirror write
         console.warn('Standalone mirror write warning:', mirrorErr);
       }
     }
