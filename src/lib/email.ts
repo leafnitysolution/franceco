@@ -43,7 +43,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
   const smtpHost = (await getSetting('SMTP_HOST')) || process.env.SMTP_HOST || 'smtp-mail.outlook.com';
   const smtpPort = Number((await getSetting('SMTP_PORT')) || process.env.SMTP_PORT || '587');
   const smtpSecure = ((await getSetting('SMTP_SECURE')) || process.env.SMTP_SECURE) === 'true';
-  const smtpSender = smtpUser || 'noreply@francego.com';
+  const smtpSender = smtpUser || 'noreply@francegotransfers.io';
 
   const vehicleName =
     data.vehicleTier === 'SEDAN'

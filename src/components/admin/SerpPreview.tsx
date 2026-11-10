@@ -1,4 +1,4 @@
-import { Globe, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface SerpPreviewProps {
   title: string;
@@ -7,7 +7,7 @@ interface SerpPreviewProps {
 }
 
 export function SerpPreview({ title, slug, description }: SerpPreviewProps) {
-  const displayTitle = title || 'Route Title | FastForward Shuttle';
+  const displayTitle = title || 'Route Title | FranceGo';
   const displaySlug = slug ? `/transfers/${slug}` : '/transfers/your-route-slug';
   const displayDesc =
     description ||
@@ -18,7 +18,7 @@ export function SerpPreview({ title, slug, description }: SerpPreviewProps) {
 
   return (
     <div className="bg-slate-900 border border-slate-700/80 rounded-2xl p-5 space-y-3">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
           <Search className="w-4 h-4 text-brand-500" />
           <span>Live Google SERP Snippet Preview</span>
@@ -36,13 +36,13 @@ export function SerpPreview({ title, slug, description }: SerpPreviewProps) {
       {/* Google Result Mockup Card */}
       <div className="bg-white rounded-xl p-4 text-slate-900 font-sans shadow-md space-y-1">
         {/* Favicon & Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-slate-600">
-          <div className="w-4 h-4 rounded-full bg-gold-600 text-white flex items-center justify-center text-[9px] font-bold">
-            E
+        <div className="flex items-center gap-2 text-xs text-slate-600 min-w-0">
+          <div className="w-4 h-4 shrink-0 rounded-full bg-gold-600 text-white flex items-center justify-center text-[9px] font-bold">
+            F
           </div>
-          <span className="font-medium text-slate-800">FastForward Shuttle</span>
-          <span className="text-slate-400">•</span>
-          <span className="text-slate-600 truncate">https://fastforwardshuttle.com{displaySlug}</span>
+          <span className="font-medium text-slate-800 shrink-0">FranceGo</span>
+          <span className="text-slate-400 shrink-0">•</span>
+          <span className="text-slate-600 truncate">https://francegotransfers.io{displaySlug}</span>
         </div>
 
         {/* Title */}

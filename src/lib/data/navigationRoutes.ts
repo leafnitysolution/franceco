@@ -29,7 +29,6 @@ export const VERSAILLES_ROUTES = [
 ];
 
 export const TRAIN_STATION_ROUTES = [
-  { label: 'Gare du Nord to Disneyland', slug: 'cdg-to-disneyland-paris' },
-  { label: 'Paris Stations to Hotels', slug: 'cdg-to-paris-city' },
+  { label: 'Gare du Nord & Stations to Disneyland', slug: 'paris-train-stations-to-disneyland' },
+  { label: 'Paris Train Stations to Hotels', slug: 'paris-train-stations-to-paris' },
 ];
-

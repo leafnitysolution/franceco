@@ -744,7 +744,7 @@ export function RouteForm({ initialData, locations }: RouteFormProps) {
 
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
               <div className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 font-mono">
-                <span>https://fastforwardshuttle.com › transfers › {slug}</span>
+                <span className="truncate">https://francegotransfers.io › transfers › {slug}</span>
               </div>
               <div className="text-base font-bold text-blue-700 hover:underline cursor-pointer line-clamp-1">
                 {metaTitle || 'Meta Title Placeholder'}

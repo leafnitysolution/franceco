@@ -156,7 +156,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
         });
       }
 
-      const resData = await res.json();
+      const resData = await res.json().catch(() => ({}));
       if (!res.ok || !resData.success) {
         throw new Error(resData.error || 'Failed to upload photo.');
       }
@@ -164,7 +164,9 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
       setUploadedPhotoUrl(resData.url);
     } catch (err: any) {
       console.warn('Photo upload warning:', err);
-      setUploadedPhotoUrl(localBlobUrl);
+      setPreviewPhotoUrl('');
+      setUploadedPhotoUrl('');
+      setErrorMsg(err?.message || 'Photo upload failed. Please try a smaller image or submit without a photo.');
     } finally {
       setIsUploadingPhoto(false);
     }
@@ -179,7 +181,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     formData.set('rating', rating.toString());
-    const finalPhoto = uploadedPhotoUrl || previewPhotoUrl;
+    const finalPhoto = uploadedPhotoUrl && !uploadedPhotoUrl.startsWith('blob:') ? uploadedPhotoUrl : '';
     if (finalPhoto) {
       formData.set('imageUrl', finalPhoto);
     }
@@ -249,6 +251,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
           )}
 
           <button
+            type="button"
             onClick={() => setIsModalOpen(true)}
             className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] hover:brightness-105 text-white font-black text-xs sm:text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center gap-2 cursor-pointer"
           >
@@ -273,6 +276,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
                     <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gold-400/40 shrink-0">
                       <Image
                         src={r.authorAvatar}
+                        sizes="40px"
                         alt={r.authorName}
                         fill
                         className="object-cover"
@@ -315,6 +319,7 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
                   <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                     <Image
                       src={displayPhoto}
+                      sizes="(max-width: 768px) 100vw, 400px"
                       alt={`Photo from ${r.authorName}`}
                       fill
                       className="object-cover"
@@ -359,6 +364,8 @@ export function ReviewsPageClient({ initialReviews }: ReviewsPageClientProps) {
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[92vh] overflow-y-auto">
             <button
+              type="button"
+              aria-label="Close review modal"
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200 cursor-pointer"
             >

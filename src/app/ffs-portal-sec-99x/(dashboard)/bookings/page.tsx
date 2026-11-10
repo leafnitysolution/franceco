@@ -3,6 +3,10 @@ import { AdminBookingsClient } from '@/components/admin/AdminBookingsClient';
 
 export const revalidate = 0;
 
+export const metadata = {
+  title: 'Reservations',
+};
+
 export default async function AdminBookingsPage() {
   const bookings = await db.booking.findMany({
     orderBy: { createdAt: 'desc' },

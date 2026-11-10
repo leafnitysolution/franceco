@@ -86,25 +86,26 @@ export function Footer({ routes }: FooterProps) {
         {/* TOP BRAND & TRUST SECTION */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12 border-b border-[#1E2D42] items-start">
           {/* Brand Info & Contact Quick Actions (Col 8) */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-6 min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <Link
                 href="/"
                 className="inline-block bg-white rounded-2xl px-4 py-2.5 shadow-md border border-white/20 hover:scale-[1.02] transition-transform self-start"
               >
-                <div className="relative h-14 w-52 sm:w-60">
+                <div className="relative h-14 w-48 sm:w-56 overflow-hidden">
                   <Image
                     src="/images/logo.png"
                     alt="FranceGo - VIP Transfers & Tours"
                     fill
-                    className="object-contain object-center scale-105"
+                    sizes="(max-width: 640px) 192px, 224px"
+                    className="object-contain object-center"
                   />
                 </div>
               </Link>
 
               {/* Quick Badge */}
               <div className="inline-flex items-center gap-2 bg-[#132338] border border-gold-500/30 px-3.5 py-1.5 rounded-full text-gold-400 text-xs font-bold self-start">
-                <ShieldCheck className="w-4 h-4 text-gold-400" />
+                <ShieldCheck className="w-4 h-4 text-gold-400 shrink-0" />
                 <span>{t('officialChauffeurService')}</span>
               </div>
             </div>
@@ -114,14 +115,14 @@ export function Footer({ routes }: FooterProps) {
             </p>
 
             {/* Quick Contact Details Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2">
-              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs pt-2">
+              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
                   <Phone className="w-4 h-4 text-gold-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-[10px] text-slate-400 uppercase font-bold">{t('hotline')}</div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                     <a href="tel:+33781118394" className="font-extrabold text-white hover:text-gold-400 transition-colors">
                       +33 7 81 11 83 94
                     </a>
@@ -133,23 +134,23 @@ export function Footer({ routes }: FooterProps) {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
                   <Mail className="w-4 h-4 text-gold-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Email Dispatch</div>
-                  <a href="mailto:projet15df@outlook.fr" className="font-extrabold text-white hover:text-gold-400 transition-colors">
+                  <a href="mailto:projet15df@outlook.fr" className="font-extrabold text-white hover:text-gold-400 transition-colors break-all">
                     projet15df@outlook.fr
                   </a>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3">
+              <div className="p-3.5 rounded-2xl bg-[#0F1E36] border border-[#1E2D42] flex items-start gap-3 min-w-0 sm:col-span-2 lg:col-span-1">
                 <div className="w-8 h-8 rounded-xl bg-gold-600/10 border border-gold-500/30 flex items-center justify-center text-gold-400 shrink-0 mt-0.5">
                   <MapPin className="w-4 h-4 text-gold-400" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Head Office & Hubs</div>
                   <span className="font-bold text-slate-200">Paris CDG, Orly & DLP</span>
                 </div>
@@ -214,9 +215,9 @@ export function Footer({ routes }: FooterProps) {
         </div>
 
         {/* 4 COLUMNS FOOTER NAVIGATION GRID */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {/* Column 1: Transfers */}
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0">
             <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               TRANSFERS
             </h3>
@@ -232,9 +233,9 @@ export function Footer({ routes }: FooterProps) {
           </div>
 
           {/* Column 2: Tours & Day Trips */}
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0">
             <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
-              TOURS & DAY TRIPS
+              TOURS &amp; DAY TRIPS
             </h3>
             <ul className="space-y-2 text-xs font-medium text-slate-400">
               {tourLinks.map((link, idx) => (
@@ -248,7 +249,7 @@ export function Footer({ routes }: FooterProps) {
           </div>
 
           {/* Column 3: Company */}
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0">
             <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               COMPANY
             </h3>
@@ -277,7 +278,7 @@ export function Footer({ routes }: FooterProps) {
           </div>
 
           {/* Column 4: Help & Policies */}
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0">
             <h3 className="text-white font-bold text-xs uppercase tracking-wider border-b border-[#1E2D42] pb-2 font-serif">
               {t('legalPolicies')}
             </h3>
@@ -309,7 +310,7 @@ export function Footer({ routes }: FooterProps) {
         {/* BOTTOM COPYRIGHT & LEGAL BAR */}
         <div className="pt-8 border-t border-[#1E2D42] text-center text-[11px] text-slate-400 font-medium flex flex-col md:flex-row justify-between items-center gap-3">
           <p>© {new Date().getFullYear()} FranceGo. {t('rightsReserved')}</p>
-          <div className="flex items-center gap-4 text-xs font-semibold">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs font-semibold">
             <Link href="/terms-and-conditions" className="hover:text-gold-400 transition-colors">
               {t('termsConditions')}
             </Link>
@@ -322,7 +323,7 @@ export function Footer({ routes }: FooterProps) {
               {t('cancellationPolicy')}
             </Link>
           </div>
-          <p>Official Door-to-Door Private Chauffeur & Shuttle Service in France</p>
+          <p>Official Door-to-Door Private Chauffeur &amp; Shuttle Service in France</p>
         </div>
       </div>
     </footer>

@@ -5,7 +5,7 @@ import { Mail, Clock, CheckCheck, Inbox } from 'lucide-react';
 export const revalidate = 0;
 
 export const metadata = {
-  title: 'Contact Messages | FastForward Admin',
+  title: 'Contact Messages',
 };
 
 export default async function AdminMessagesPage() {

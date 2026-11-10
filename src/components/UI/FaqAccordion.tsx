@@ -40,8 +40,10 @@ export function FaqAccordion({ faqs, title = 'Frequently Asked Questions' }: Faq
               }`}
             >
               <button
+                type="button"
                 onClick={() => toggle(idx)}
-                className="w-full text-left p-5 flex items-center justify-between gap-4 font-serif font-bold text-navy-900 hover:text-gold-700 transition-colors"
+                aria-expanded={isOpen}
+                className="w-full text-left p-5 flex items-center justify-between gap-4 font-serif font-bold text-navy-900 hover:text-gold-700 transition-colors cursor-pointer"
               >
                 <span className="text-base sm:text-lg">{faq.question}</span>
                 <ChevronDown

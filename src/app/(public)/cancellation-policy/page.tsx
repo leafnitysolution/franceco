@@ -1,11 +1,14 @@
+import type { Metadata } from 'next';
 import React from 'react';
-import Link from 'next/link';
 import { CheckCircle2, Clock, CalendarX, AlertTriangle, ShieldCheck } from 'lucide-react';
 
-export const metadata = {
-  title: 'Cancellation & Refund Policy | FranceGo',
+export const metadata: Metadata = {
+  title: 'Cancellation & Refund Policy',
   description:
     'Learn about our zero-risk 24-hour free cancellation policy for airport shuttles and private transfers in Paris.',
+  alternates: {
+    canonical: '/cancellation-policy',
+  },
 };
 
 export default function CancellationPolicyPage() {
@@ -28,7 +31,7 @@ export default function CancellationPolicyPage() {
       </section>
 
       {/* MAIN DOCUMENT BODY */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-8 text-xs sm:text-sm leading-relaxed text-slate-700">
           {/* Section 1 */}
           <section className="space-y-3">
@@ -56,10 +59,20 @@ export default function CancellationPolicyPage() {
             <p>To cancel or request changes to your booking, simply provide your booking reference number through any of the following channels:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong>Email:</strong> Send a request to <code>projet15df@outlook.fr</code>
+                <strong>Email:</strong> Send a request to{' '}
+                <a href="mailto:projet15df@outlook.fr" className="font-bold text-emerald-700 hover:underline">
+                  projet15df@outlook.fr
+                </a>
               </li>
               <li>
-                <strong>WhatsApp / Hotline:</strong> Message our 24/7 dispatch desk at <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="font-bold text-emerald-700 hover:underline">+33 7 81 11 83 94</a>
+                <strong>Hotline / WhatsApp:</strong> Call{' '}
+                <a href="tel:+33781118394" className="font-bold text-emerald-700 hover:underline">
+                  +33 7 81 11 83 94
+                </a>{' '}
+                or{' '}
+                <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="font-bold text-emerald-700 hover:underline">
+                  chat on WhatsApp
+                </a>
               </li>
             </ul>
           </section>
@@ -68,7 +81,7 @@ export default function CancellationPolicyPage() {
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-600" />
-              <span>3. Flight Delays & Airline Disruptions</span>
+              <span>3. Flight Delays &amp; Airline Disruptions</span>
             </h2>
             <p>
               If your incoming flight to Paris CDG, Orly, or Beauvais Airport is delayed, cancelled by the airline, or rescheduled:
@@ -87,7 +100,7 @@ export default function CancellationPolicyPage() {
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
-              <span>4. Late Cancellations & No-Shows</span>
+              <span>4. Late Cancellations &amp; No-Shows</span>
             </h2>
             <p>
               If a cancellation notice is received less than 3 hours before pickup time or if passengers fail to arrive without notice, driver dispatch costs may be billed. However, we evaluate every situation compassionately in cases of severe flight disruptions or emergencies.
@@ -112,7 +125,7 @@ export default function CancellationPolicyPage() {
             </div>
           </section>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -3,9 +3,12 @@ import Link from 'next/link';
 import { ShieldCheck, FileText, CheckCircle2, Phone, Mail, Globe, AlertCircle, Info, Scale } from 'lucide-react';
 
 export const metadata = {
-  title: 'Terms & Conditions | FranceGo VIP Transfers & Tours',
+  title: 'Terms & Conditions',
   description:
     'Review the official terms and conditions for private airport transfers and luxury chauffeur services provided by FranceGo VIP Transfers & Tours.',
+  alternates: {
+    canonical: '/terms-and-conditions',
+  },
 };
 
 export default function TermsAndConditionsPage() {
@@ -28,7 +31,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* MAIN DOCUMENT BODY */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-10 text-xs sm:text-sm leading-relaxed text-slate-700">
 
           {/* Section 1 */}
@@ -372,7 +375,7 @@ export default function TermsAndConditionsPage() {
               </div>
               <div className="flex items-center gap-2.5 text-slate-700">
                 <Phone className="w-4 h-4 text-gold-600 shrink-0" />
-                <span>Phone / WhatsApp: <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="text-gold-700 hover:underline">+33 7 81 11 83 94</a></span>
+                <span>Phone: <a href="tel:+33781118394" className="text-gold-700 hover:underline">+33 7 81 11 83 94</a> • <a href="https://wa.me/33781118394" target="_blank" rel="noopener noreferrer" className="text-gold-700 hover:underline">WhatsApp</a></span>
               </div>
               <div className="flex items-center gap-2.5 text-slate-700">
                 <Globe className="w-4 h-4 text-gold-600 shrink-0" />
@@ -404,7 +407,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
         </div>
-      </main>
+      </div>
     </div>
   );
 }

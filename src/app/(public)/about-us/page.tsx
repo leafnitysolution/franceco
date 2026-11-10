@@ -1,10 +1,14 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
-import { ShieldCheck, Award, Car, Users, Clock, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 
-export const metadata = {
-  title: 'About Us | FranceGo',
+export const metadata: Metadata = {
+  title: 'About Us',
   description:
     'Premier private chauffeur & airport transfer operator in Paris & Disneyland Paris. Delivering reliable door-to-door comfort for families and business travelers.',
+  alternates: {
+    canonical: '/about-us',
+  },
 };
 
 export default function AboutUsPage() {
@@ -18,14 +22,15 @@ export default function AboutUsPage() {
             alt="About FranceGo Paris"
             fill
             priority
+            sizes="100vw"
             className="object-cover object-center"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/90 to-slate-950/95 z-0"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 relative z-10 text-center">
-          <span className="text-xs font-black uppercase tracking-widest text-brand-400 bg-brand-500/20 px-4 py-1.5 rounded-full border border-brand-400/30">
-            OUR STORY & MISSION
+          <span className="text-xs font-black uppercase tracking-widest text-brand-400 bg-brand-500/20 px-4 py-1.5 rounded-full border border-brand-400/30 inline-block">
+            OUR STORY &amp; MISSION
           </span>
           <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
             About FranceGo
@@ -37,11 +42,11 @@ export default function AboutUsPage() {
       </section>
 
       {/* CONTENT & MISSION */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-              Paris&apos;s Most Reliable Family & Airport Transfer Partner
+              Paris&apos;s Most Reliable Family &amp; Airport Transfer Partner
             </h2>
 
             <p className="text-sm text-slate-700 leading-relaxed font-medium">
@@ -52,14 +57,14 @@ export default function AboutUsPage() {
               We specialize in door-to-door private transfers linking Charles de Gaulle (CDG), Orly (ORY), and Beauvais (BVA) airports directly to Disneyland Paris hotels, central Paris apartments, and historic regional châteaux.
             </p>
 
-            <div className="grid grid-cols-2 gap-4 text-xs font-bold text-slate-800 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-slate-800 pt-2">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>100% Fixed Rates (Zero Meter Surprise)</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Free Infant & Booster Car Seats</span>
+                <span>Free Infant &amp; Booster Car Seats</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -72,16 +77,17 @@ export default function AboutUsPage() {
             </div>
           </div>
 
-          <div className="relative h-96 rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
+          <div className="relative h-72 sm:h-96 rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
             <Image
               src="/images/france_transfer_hero.jpg"
               alt="Private Luxury Van Fleet Paris"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

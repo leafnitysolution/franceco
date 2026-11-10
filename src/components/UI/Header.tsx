@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, Menu, X, ChevronDown, Sparkles } from 'lucide-react';
+import { ShieldCheck, Menu, X, ChevronDown, Sparkles, Phone, Mail, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
@@ -21,6 +21,7 @@ interface HeaderProps {
 
 export function Header({ routes }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<string | null>('paris');
   const { t } = useLanguage();
   const pathname = usePathname();
 
@@ -123,32 +124,36 @@ export function Header({ routes }: HeaderProps) {
         }))
     : EXCURSIONS_ROUTES;
 
+  const toggleMobileSection = (key: string) => {
+    setMobileSection((prev) => (prev === key ? null : key));
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200/80 shadow-sm transition-all duration-300">
       {/* Top Notice Banner - Deep Midnight Navy */}
-      <div className="bg-[#0B192C] text-white text-[11px] font-bold py-2 px-4 text-center tracking-wider flex items-center justify-center gap-2 relative overflow-hidden uppercase">
+      <div className="bg-[#0B192C] text-white text-[10px] sm:text-[11px] font-bold py-2 px-3 sm:px-4 text-center tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 relative overflow-hidden uppercase">
         <ShieldCheck className="w-3.5 h-3.5 text-[#C5A059] shrink-0" />
-        <span className="text-slate-200">{t('topBanner')}</span>
+        <span className="text-slate-200 leading-tight">{t('topBanner')}</span>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4 min-w-0">
           {/* Header Logo - FRANCE GO */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0 py-1">
-            <div className="relative h-16 sm:h-20 w-56 sm:w-72 hover:scale-[1.02] transition-transform duration-200">
+          <Link href="/" className="flex items-center gap-3 group shrink-0 py-1 min-w-0">
+            <div className="relative h-12 sm:h-16 lg:h-20 w-36 sm:w-52 lg:w-64 hover:scale-[1.02] transition-transform duration-200 overflow-hidden">
               <Image
                 src="/images/logo.png"
                 alt="FRANCE GO - VIP Transfers & Tours"
                 fill
                 priority
-                sizes="(max-width: 768px) 240px, 300px"
-                className="object-contain object-left scale-105"
+                sizes="(max-width: 640px) 144px, (max-width: 1024px) 208px, 256px"
+                className="object-contain object-left"
               />
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 shrink-0">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 shrink-0" aria-label="Main navigation">
             <Link
               href="/"
               className={`text-xs sm:text-sm font-bold transition-all duration-200 ${
@@ -163,6 +168,7 @@ export function Header({ routes }: HeaderProps) {
             {/* PARIS TRANSFERS DROPDOWN */}
             <div className="relative group py-6">
               <button
+                type="button"
                 className={`text-xs sm:text-sm font-bold transition-colors flex items-center gap-1 ${
                   isParisTransfersActive
                     ? 'text-[#C5A059] font-black'
@@ -228,6 +234,7 @@ export function Header({ routes }: HeaderProps) {
             {/* DISNEYLAND TRANSFERS DROPDOWN */}
             <div className="relative group py-6">
               <button
+                type="button"
                 className={`text-xs sm:text-sm font-bold transition-colors flex items-center gap-1 ${
                   isDisneyTransfersActive
                     ? 'text-[#C5A059] font-black'
@@ -257,6 +264,7 @@ export function Header({ routes }: HeaderProps) {
             {/* TOURS DROPDOWN */}
             <div className="relative group py-6">
               <button
+                type="button"
                 className={`text-xs sm:text-sm font-bold transition-colors flex items-center gap-1 ${
                   isToursActive
                     ? 'text-[#C5A059] font-black'
@@ -299,6 +307,7 @@ export function Header({ routes }: HeaderProps) {
             {/* MORE DROPDOWN */}
             <div className="relative group py-6">
               <button
+                type="button"
                 className={`text-xs sm:text-sm font-bold transition-colors flex items-center gap-1 ${
                   isMoreActive
                     ? 'text-[#C5A059] font-black'
@@ -386,22 +395,25 @@ export function Header({ routes }: HeaderProps) {
           <div className="hidden lg:flex items-center gap-3 shrink-0">
             <LanguageSelector />
 
-            <a
-              href="#booking-widget"
+            <Link
+              href="/book"
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] text-slate-900 font-black text-xs uppercase tracking-wider hover:brightness-105 hover:scale-105 active:scale-95 transition-all shadow-md shadow-amber-900/10"
             >
               <span>{t('bookNowBtn')}</span>
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu & Language Toggle */}
-          <div className="flex lg:hidden items-center gap-2 shrink-0">
+          <div className="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
             <LanguageSelector />
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl bg-[#F5F2EA] text-slate-800 hover:text-slate-900 border border-[#E5D7BC] transition-all"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+              className="p-2 rounded-xl bg-[#F5F2EA] text-slate-800 hover:text-slate-900 border border-[#E5D7BC] transition-all cursor-pointer"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
@@ -409,47 +421,218 @@ export function Header({ routes }: HeaderProps) {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-[#E5D7BC] bg-white px-4 pt-4 pb-6 space-y-4 max-h-[80vh] overflow-y-auto animate-in slide-in-from-top-4 duration-300">
+        <nav
+          aria-label="Mobile navigation"
+          className="lg:hidden border-t border-[#E5D7BC] bg-white px-4 pt-4 pb-6 space-y-3 max-h-[82vh] overflow-y-auto shadow-xl animate-in slide-in-from-top-4 duration-200"
+        >
+          {/* Quick Primary Bar */}
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <Link
+              href="/book"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#C5A059] to-[#B08B43] text-slate-900 font-black text-xs uppercase tracking-wider text-center shadow-sm flex items-center justify-center gap-1.5"
+            >
+              <span>{t('bookNowBtn')}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              href="/our-rates"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-2.5 rounded-xl bg-[#F7F2E7] border border-[#E5D7BC] text-[#9E7B3B] font-bold text-xs flex items-center gap-1"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t('transferRates')}</span>
+            </Link>
+          </div>
+
           <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-bold text-slate-900 hover:text-[#C5A059] py-2 border-b border-slate-100"
+            className={`block text-sm font-bold py-2 border-b border-slate-100 ${
+              isHomeActive ? 'text-[#C5A059]' : 'text-slate-900 hover:text-[#C5A059]'
+            }`}
           >
             {t('home')}
           </Link>
 
-          <div className="space-y-2 border-b border-slate-100 pb-3">
-            <div className="text-xs font-black text-[#9E7B3B] uppercase">{t('support')} & {t('reviews')}</div>
-            <Link
-              href="/reviews"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-xs font-black text-[#C5A059] py-1"
+          {/* Collapsible Paris Transfers */}
+          <div className="border-b border-slate-100 pb-2">
+            <button
+              type="button"
+              onClick={() => toggleMobileSection('paris')}
+              className="w-full flex items-center justify-between py-2 text-xs font-black uppercase tracking-wider text-[#9E7B3B]"
             >
-              {t('reviews')}
-            </Link>
-            <Link
-              href="/about-us"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-xs font-semibold text-slate-800 py-1"
-            >
-              {t('aboutUs')}
-            </Link>
-            <Link
-              href="/contact-us"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-xs font-semibold text-slate-800 py-1"
-            >
-              {t('contactUs')}
-            </Link>
-            <Link
-              href="/faqs"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-xs font-semibold text-slate-800 py-1"
-            >
-              {t('faqs')}
-            </Link>
+              <span>{t('parisTransfers')}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${mobileSection === 'paris' ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileSection === 'paris' && (
+              <div className="space-y-3 pl-2 pt-1 pb-2">
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Airports</div>
+                  {airportRoutes.map((r) => (
+                    <Link
+                      key={r.slug}
+                      href={`/transfers/${r.slug}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-xs font-semibold text-slate-800 hover:text-[#C5A059] py-1"
+                    >
+                      {r.label}
+                    </Link>
+                  ))}
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Versailles & Stations</div>
+                  {[...versaillesRoutes, ...trainStationRoutes].map((r) => (
+                    <Link
+                      key={r.slug}
+                      href={`/transfers/${r.slug}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-xs font-semibold text-slate-800 hover:text-[#C5A059] py-1"
+                    >
+                      {r.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+
+          {/* Collapsible Disneyland Transfers */}
+          <div className="border-b border-slate-100 pb-2">
+            <button
+              type="button"
+              onClick={() => toggleMobileSection('disney')}
+              className="w-full flex items-center justify-between py-2 text-xs font-black uppercase tracking-wider text-[#9E7B3B]"
+            >
+              <span>{t('disneylandTransfers')}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${mobileSection === 'disney' ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileSection === 'disney' && (
+              <div className="space-y-1 pl-2 pt-1 pb-2">
+                {disneylandRoutes.map((r) => (
+                  <Link
+                    key={r.slug}
+                    href={`/transfers/${r.slug}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-xs font-semibold text-slate-800 hover:text-[#C5A059] py-1"
+                  >
+                    {r.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Collapsible Tours & Excursions */}
+          <div className="border-b border-slate-100 pb-2">
+            <button
+              type="button"
+              onClick={() => toggleMobileSection('tours')}
+              className="w-full flex items-center justify-between py-2 text-xs font-black uppercase tracking-wider text-[#9E7B3B]"
+            >
+              <span>{t('tours')}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${mobileSection === 'tours' ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileSection === 'tours' && (
+              <div className="space-y-1 pl-2 pt-1 pb-2">
+                {excursionsRoutes.map((r) => (
+                  <Link
+                    key={r.slug}
+                    href={`/transfers/${r.slug}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-xs font-semibold text-slate-800 hover:text-[#C5A059] py-1"
+                  >
+                    {r.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Company, Support & Legal */}
+          <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-3 pt-1">
+            <div className="space-y-1">
+              <div className="text-[10px] font-black text-[#9E7B3B] uppercase">{t('support')}</div>
+              <Link
+                href="/reviews"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-black text-[#C5A059] py-1"
+              >
+                {t('reviews')}
+              </Link>
+              <Link
+                href="/about-us"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-semibold text-slate-800 py-1"
+              >
+                {t('aboutUs')}
+              </Link>
+              <Link
+                href="/contact-us"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-semibold text-slate-800 py-1"
+              >
+                {t('contactUs')}
+              </Link>
+              <Link
+                href="/faqs"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-semibold text-slate-800 py-1"
+              >
+                {t('faqs')}
+              </Link>
+            </div>
+
+            <div className="space-y-1">
+              <div className="text-[10px] font-black text-[#9E7B3B] uppercase">{t('legalPolicies')}</div>
+              <Link
+                href="/terms-and-conditions"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-semibold text-slate-800 py-1"
+              >
+                {t('termsConditions')}
+              </Link>
+              <Link
+                href="/privacy-policy"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-semibold text-slate-800 py-1"
+              >
+                {t('privacyPolicy')}
+              </Link>
+              <Link
+                href="/cancellation-policy"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-xs font-semibold text-slate-800 py-1"
+              >
+                {t('cancellationPolicy')}
+              </Link>
+            </div>
+          </div>
+
+          {/* Clickable Mobile Contact Shortcuts */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+            <a
+              href="tel:+33781118394"
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 hover:border-[#C5A059]"
+            >
+              <Phone className="w-3.5 h-3.5 text-[#C5A059] shrink-0" />
+              <span>+33 7 81 11 83 94</span>
+            </a>
+            <a
+              href="mailto:projet15df@outlook.fr"
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 hover:border-[#C5A059] truncate"
+            >
+              <Mail className="w-3.5 h-3.5 text-[#C5A059] shrink-0" />
+              <span className="truncate">projet15df@outlook.fr</span>
+            </a>
+          </div>
+        </nav>
       )}
     </header>
   );

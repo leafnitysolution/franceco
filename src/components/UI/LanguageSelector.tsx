@@ -30,8 +30,9 @@ export function LanguageSelector() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-100/90 hover:bg-slate-200/80 text-slate-800 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
+        className="px-3 sm:px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-100/90 hover:bg-slate-200/80 text-slate-800 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
         aria-expanded={isOpen}
+        aria-label="Select language"
       >
         <span className="text-sm leading-none">{currentLanguage.flag}</span>
         <span className="font-extrabold text-slate-900 tracking-wide">{currentLanguage.displayCode}</span>
@@ -42,17 +43,18 @@ export function LanguageSelector() {
         />
       </button>
 
-      {/* Popover Dropdown matching Screenshot */}
+      {/* Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200/90 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute right-0 top-full mt-2 w-48 max-w-[calc(100vw-2rem)] bg-white border border-slate-200/90 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="space-y-0.5">
             {LANGUAGES.map((lang) => {
               const isSelected = lang.code === currentLanguage.code;
               return (
                 <button
                   key={lang.code}
+                  type="button"
                   onClick={() => handleSelect(lang.code)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer ${
                     isSelected
                       ? 'bg-[#F7F2E7] text-gold-700 border border-[#E5D7BC] shadow-sm'
                       : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'

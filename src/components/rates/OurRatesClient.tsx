@@ -20,6 +20,7 @@ import {
   Users,
   Compass,
   Clock,
+  AlertCircle,
   Award,
   Calendar,
 } from 'lucide-react';
@@ -168,6 +169,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
     pricing: { sedan: number; economyVan: number; businessVan: number; minibus: number };
   } | null>(null);
   const [isCalculatingCustom, setIsCalculatingCustom] = useState(false);
+  const [customCalcError, setCustomCalcError] = useState<string | null>(null);
 
   const {
     setServiceMode,
@@ -229,6 +231,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
 
       if (!dbMatch) {
         setIsCalculatingCustom(true);
+        setCustomCalcError(null);
         fetch('/api/maps/distance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -237,7 +240,16 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
             destination: selectedToLoc.name,
           }),
         })
-          .then((res) => res.json())
+          .then(async (res) => {
+            const data = await res.json().catch(() => ({}));
+            if (!isCancelled && (!res.ok || !data?.success || !data?.pricing)) {
+              setCustomRouteData(null);
+              setCustomCalcError(
+                data?.error || 'Could not calculate distance for this custom pair. Please select a fixed route or continue via our booking page.'
+              );
+            }
+            return data;
+          })
           .then((data) => {
             if (!isCancelled && data.success && data.pricing) {
               setCustomRouteData({
@@ -249,6 +261,10 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
           })
           .catch((err) => {
             console.warn('Failed to calculate custom route:', err);
+            if (!isCancelled) {
+              setCustomRouteData(null);
+              setCustomCalcError('Distance calculator is temporarily unavailable. Please choose a fixed route below or book directly.');
+            }
           })
           .finally(() => {
             if (!isCancelled) setIsCalculatingCustom(false);
@@ -316,7 +332,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
       {/* ========================================================================= */}
       {/* 1. TOP SERVICE MODE SELECTOR TABS: DIRECT TRANSFERS vs HOURLY CHAUFFEUR TOURS */}
       {/* ========================================================================= */}
-      <div className="max-w-2xl mx-auto flex p-1.5 bg-[#F5F3ED] rounded-2xl border border-[#E5D7BC] shadow-sm">
+      <div className="max-w-2xl mx-auto flex flex-col sm:flex-row p-1.5 bg-[#F5F3ED] rounded-2xl border border-[#E5D7BC] shadow-sm gap-1.5 sm:gap-0">
         <button
           type="button"
           onClick={() => setActiveServiceTab('TRANSFERS')}
@@ -554,6 +570,7 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
                     setSelectedToLoc(null);
                     setSelectedFromId('');
                     setSelectedToId('');
+                    setCustomCalcError(null);
                     setCustomRouteData(null);
                   }}
                   className="text-xs font-bold text-gold-700 hover:text-gold-800 underline flex items-center gap-1 cursor-pointer ml-auto"
@@ -566,6 +583,12 @@ export function OurRatesClient({ locations, initialRoutes }: OurRatesClientProps
 
           {/* RESULTS SECTION ANCHOR */}
           <div id="rates-results" className="space-y-8 scroll-mt-24">
+            {customCalcError && !isCalculatingCustom && !customRouteData && (
+              <div className="max-w-2xl mx-auto bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 text-xs sm:text-sm font-semibold flex items-start gap-2.5 shadow-sm">
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <span>{customCalcError}</span>
+              </div>
+            )}
             {/* DYNAMIC CALCULATED ROUTE CARD (When user types or selects custom locations without a fixed DB route) */}
             {selectedFromLoc && selectedToLoc && selectedFromLoc.id !== selectedToLoc.id && (
               <>

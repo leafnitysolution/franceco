@@ -260,7 +260,7 @@ export function CustomerReviews({ title, subtitle, initialReviews }: CustomerRev
         });
       }
 
-      const resData = await res.json();
+      const resData = await res.json().catch(() => ({}));
       if (!res.ok || !resData.success) {
         throw new Error(resData.error || 'Failed to upload photo.');
       }
@@ -269,7 +269,9 @@ export function CustomerReviews({ title, subtitle, initialReviews }: CustomerRev
     } catch (err: any) {
       console.warn('Photo upload warning:', err);
       // Keep local preview so the user still sees their uploaded photo
-      setUploadedPhotoUrl(localBlobUrl);
+      setPreviewPhotoUrl('');
+      setUploadedPhotoUrl('');
+      setModalError(err?.message || 'Photo upload failed. Please try a smaller image or submit without a photo.');
     } finally {
       setIsUploadingPhoto(false);
     }
@@ -284,7 +286,7 @@ export function CustomerReviews({ title, subtitle, initialReviews }: CustomerRev
     const form = e.currentTarget;
     const formData = new FormData(form);
     formData.set('rating', modalRating.toString());
-    const finalPhoto = uploadedPhotoUrl || previewPhotoUrl;
+    const finalPhoto = uploadedPhotoUrl && !uploadedPhotoUrl.startsWith('blob:') ? uploadedPhotoUrl : '';
     if (finalPhoto) {
       formData.set('imageUrl', finalPhoto);
     }
@@ -417,7 +419,7 @@ export function CustomerReviews({ title, subtitle, initialReviews }: CustomerRev
           return (
             <div
               key={r.id}
-              className="snap-start w-[320px] sm:w-[380px] shrink-0 bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-lg hover:shadow-2xl hover:border-gold-400 transition-all duration-300 flex flex-col justify-between group"
+              className="snap-start w-[84vw] max-w-[340px] sm:w-[380px] sm:max-w-none shrink-0 bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-lg hover:shadow-2xl hover:border-gold-400 transition-all duration-300 flex flex-col justify-between group"
             >
               <div className="space-y-4">
                 {/* Header: Avatar, Name, Verified Badge, Rating */}
@@ -427,6 +429,7 @@ export function CustomerReviews({ title, subtitle, initialReviews }: CustomerRev
                       <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-gold-400/40 shrink-0">
                         <Image
                           src={r.authorAvatar}
+                          sizes="44px"
                           alt={r.name}
                           fill
                           className="object-cover"
@@ -468,6 +471,7 @@ export function CustomerReviews({ title, subtitle, initialReviews }: CustomerRev
                   <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-inner group-hover:scale-[1.01] transition-transform duration-300">
                     <Image
                       src={displayPhoto}
+                      sizes="(max-width: 640px) 84vw, 332px"
                       alt={`Customer photo from ${r.name}`}
                       fill
                       className="object-cover"

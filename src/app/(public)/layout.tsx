@@ -15,7 +15,7 @@ export default async function PublicLayout({
   return (
     <>
       <Header routes={activeRoutes as any} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 min-w-0 w-full overflow-x-clip">{children}</main>
       <Footer routes={activeRoutes as any} />
       <CheckoutModal />
     </>

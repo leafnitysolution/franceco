@@ -4,6 +4,10 @@ import { AdminSettingsClient } from '@/components/admin/AdminSettingsClient';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+export const metadata = {
+  title: 'API & Settings',
+};
+
 export default async function AdminSettingsPage() {
   const settings = await getAllSettings();
 

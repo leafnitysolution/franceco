@@ -1,13 +1,17 @@
+import type { Metadata } from 'next';
 import { OurRatesClient } from '@/components/rates/OurRatesClient';
 import { Sparkles } from 'lucide-react';
 import { getPublicLocations, getPublicRoutes } from '@/lib/publicData';
 
 export const revalidate = 60;
 
-export const metadata = {
-  title: 'Our Rates & Transfer Prices | FranceGo',
+export const metadata: Metadata = {
+  title: 'Our Rates & Transfer Prices',
   description:
     'Transparent fixed pricing for private airport transfers between CDG, Orly, Beauvais, Disneyland Paris, and Paris City Center. No meters, free child seats.',
+  alternates: {
+    canonical: '/our-rates',
+  },
 };
 
 export default async function OurRatesPage() {

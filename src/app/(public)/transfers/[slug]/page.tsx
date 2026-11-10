@@ -9,7 +9,13 @@ import { ShieldCheck, Clock, MapPin, CheckCircle2, Sparkles, HelpCircle, AlertCi
 import { formatCurrency } from '@/lib/utils';
 import { ensureLocationsSeeded } from '@/lib/seedHelper';
 
-import { getPublicRoutes, getPublicLocations, getPublicCategories, DEFAULT_ROUTES } from '@/lib/publicData';
+import {
+  getPublicRoutes,
+  getPublicLocations,
+  getPublicCategories,
+  getPublicReviews,
+  DEFAULT_ROUTES,
+} from '@/lib/publicData';
 
 export const revalidate = 60;
 
@@ -33,11 +39,12 @@ export async function generateMetadata({ params }: RoutePageProps): Promise<Meta
     route = await db.route.findUnique({
       where: { slug },
     });
-  } catch (err) {
+  } catch {
     route = DEFAULT_ROUTES.find((r) => r.slug === slug) || null;
   }
 
-  const title = route?.metaTitle || `${formatSlugToTitle(slug)} | FranceGo Transfers`;
+  const rawTitle = route?.metaTitle || `${formatSlugToTitle(slug)} Private Transfer`;
+  const title = /francego/i.test(rawTitle) ? { absolute: rawTitle } : rawTitle;
   const description =
     route?.metaDescription ||
     `Book door-to-door private transfers for ${formatSlugToTitle(
@@ -47,6 +54,9 @@ export async function generateMetadata({ params }: RoutePageProps): Promise<Meta
   return {
     title,
     description,
+    alternates: {
+      canonical: `/transfers/${slug}`,
+    },
   };
 }
 
@@ -71,9 +81,11 @@ export default async function RoutePage({ params }: RoutePageProps) {
     route = DEFAULT_ROUTES.find((r) => r.slug === slug) || null;
   }
 
-  const [locations, categories] = await Promise.all([
+  const [locations, categories, allRoutes, initialReviews] = await Promise.all([
     getPublicLocations(),
     getPublicCategories(),
+    getPublicRoutes(),
+    getPublicReviews(),
   ]);
 
   // Customized details per hub location category
@@ -168,9 +180,11 @@ export default async function RoutePage({ params }: RoutePageProps) {
   let faqs = [];
   try {
     faqs = typeof currentRoute.faqs === 'string' ? JSON.parse(currentRoute.faqs) : currentRoute.faqs;
-  } catch (e) {
+  } catch {
     faqs = [];
   }
+
+  const resolvedHeroImage = currentRoute.imageUrl || heroImage;
 
   return (
     <div className="space-y-16 pb-20 bg-[#FBF9F5] text-navy-900">
@@ -179,14 +193,14 @@ export default async function RoutePage({ params }: RoutePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* LEFT COLUMN: TITLE, FEATURED IMAGE BANNER & SUMMARY */}
-            <div className="lg:col-span-7 space-y-6 pt-2">
+            <div className="lg:col-span-7 space-y-6 pt-2 min-w-0">
               {/* Breadcrumbs */}
-              <div className="flex items-center gap-2 text-xs text-slate-500 font-bold bg-white px-3.5 py-1.5 rounded-full border border-[#E5D7BC] shadow-sm w-fit">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 font-bold bg-white px-3.5 py-1.5 rounded-2xl sm:rounded-full border border-[#E5D7BC] shadow-sm w-fit max-w-full">
                 <span>Transfers</span>
                 <span>/</span>
-                <span className="text-slate-700">{currentRoute.origin?.name}</span>
+                <span className="text-slate-700 break-words">{currentRoute.origin?.name}</span>
                 <span>→</span>
-                <span className="text-gold-700 font-bold">{currentRoute.destination?.name}</span>
+                <span className="text-gold-700 font-bold break-words">{currentRoute.destination?.name}</span>
               </div>
 
               {/* Main Headline */}
@@ -213,16 +227,18 @@ export default async function RoutePage({ params }: RoutePageProps) {
               </div>
 
               {/* FEATURED ROUTE IMAGE BANNER */}
-              <div className="relative w-full h-[280px] sm:h-[360px] rounded-3xl overflow-hidden shadow-xl border border-[#E5D7BC] group">
+              <div className="relative w-full h-[240px] sm:h-[360px] rounded-3xl overflow-hidden shadow-xl border border-[#E5D7BC] group">
                 <Image
-                  src={heroImage}
+                  src={resolvedHeroImage}
                   alt={currentRoute.h1Heading}
                   fill
                   priority
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  unoptimized={resolvedHeroImage.startsWith('http')}
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4 text-white font-bold text-xs flex items-center justify-between">
+                <div className="absolute bottom-4 left-4 right-4 text-white font-bold text-xs flex flex-wrap items-center justify-between gap-2">
                   <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/30">
                     Door-to-door Private Shuttle
                   </span>
@@ -239,16 +255,18 @@ export default async function RoutePage({ params }: RoutePageProps) {
             </div>
 
             {/* RIGHT COLUMN: COMPACT RESERVATION ENGINE */}
-            <div className="lg:col-span-5 sticky top-24">
+            <div className="lg:col-span-5 lg:sticky lg:top-24 min-w-0">
               <BookingWidget
                 compact={true}
                 locations={locations}
                 categories={categories as any}
+                routes={allRoutes as any}
                 defaultOriginId={currentRoute.originId}
                 defaultDestinationId={currentRoute.destinationId}
                 defaultSedanPrice={currentRoute.sedanPriceEur}
                 defaultEconomyVanPrice={currentRoute.economyVanPriceEur}
                 defaultBusinessVanPrice={currentRoute.businessVanPriceEur}
+                defaultMinibusPrice={currentRoute.minibusPriceEur}
               />
             </div>
           </div>
@@ -259,7 +277,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* Main Article Body */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 min-w-0">
             <div className="space-y-4">
               <h2 className="font-serif text-2xl font-bold text-navy-900 tracking-tight">
                 About this Transfer Route ({currentRoute.origin?.shortCode || 'DEP'} → {currentRoute.destination?.shortCode || 'ARR'})
@@ -276,7 +294,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
             <div className="bg-[#F7F2E7] border border-[#E5D7BC] rounded-3xl p-6 space-y-3">
               <div className="flex items-center gap-2 font-bold text-navy-900 text-base">
                 <AlertCircle className="w-5 h-5 text-gold-600 shrink-0" />
-                <span>Driver Meet & Greet Instructions</span>
+                <span>Driver Meet &amp; Greet Instructions</span>
               </div>
               <p className="text-xs font-semibold text-slate-700 leading-relaxed">
                 {terminalGuide} We track your arrival schedule in real-time so even if your arrival is delayed, your driver will be waiting for you.
@@ -293,7 +311,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
                 <div className="bg-emerald-50/70 border border-emerald-200 rounded-3xl p-6 space-y-3">
                   <div className="flex items-center gap-2 text-emerald-800 font-bold text-base">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <span>FastForward Private Shuttle</span>
+                    <span>FranceGo Private Chauffeur</span>
                   </div>
                   <ul className="space-y-2 text-xs font-semibold text-slate-700">
                     <li className="flex items-center gap-2">
@@ -306,11 +324,11 @@ export default async function RoutePage({ params }: RoutePageProps) {
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      Free baby & booster seats fitted
+                      Free baby &amp; booster seats fitted
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      Meet & Greet sign at terminal arrivals
+                      Meet &amp; Greet sign at terminal arrivals
                     </li>
                   </ul>
                 </div>
@@ -344,7 +362,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
           </div>
 
           {/* Quick Route Rate Summary Side Card */}
-          <div className="bg-white p-6 rounded-3xl border border-[#E5D7BC] space-y-6 shadow-xl sticky top-24">
+          <div className="bg-white p-6 rounded-3xl border border-[#E5D7BC] space-y-6 shadow-xl lg:sticky lg:top-24 min-w-0">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-serif text-base font-bold text-navy-900">Fixed Fares for this Route</h3>
               <Sparkles className="w-4 h-4 text-gold-600" />
@@ -381,7 +399,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
 
       {/* CUSTOMER REVIEWS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <CustomerReviews />
+        <CustomerReviews initialReviews={initialReviews} />
       </section>
 
       {/* FLEET SHOWCASE */}

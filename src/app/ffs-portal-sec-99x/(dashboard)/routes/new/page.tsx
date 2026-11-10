@@ -1,6 +1,10 @@
 import { db } from '@/lib/db';
 import { RouteForm } from '@/components/admin/RouteForm';
 
+export const metadata = {
+  title: 'Create Route',
+};
+
 export default async function NewRoutePage() {
   const locations = await db.location.findMany({
     orderBy: { name: 'asc' },

@@ -120,6 +120,8 @@ export function CheckoutModal() {
           </div>
 
           <button
+            type="button"
+            aria-label="Close modal"
             onClick={() => store.closeModal()}
             className="p-2 rounded-xl bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
           >
@@ -263,7 +265,7 @@ export function CheckoutModal() {
                   <input
                     type="email"
                     required
-                    placeholder="sarah@example.com"
+                    placeholder="your.name@gmail.com"
                     value={store.customerEmail}
                     onChange={(e) => store.setCustomerDetails({ name: store.customerName, email: e.target.value, phone: store.customerPhone, notes: store.notes })}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-bold focus:outline-none focus:border-brand-500"

@@ -5,7 +5,7 @@ import { MessageSquareDiff, Star, CheckCircle2, Clock } from 'lucide-react';
 export const revalidate = 0;
 
 export const metadata = {
-  title: 'Manage Reviews | FastForward Admin',
+  title: 'Manage Reviews',
 };
 
 export default async function AdminReviewsPage() {

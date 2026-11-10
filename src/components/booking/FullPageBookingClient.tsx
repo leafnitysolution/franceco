@@ -44,7 +44,7 @@ import {
   Wine,
   Wifi,
 } from 'lucide-react';
-import { BookingAddon, DEFAULT_BOOKING_ADDONS, calculateAddonsTotal } from '@/lib/addons';
+import { BookingAddon, DEFAULT_BOOKING_ADDONS, calculateAddonsTotal } from '@/lib/addonsShared';
 
 interface FullPageBookingClientProps {
   locations: LocationItem[];
@@ -679,6 +679,7 @@ export function FullPageBookingClient({ locations, categories, routes, addons }:
                             <div className="relative w-24 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
                               <Image
                                 src={item.image}
+                                sizes="96px"
                                 alt={item.title}
                                 fill
                                 className="object-cover"
@@ -978,6 +979,13 @@ export function FullPageBookingClient({ locations, categories, routes, addons }:
                       Enter details for the lead passenger. This person must be 18 years or older.
                     </p>
                   </div>
+
+                  {errorMsg && (
+                    <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                      <span>{errorMsg}</span>
+                    </div>
+                  )}
 
                   {/* First Name & Last Name */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1771,7 +1779,7 @@ export function FullPageBookingClient({ locations, categories, routes, addons }:
             {/* Return Trip Toggle */}
             <div className="p-3 bg-amber-50/60 border border-amber-200/80 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-amber-900">Add Return Journey (+10% Discount)</span>
+                <span className="text-xs font-extrabold text-amber-900">Add Return Journey (Round Trip)</span>
                 <button
                   type="button"
                   onClick={() => store.setIsReturn(!store.isReturn)}
@@ -1832,6 +1840,13 @@ export function FullPageBookingClient({ locations, categories, routes, addons }:
                 </div>
               )}
             </div>
+
+            {(store.origin?.id && store.destination?.id && store.origin.id === store.destination.id) && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>Pickup and drop-off locations cannot be the same.</span>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="pt-2 flex items-center justify-end gap-3">

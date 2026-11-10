@@ -281,6 +281,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
           {tabs.map((tab) => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === tab.key
@@ -310,6 +311,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
 
         {/* Add New Review Button */}
         <button
+          type="button"
           onClick={openCreateModal}
           className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black shadow-md flex items-center gap-2 transition-all self-start sm:self-auto cursor-pointer"
         >
@@ -415,6 +417,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                           <Image
                             src={r.imageUrl}
                             alt={r.name}
+                            sizes="(max-width: 768px) 100vw, 400px"
                             fill
                             className="object-cover"
                             unoptimized
@@ -456,7 +459,8 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                   : 'No reviews found in this category.'}
               </p>
               <button
-                onClick={openCreateModal}
+                type="button"
+          onClick={openCreateModal}
                 className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold inline-flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4 text-gold-400" />
@@ -509,6 +513,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                       <Image
                         src={review.imageUrl}
                         alt={`Photo from ${review.authorName}`}
+                        sizes="(max-width: 768px) 100vw, 400px"
                         fill
                         className="object-cover"
                         unoptimized
@@ -561,6 +566,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                   <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
                     <button
                       onClick={() => openEditModal(review)}
+                      type="button"
                       title="Edit Review & Photo"
                       className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
                     >
@@ -571,6 +577,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                     {review.isPublished ? (
                       <button
                         onClick={() => handleUnpublish(review.id)}
+                        type="button"
                         title="Unpublish"
                         className="p-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition-all cursor-pointer"
                       >
@@ -579,6 +586,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                     ) : (
                       <button
                         onClick={() => handlePublish(review.id)}
+                        type="button"
                         title="Approve & Publish"
                         className="p-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition-all cursor-pointer"
                       >
@@ -589,12 +597,14 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                     {confirmDelete === review.id ? (
                       <div className="flex items-center gap-1">
                         <button
+                          type="button"
                           onClick={() => handleDelete(review.id)}
                           className="px-2.5 py-1 rounded-xl bg-red-600 text-white text-[10px] font-black hover:bg-red-700 cursor-pointer"
                         >
                           Confirm
                         </button>
                         <button
+                          type="button"
                           onClick={() => setConfirmDelete(null)}
                           className="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700 text-[10px] font-bold hover:bg-slate-200 cursor-pointer"
                         >
@@ -604,6 +614,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                     ) : (
                       <button
                         onClick={() => setConfirmDelete(review.id)}
+                        type="button"
                         title="Delete"
                         className="p-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition-all cursor-pointer"
                       >
@@ -759,6 +770,7 @@ export function AdminReviewsClient({ initialReviews }: AdminReviewsClientProps) 
                       <Image
                         src={photoUrl}
                         alt="Preview"
+                        sizes="(max-width: 768px) 100vw, 400px"
                         fill
                         className="object-cover"
                         unoptimized={photoUrl.startsWith('http')}

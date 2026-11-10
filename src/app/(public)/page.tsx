@@ -1,8 +1,18 @@
+import type { Metadata } from 'next';
 import { HomePageClient } from '@/components/home/HomePageClient';
 import { getPublicLocations, getPublicCategories, getPublicRoutes, getPublicReviews } from '@/lib/publicData';
 import { getHeroSlides, getHeroIntervalSeconds } from '@/lib/heroSlides';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: { absolute: 'FranceGo | VIP Paris & Disneyland Airport Private Transfers' },
+  description:
+    'Book fixed-rate private chauffeur transfers between Paris CDG, Orly, Beauvais airports, Disneyland Paris, and city hotels. Mercedes fleet, free child seats & pay on arrival.',
+  alternates: {
+    canonical: '/',
+  },
+};
 
 export default async function HomePage() {
   const [locations, categories, allRoutes, heroSlides, heroIntervalSeconds, initialReviews] = await Promise.all([

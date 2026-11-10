@@ -1,8 +1,9 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { BookingWidget } from '@/components/booking/BookingWidget';
-import { db } from '@/lib/db';
-import { MapPin, Clock, ShieldCheck, CheckCircle2, Star, Sparkles } from 'lucide-react';
+import { getPublicLocations, getPublicCategories, getPublicRoutes } from '@/lib/publicData';
+import { Clock, ShieldCheck, CheckCircle2, Star, Sparkles } from 'lucide-react';
 
 export const revalidate = 60;
 
@@ -58,6 +59,26 @@ const TOURS_DATA: Record<string, any> = {
   },
 };
 
+export async function generateMetadata({ params }: TourPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const tour = TOURS_DATA[slug];
+
+  if (!tour) {
+    return {
+      title: 'Tour Not Found',
+      description: 'Explore our private sightseeing tours and excursions across Paris and France.',
+    };
+  }
+
+  return {
+    title: tour.title,
+    description: tour.subtitle,
+    alternates: {
+      canonical: `/tours/${slug}`,
+    },
+  };
+}
+
 export default async function TourDetailPage({ params }: TourPageProps) {
   const { slug } = await params;
   const tour = TOURS_DATA[slug];
@@ -66,9 +87,11 @@ export default async function TourDetailPage({ params }: TourPageProps) {
     notFound();
   }
 
-  const locations = await db.location.findMany({
-    orderBy: { name: 'asc' },
-  });
+  const [locations, categories, routes] = await Promise.all([
+    getPublicLocations(),
+    getPublicCategories(),
+    getPublicRoutes(),
+  ]);
 
   return (
     <div className="space-y-16 pb-20 bg-slate-50 text-slate-900">
@@ -80,6 +103,7 @@ export default async function TourDetailPage({ params }: TourPageProps) {
             alt={tour.title}
             fill
             priority
+            sizes="100vw"
             className="object-cover object-center"
           />
         </div>
@@ -89,7 +113,7 @@ export default async function TourDetailPage({ params }: TourPageProps) {
           <div className="space-y-3 pt-4 text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-bold">
               <Sparkles className="w-4 h-4 text-brand-400" />
-              <span>PRIVATE TOUR & EXCURSION</span>
+              <span>PRIVATE TOUR &amp; EXCURSION</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -115,7 +139,7 @@ export default async function TourDetailPage({ params }: TourPageProps) {
 
           {/* Booking Widget */}
           <div className="max-w-5xl mx-auto">
-            <BookingWidget locations={locations} />
+            <BookingWidget locations={locations} categories={categories as any} routes={routes as any} />
           </div>
         </div>
       </section>
@@ -168,7 +192,7 @@ export default async function TourDetailPage({ params }: TourPageProps) {
             </div>
 
             <div className="text-[11px] text-slate-500 text-center font-semibold pt-1">
-              ✓ Door-to-door hotel pickup & drop-off included.
+              ✓ Door-to-door hotel pickup &amp; drop-off included.
             </div>
           </div>
         </div>

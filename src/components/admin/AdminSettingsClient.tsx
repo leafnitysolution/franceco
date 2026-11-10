@@ -8,12 +8,12 @@ import {
   adminSearchTripAdvisorAction,
   adminTestEmailAction,
 } from '@/lib/actions/settings';
-import { BookingAddon, DEFAULT_BOOKING_ADDONS } from '@/lib/addons';
+import { BookingAddon, DEFAULT_BOOKING_ADDONS } from '@/lib/addonsShared';
 import {
   HeroSlide,
   DEFAULT_HERO_SLIDES,
   DEFAULT_HERO_INTERVAL_SECONDS,
-} from '@/lib/heroSlides';
+} from '@/lib/heroSlidesShared';
 import {
   Key,
   MapPin,

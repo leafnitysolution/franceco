@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 
 export const revalidate = 0;
 
+export const metadata = {
+  title: 'Edit Route',
+};
+
 interface EditRoutePageProps {
   params: Promise<{
     id: string;

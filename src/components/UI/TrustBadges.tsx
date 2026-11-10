@@ -71,8 +71,8 @@ export function RepubliqueFrancaiseBadge({
             src="/images/republique_francaise.png"
             alt="République Française"
             fill
+            sizes="56px"
             className="object-contain"
-            priority
           />
         </div>
 
@@ -98,8 +98,8 @@ export function RepubliqueFrancaiseBadge({
           src="/images/republique_francaise.png"
           alt="République Française"
           fill
+          sizes="64px"
           className="object-contain"
-          priority
         />
       </div>
 
@@ -119,8 +119,8 @@ export function RepubliqueFrancaiseBadge({
 }
 
 /**
- * TripAdvisor Travellers' Choice 2025 Award Card
- * Matches official Travellers' Choice 2025 badge with TripAdvisor green logo
+ * TripAdvisor Travellers' Choice 2026 Award Card
+ * Matches official Travellers' Choice 2026 badge with TripAdvisor green logo
  */
 export function TripAdvisorTravellersChoiceCard({
   className = '',
@@ -152,20 +152,21 @@ export function TripAdvisorTravellersChoiceCard({
           src="/images/tripadvisor_icon.jpg"
           alt="TripAdvisor Official Award"
           fill
+          sizes="(max-width: 640px) 48px, 80px"
           className="object-cover"
-          priority
+          priority={compact}
         />
       </div>
 
       {/* Text Info */}
       <div className="space-y-0.5 text-left min-w-0">
         <div
-          className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+          className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 flex-wrap ${
             isDark ? 'text-slate-300' : 'text-slate-500'
           }`}
         >
           <span>TRIPADVISOR TRAVELLERS&apos; CHOICE</span>
-          <span className="text-[9px] font-black bg-[#00AA6C] text-black px-1.5 py-0.5 rounded font-mono">2025</span>
+          <span className="text-[9px] font-black bg-[#00AA6C] text-black px-1.5 py-0.5 rounded font-mono">2026</span>
         </div>
         <div className={`${compact ? 'text-xs sm:text-xs' : 'text-sm sm:text-base'} font-bold leading-snug`}>
           Awarded for consistent great reviews from global travellers.
@@ -181,4 +182,3 @@ export function TripAdvisorTravellersChoiceCard({
     </div>
   );
 }
-

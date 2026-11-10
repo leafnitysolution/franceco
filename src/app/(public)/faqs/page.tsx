@@ -1,10 +1,14 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { FaqAccordion } from '@/components/UI/FaqAccordion';
 
-export const metadata = {
-  title: 'Frequently Asked Questions | FranceGo',
+export const metadata: Metadata = {
+  title: 'Frequently Asked Questions',
   description:
     'Answers to common questions regarding airport pickups, child seats, flight delay tracking, and payment methods.',
+  alternates: {
+    canonical: '/faqs',
+  },
 };
 
 export default function FaqsPage() {
@@ -38,31 +42,32 @@ export default function FaqsPage() {
         <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
           <Image
             src="/images/meet_greet_driver.jpg"
-            alt="FAQs FastForward Shuttle"
+            alt="Frequently Asked Questions - FranceGo"
             fill
             priority
+            sizes="100vw"
             className="object-cover object-center"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/90 to-slate-950/95 z-0"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 relative z-10 text-center">
-          <span className="text-xs font-black uppercase tracking-widest text-brand-400 bg-brand-500/20 px-4 py-1.5 rounded-full border border-brand-400/30">
-            HELP CENTER & FAQS
+          <span className="text-xs font-black uppercase tracking-widest text-brand-400 bg-brand-500/20 px-4 py-1.5 rounded-full border border-brand-400/30 inline-block">
+            HELP CENTER &amp; FAQS
           </span>
           <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
             Frequently Asked Questions
           </h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium max-w-xl mx-auto">
-            Everything you need to know about your private transfer in Paris & Disneyland.
+            Everything you need to know about your private transfer in Paris &amp; Disneyland.
           </p>
         </div>
       </section>
 
       {/* FAQS ACCORDION */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <FaqAccordion faqs={faqs} title="Popular Transfer Questions & Answers" />
-      </main>
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import {
   HeroSlide,
   DEFAULT_HERO_SLIDES,
   DEFAULT_HERO_INTERVAL_SECONDS,
-} from '@/lib/heroSlides';
+} from '@/lib/heroSlidesShared';
 
 export type { HeroSlide };
 
@@ -93,7 +93,6 @@ export function HeroBackgroundSlider({ slides, intervalSeconds }: HeroBackground
               alt={slide.alt || slide.title || 'FranceGo Luxury Chauffeur Transfer'}
               fill
               priority={isPriority}
-              loading={isPriority ? 'eager' : 'lazy'}
               sizes="100vw"
               quality={85}
               className={`object-cover object-center transition-transform duration-[7000ms] ease-out ${

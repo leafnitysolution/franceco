@@ -5,6 +5,10 @@ import { formatCurrency } from '@/lib/utils';
 
 export const revalidate = 0;
 
+export const metadata = {
+  title: 'Route Fares & SEO',
+};
+
 export default async function AdminRoutesPage() {
   const routes = await db.route.findMany({
     orderBy: { isFeatured: 'desc' },

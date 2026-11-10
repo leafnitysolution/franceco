@@ -981,7 +981,7 @@ export function BookingWidget({
                   <input
                     type="email"
                     required
-                    placeholder="john@example.com"
+                    placeholder="your.name@gmail.com"
                     value={store.customerEmail}
                     onChange={(e) => store.setCustomerDetails({ name: store.customerName, email: e.target.value, phone: store.customerPhone, notes: store.notes })}
                     className="w-full bg-slate-100/90 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-bold focus:outline-none focus:border-slate-400"

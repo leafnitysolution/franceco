@@ -251,7 +251,7 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     // Fleet & Services
     fleetTitle: 'Nuestra Flota de Chóferes Premium',
     fleetSubtitle: 'Sedanes de lujo y vans espaciosas limpias, modernas y totalmente homologadas.',
-    servicesTitle: 'Por Qué Elegir FastForward Shuttle',
+    servicesTitle: 'Por Qué Elegir FranceGo',
     servicesSubtitle: 'Servicios de traslado puerta a puerta diseñados para familias y viajeros internacionales.',
 
     // Reviews Section
@@ -392,7 +392,7 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     // Fleet & Services
     fleetTitle: 'Notre Flotte de Véhicules avec Chauffeur',
     fleetSubtitle: 'Berlines haut de gamme et vans spacieux, récents et parfaitement entretenus.',
-    servicesTitle: 'Pourquoi Choisir FastForward Shuttle',
+    servicesTitle: 'Pourquoi Choisir FranceGo',
     servicesSubtitle: 'Des services de transfert sur mesure pensés pour les familles et voyageurs du monde entier.',
 
     // Reviews Section
@@ -533,7 +533,7 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     // Fleet & Services
     fleetTitle: 'La Nostra Flotta di Veicoli',
     fleetSubtitle: 'Berline di lusso e capienti van moderni, sanificati e con licenza ufficiale.',
-    servicesTitle: 'Perché Scegliere FastForward Shuttle',
+    servicesTitle: 'Perché Scegliere FranceGo',
     servicesSubtitle: 'Servizi di trasferimento privati pensati per famiglie e viaggiatori internazionali.',
 
     // Reviews Section
@@ -674,7 +674,7 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     // Fleet & Services
     fleetTitle: 'Unsere Premium Chauffeur-Flotte',
     fleetSubtitle: 'Moderne, saubere und voll lizenzierte Luxuslimousinen sowie geräumige Vans.',
-    servicesTitle: 'Warum FastForward Shuttle Wählen',
+    servicesTitle: 'Warum FranceGo Wählen',
     servicesSubtitle: 'Erstklassige Tür-zu-Tür-Transfers speziell für Familien und internationale Reisende.',
 
     // Reviews Section
@@ -815,7 +815,7 @@ export const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     // Fleet & Services
     fleetTitle: 'Nossa Frota de Veículos com Motorista',
     fleetSubtitle: 'Sedans de luxo e vans espaçosas, limpas, modernas e totalmente licenciadas.',
-    servicesTitle: 'Por Que Escolher a FastForward Shuttle',
+    servicesTitle: 'Por Que Escolher a FranceGo',
     servicesSubtitle: 'Serviços de transfer porta a porta pensados para famílias e viajantes internacionais.',
 
     // Reviews Section
@@ -924,7 +924,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem('fastforward_lang') as LanguageCode;
+    const saved = (localStorage.getItem('francego_lang') || localStorage.getItem('fastforward_lang')) as LanguageCode | null;
     if (saved) {
       const found = LANGUAGES.find((l) => l.code === saved);
       if (found) {
@@ -938,7 +938,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const found = LANGUAGES.find((l) => l.code === langCode);
     if (found) {
       setCurrentLanguageState(found);
-      localStorage.setItem('fastforward_lang', langCode);
+      localStorage.setItem('francego_lang', langCode);
+      localStorage.removeItem('fastforward_lang');
       syncGoogleTranslateCookie(langCode);
     }
   };

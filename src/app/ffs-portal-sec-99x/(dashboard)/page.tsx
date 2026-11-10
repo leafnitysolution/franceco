@@ -14,6 +14,10 @@ import { formatCurrency } from '@/lib/utils';
 
 export const revalidate = 0;
 
+export const metadata = {
+  title: 'Dashboard',
+};
+
 export default async function AdminDashboardPage() {
   const totalBookingsCount = await db.booking.count();
   const pendingBookingsCount = await db.booking.count({ where: { status: 'PENDING' } });

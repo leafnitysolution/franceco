@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BookingWidget } from '@/components/booking/BookingWidget';
 import { FleetShowcase } from '@/components/UI/FleetShowcase';
@@ -12,20 +11,13 @@ import { HeroBackgroundSlider } from '@/components/home/HeroBackgroundSlider';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useBookingStore } from '@/lib/store';
 import { LocationItem, CategoryItem } from '@/types';
-import { TripAdvisorLogo, RepubliqueFrancaiseBadge, TripAdvisorTravellersChoiceCard, TripAdvisorLockupLogo } from '@/components/UI/TrustBadges';
+import { RepubliqueFrancaiseBadge, TripAdvisorTravellersChoiceCard, TripAdvisorLockupLogo } from '@/components/UI/TrustBadges';
 import {
-  ShieldCheck,
-  Clock,
-  Award,
   Sparkles,
   ArrowRight,
   ChevronRight,
-  MapPin,
   CheckCircle2,
-  Users,
-  Plane,
   Compass,
-  Bus,
   Star,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
@@ -211,15 +203,15 @@ export function HomePageClient({
                 </div>
               </div>
 
-              {/* TRIPADVISOR TRAVELLERS' CHOICE 2025 AWARD CARD (DESKTOP) */}
+              {/* TRIPADVISOR TRAVELLERS' CHOICE 2026 AWARD CARD (DESKTOP) */}
               <TripAdvisorTravellersChoiceCard theme="dark" compact className="mt-2.5" />
             </div>
 
             {/* RIGHT COLUMN: BOOKING ENGINE WIDGET */}
             <div className="lg:col-span-6 space-y-3">
               <BookingWidget locations={locations} categories={categories} routes={featuredRoutes as any} />
-              
-              {/* TRIPADVISOR TRAVELLERS' CHOICE 2025 AWARD CARD (MOBILE / TABLET) */}
+
+              {/* TRIPADVISOR TRAVELLERS' CHOICE 2026 AWARD CARD (MOBILE / TABLET) */}
               <TripAdvisorTravellersChoiceCard theme="light" className="lg:hidden" />
             </div>
           </div>
@@ -245,7 +237,7 @@ export function HomePageClient({
           {/* OFFICIAL TRIPADVISOR BADGE WITH BRAND LOGO */}
           <div className="p-2 flex flex-col items-center justify-center space-y-1">
             <TripAdvisorLockupLogo className="h-5.5 w-auto" />
-            <div className="text-[10px] text-slate-500 font-medium">Ranked #6 Travellers' Choice</div>
+            <div className="text-[10px] text-slate-500 font-medium">Ranked #6 Travellers&apos; Choice</div>
           </div>
 
           {/* OFFICIAL LICENSED COMPANY - RÉPUBLIQUE FRANÇAISE BADGE */}
@@ -266,7 +258,7 @@ export function HomePageClient({
       </section>
 
       {/* POPULAR ROUTES GRID */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-2">
           <span className="text-xs font-bold uppercase tracking-widest text-gold-700 bg-[#F7F2E7] px-3.5 py-1 rounded-full border border-[#E5D7BC]">
             {t('popularRoutesBadge')}
@@ -381,7 +373,7 @@ export function HomePageClient({
 
       {/* BOTTOM MIDNIGHT NAVY CTA BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#0B192C] text-white rounded-3xl p-10 sm:p-14 text-center space-y-6 shadow-2xl relative overflow-hidden">
+        <div className="bg-[#0B192C] text-white rounded-3xl p-8 sm:p-14 text-center space-y-6 shadow-2xl relative overflow-hidden">
           <div className="space-y-3 max-w-2xl mx-auto">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight">
               {t('bottomCtaTitle')}
@@ -393,8 +385,9 @@ export function HomePageClient({
 
           <div className="pt-2">
             <button
+              type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="px-8 py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all"
+              className="px-8 py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer"
             >
               BOOK YOUR TRANSFER
             </button>
@@ -404,4 +397,3 @@ export function HomePageClient({
     </div>
   );
 }
-

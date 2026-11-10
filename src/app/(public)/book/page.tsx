@@ -1,13 +1,17 @@
+import type { Metadata } from 'next';
 import { FullPageBookingClient } from '@/components/booking/FullPageBookingClient';
 import { getPublicLocations, getPublicCategories, getPublicRoutes } from '@/lib/publicData';
 import { getBookingAddons } from '@/lib/addons';
 
 export const revalidate = 0;
 
-export const metadata = {
-  title: 'Book your Transfer | FranceGo',
+export const metadata: Metadata = {
+  title: 'Book your Transfer',
   description:
     'Complete your private transfer reservation in France with fixed rates, free child seats, zero deposit, and payment on arrival.',
+  alternates: {
+    canonical: '/book',
+  },
 };
 
 export default async function BookPage() {

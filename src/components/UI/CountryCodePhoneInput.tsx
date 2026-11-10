@@ -368,7 +368,7 @@ export function CountryCodePhoneInput({
 
       {/* Scrollable Country Selector Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-72 max-h-64 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute top-full left-0 mt-1 w-72 max-w-[calc(100vw-2rem)] max-h-64 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-150">
           <div className="p-2 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <input

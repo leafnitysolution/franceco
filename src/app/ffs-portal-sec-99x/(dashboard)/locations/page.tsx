@@ -4,6 +4,10 @@ import { ensureLocationCategoriesSeeded } from '@/lib/seedHelper';
 
 export const revalidate = 0;
 
+export const metadata = {
+  title: 'Location Hubs',
+};
+
 export default async function LocationsPage() {
   await ensureLocationCategoriesSeeded();
 

@@ -206,7 +206,7 @@ export function AdminBookingsClient({ initialBookings }: AdminBookingsClientProp
           </div>
 
           {/* Filter Dropdowns & Export Buttons */}
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-start md:justify-end">
             {/* Status Filter */}
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-2xl px-3 py-1.5 text-xs font-bold text-slate-700">
               <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -312,7 +312,7 @@ export function AdminBookingsClient({ initialBookings }: AdminBookingsClientProp
                       ? '16-Pax Minibus'
                       : 'Economy Minivan';
 
-                  const whatsappMsg = `FastForward Shuttle Alert! Ref: ${b.bookingRef}%0ACustomer: ${b.customerName} (${b.customerPhone})%0ARoute: ${b.origin?.name || 'Pickup'} -> ${b.destination?.name || 'Dropoff'}%0APickup Date: ${new Date(b.pickupDateTime).toLocaleString()}%0AVehicle: ${vehicleLabel}%0AFlight: ${b.flightOrTrainNumber || 'None'}%0AFare to Collect: ${b.totalFareEur}€`;
+                  const whatsappMsg = `FranceGo Alert! Ref: ${b.bookingRef}%0ACustomer: ${b.customerName} (${b.customerPhone})%0ARoute: ${b.origin?.name || 'Pickup'} -> ${b.destination?.name || 'Dropoff'}%0APickup Date: ${new Date(b.pickupDateTime).toLocaleString()}%0AVehicle: ${vehicleLabel}%0AFlight: ${b.flightOrTrainNumber || 'None'}%0AFare to Collect: ${b.totalFareEur}€`;
 
                   return (
                     <tr
