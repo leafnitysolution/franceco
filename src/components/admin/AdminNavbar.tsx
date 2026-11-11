@@ -128,25 +128,25 @@ export function AdminNavbar() {
   return (
     <>
       <header className="bg-white border-b border-[#E5D7BC] sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-6 h-16 flex items-center justify-between gap-2 xl:gap-3">
           {/* Brand Logo */}
-          <Link href="/ffs-portal-sec-99x" className="flex items-center gap-2.5 group min-w-0 shrink">
+          <Link href="/ffs-portal-sec-99x" className="flex items-center gap-2.5 group min-w-0 xl:shrink-0">
             <div className="w-9 h-9 shrink-0 rounded-xl bg-gold-600 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:scale-105 transition-transform">
               F
             </div>
-            <div className="min-w-0">
-              <span className="text-xs font-bold text-navy-900 tracking-wider block font-serif truncate whitespace-nowrap">
+            <div className="min-w-0 overflow-hidden leading-tight">
+              <span className="text-[11px] 2xl:text-xs font-bold text-navy-900 tracking-wide block font-serif truncate">
                 FRANCEGO BACK-OFFICE
               </span>
-              <span className="hidden sm:flex text-[10px] text-emerald-700 font-bold items-center gap-1 whitespace-nowrap">
+              <span className="hidden sm:flex text-[10px] text-emerald-700 font-bold items-center gap-1 min-w-0">
                 <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
-                SECURE ADMIN SESSION ACTIVE
+                <span className="truncate">SECURE ADMIN SESSION ACTIVE</span>
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1.5 text-xs font-bold">
+          <nav className="hidden xl:flex items-center gap-1 2xl:gap-1.5 text-[11px] 2xl:text-xs font-bold min-w-0">
             {navItems.map((item) => {
               const active = isActive(item);
               const Icon = item.icon;
@@ -154,13 +154,13 @@ export function AdminNavbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-xl border transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  className={`px-2.5 2xl:px-3 py-1.5 2xl:py-2 rounded-xl border transition-all flex items-center gap-1 2xl:gap-1.5 whitespace-nowrap ${
                     active
                       ? 'bg-[#F7F2E7] text-gold-800 border-[#E5D7BC] shadow-sm font-black'
                       : 'text-slate-600 border-transparent hover:text-navy-900 hover:bg-slate-100/70'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? 'text-gold-600' : 'text-slate-400'}`} />
+                  <Icon className={`w-3.5 h-3.5 2xl:w-4 2xl:h-4 shrink-0 ${active ? 'text-gold-600' : 'text-slate-400'}`} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -168,22 +168,22 @@ export function AdminNavbar() {
           </nav>
 
           {/* Right Actions + Mobile Toggle */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <Link
               href="/"
               target="_blank"
-              className="hidden sm:flex items-center gap-1 text-xs text-slate-600 hover:text-navy-900 font-bold px-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors whitespace-nowrap"
+              className="hidden sm:flex items-center gap-1 text-[11px] 2xl:text-xs text-slate-600 hover:text-navy-900 font-bold px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors whitespace-nowrap"
             >
-              <Home className="w-3.5 h-3.5" />
+              <Home className="w-3.5 h-3.5 shrink-0" />
               <span>View Site</span>
             </Link>
 
             <form action={adminLogoutAction}>
               <button
                 type="submit"
-                className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-[11px] 2xl:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden sm:inline">Logout</span>
               </button>
             </form>
