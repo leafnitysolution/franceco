@@ -312,7 +312,7 @@ export function AdminBookingsClient({ initialBookings }: AdminBookingsClientProp
                       ? '16-Pax Minibus'
                       : 'Economy Minivan';
 
-                  const whatsappMsg = `FranceGo Alert! Ref: ${b.bookingRef}%0ACustomer: ${b.customerName} (${b.customerPhone})%0ARoute: ${b.origin?.name || 'Pickup'} -> ${b.destination?.name || 'Dropoff'}%0APickup Date: ${new Date(b.pickupDateTime).toLocaleString()}%0AVehicle: ${vehicleLabel}%0AFlight: ${b.flightOrTrainNumber || 'None'}%0AFare to Collect: ${b.totalFareEur}€`;
+                  const whatsappMsg = `FranceGo Alert! Ref: ${b.bookingRef}%0ACustomer: ${b.customerName} (${b.customerPhone})%0ARoute: ${b.origin?.name || 'Pickup'} -> ${b.destination?.name || 'Dropoff'}%0APickup Date: ${new Date(b.pickupDateTime).toLocaleString()}%0AVehicle: ${vehicleLabel}%0AFlight: ${b.flightOrTrainNumber || 'None'}%0AFare to Collect: ${formatCurrency(b.totalFareEur)}`;
 
                   return (
                     <tr

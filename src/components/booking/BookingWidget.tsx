@@ -10,6 +10,7 @@ import { LocationDropdown } from './LocationDropdown';
 import { findZoneRoute } from '@/lib/zoneResolver';
 import { TripAdvisorLogo } from '@/components/UI/TrustBadges';
 import { useLanguage } from '@/lib/LanguageContext';
+import { formatCurrency } from '@/lib/utils';
 import { CountryCodePhoneInput } from '@/components/UI/CountryCodePhoneInput';
 import {
   MapPin,
@@ -397,7 +398,7 @@ export function BookingWidget({
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 max-w-sm mx-auto space-y-1.5 text-xs font-bold text-slate-700 text-left">
             <div className="flex justify-between border-b border-slate-200 pb-1.5">
               <span className="text-slate-400">Total Fare:</span>
-              <span className="text-slate-900 font-black">{totalFare} € (Pay Chauffeur)</span>
+              <span className="text-slate-900 font-black">{formatCurrency(totalFare)} (Pay Chauffeur)</span>
             </div>
             <div className="flex justify-between border-b border-slate-200 pb-1.5">
               <span className="text-slate-400">Pickup Date & Time:</span>
@@ -847,7 +848,7 @@ export function BookingWidget({
                   </h3>
                 </div>
                 <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                  Total Fare: {totalFare} €
+                  Total Fare: {formatCurrency(totalFare)}
                 </span>
               </div>
 
@@ -1069,7 +1070,7 @@ export function BookingWidget({
                 </div>
                 <div className="flex justify-between items-center pt-0.5">
                   <span className="text-slate-500">Total Fixed Fare ({t('payOnArrival')}):</span>
-                  <span className="text-lg font-black text-slate-900">{totalFare} €</span>
+                  <span className="text-lg font-black text-slate-900">{formatCurrency(totalFare)}</span>
                 </div>
               </div>
 

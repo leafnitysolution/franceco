@@ -6,11 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('fr-FR', {
+  const safeAmount = Number.isFinite(amount) ? Math.round(amount * 100) / 100 : 0;
+  const fractionDigits = Number.isInteger(safeAmount) ? 0 : 2;
+  return new Intl.NumberFormat('en-IE', {
     style: 'currency',
     currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(amount);
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(safeAmount);
 }
 
 export function generateBookingRef(): string {
@@ -67,7 +70,7 @@ export function buildWhatsAppUrl(booking: {
 👥 *Pax:* ${booking.passengers} | 🧳 *Bags:* ${booking.luggageCount}
 👶 *Child Seats:* ${booking.babySeats} Baby, ${booking.boosterSeats} Booster
 
-💶 *CASH FARE TO COLLECT:* ${booking.totalFareEur}€
+💶 *CASH FARE TO COLLECT:* ${formatCurrency(booking.totalFareEur)}
 ${booking.notes ? `📝 *Notes:* ${booking.notes}` : ''}
 ----------------------------------------
 Please confirm driver assignment.`;

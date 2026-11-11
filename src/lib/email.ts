@@ -176,7 +176,7 @@ export async function sendBookingConfirmationEmails(data: EmailPayload) {
           </table>
 
           <div style="text-align: center;">
-            <a href="https://wa.me/?text=${encodeURIComponent(`FranceGo Alert! Ref: ${data.bookingRef}\nCustomer: ${data.customerName} (${data.customerPhone})\nRoute: ${data.originName} -> ${data.destinationName}\nPickup: ${data.pickupDate} ${data.pickupTime}\nFare: ${data.totalFareEur}€`)}" class="btn">
+            <a href="https://wa.me/?text=${encodeURIComponent(`FranceGo Alert! Ref: ${data.bookingRef}\nCustomer: ${data.customerName} (${data.customerPhone})\nRoute: ${data.originName} -> ${data.destinationName}\nPickup: ${data.pickupDate} ${data.pickupTime}\nFare: ${formatCurrency(data.totalFareEur)}`)}" class="btn">
               📲 Dispatch Chauffeur via WhatsApp
             </a>
           </div>
