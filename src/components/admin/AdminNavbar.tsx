@@ -135,10 +135,10 @@ export function AdminNavbar() {
               F
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-navy-900 tracking-wider block font-serif truncate">
+              <span className="text-xs font-bold text-navy-900 tracking-wider block font-serif truncate whitespace-nowrap">
                 FRANCEGO BACK-OFFICE
               </span>
-              <span className="hidden sm:flex text-[10px] text-emerald-700 font-bold items-center gap-1">
+              <span className="hidden sm:flex text-[10px] text-emerald-700 font-bold items-center gap-1 whitespace-nowrap">
                 <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
                 SECURE ADMIN SESSION ACTIVE
               </span>
